@@ -11,7 +11,6 @@
 
 
 ### Preview
-[Click here](https://phaser-class-extensions.herokuapp.com)
 
 
 ### Install instructions:
