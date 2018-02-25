@@ -1,0 +1,94 @@
+{
+  "primaryWeapons":{
+    "LASER_1": {
+      "type": "laser",
+      "name": "Laser",
+      "damage": 10,
+      "velocity": 35,
+      "number": 3,
+      "cooldown": 500,
+      "pierce": true,
+      "spread": 0,
+      "secondaryExplosion": false,
+      "description":"Description laser 1",
+      "sprite": "powerup1"
+    },
+    "LASER_2": {
+      "type": "laser",
+      "name": "Laser",
+      "damage": 10,
+      "velocity": 35,
+      "number": 3,
+      "cooldown": 500,
+      "pierce": true,
+      "spread": 0,
+      "secondaryExplosion": false,
+      "description":"Description laser 2",
+      "sprite": "powerup1"
+    },
+    "LASER_3": {
+      "type": "laser",
+      "name": "Laser",
+      "damage": 10,
+      "velocity": 35,
+      "number": 3,
+      "cooldown": 500,
+      "pierce": true,
+      "spread": 0,
+      "secondaryExplosion": false,
+      "description":"Description laser 3",
+      "sprite": "powerup1"
+    },    
+    "MISSLES_1": {
+      "type": "spread_missles",
+      "name": "Spread Missles",
+      "damage": 100,
+      "velocity": 10,
+      "number": 3,
+      "cooldown": 700,
+      "pierce": false,
+      "spread": 2,
+      "secondaryExplosion": true,
+      "description":"Description missle 1",
+      "sprite": "powerup1"
+    },
+    "MISSLES_2": {
+      "type": "spread_missles",
+      "name": "Spread Missles",
+      "damage": 100,
+      "velocity": 10,
+      "number": 3,
+      "cooldown": 700,
+      "pierce": false,
+      "spread": 2,
+      "secondaryExplosion": true,
+      "description":"Description missle 2",
+      "sprite": "powerup1"
+    },
+    "MISSLES_3": {
+      "type": "spread_missles",
+      "name": "Spread Missles",
+      "damage": 100,
+      "velocity": 10,
+      "number": 3,
+      "cooldown": 700,
+      "pierce": false,
+      "spread": 2,
+      "secondaryExplosion": true,
+      "description":"Description missle 3",
+      "sprite": "powerup1"
+    }
+  },
+  "secondaryWeapons":{
+    "CLUSTER_1": {
+      "type": "cluster",
+      "name": "Cluster Bombs",
+      "damage": 100,
+      "cooldown": 4000,
+      "bomblets": 10,
+      "description":"Description cluster 1",
+      "sprite": "powerup1"
+    }
+  }
+
+}
