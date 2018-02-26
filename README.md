@@ -11,12 +11,11 @@
 
 
 ### Preview
-[Click here](https://phaser-class-extensions.herokuapp.com)
 
 
 ### Install instructions:
 ```sh
-$ git clone https://github.com/allenRoyston/phaserCreationSuite.git
+$ git clone https://github.com/allenRoyston/saveTheWorld.git
 $ cd phaserCreationSuite
 $ npm install
 ```
