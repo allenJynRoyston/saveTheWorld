@@ -18,6 +18,7 @@ export default {
     }
   },
   mounted(){
+
     this.store.watch(this.store.getters._gameData, val => {
 
     })
@@ -25,7 +26,7 @@ export default {
   },
   methods: {
     init(){
-      //this.loadGame('level1.js')
+      // this.loadGame('level1.js')
       this.loadGame('powerUpMenu.js')
     },
     loadGame(fileName){
@@ -42,10 +43,11 @@ export default {
             __phaser.init(this.$el, this, {width: 640, height: 640, store: this.$store});
           })
     },
-    nextLevel(){
-      this.gameData.level = (this.gameData.level+1);
-      this.store.commit('setGamedata', this.gameData)
-      this.loadGame(`level${this.gameData.level}.js`)
+    test(){
+      this.loadGame('level1.js')
+    },
+    loadShop(){
+      this.loadGame('powerUpMenu.js')
     },
     gameOver(){
       alert("GAME OVER")

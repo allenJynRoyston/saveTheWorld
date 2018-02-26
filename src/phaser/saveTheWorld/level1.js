@@ -62,8 +62,9 @@ var PhaserGameObject = (function () {
             phaserMaster.let('devMode', false);
             phaserMaster.let('starMomentum', { x: 0, y: 0 });
             phaserMaster.let('population', { total: gameData.population.total, killed: gameData.population.killed });
-            phaserMaster.let('primaryWeapon', gameData.primaryWeapon);
+            var primaryWeapon = phaserMaster.let('primaryWeapon', gameData.primaryWeapon);
             phaserMaster.let('secondaryWeapon', gameData.secondaryWeapon);
+            console.log(gameData);
             game.onPause.add(function () {
                 pauseGame();
             }, this);
@@ -266,7 +267,6 @@ var PhaserGameObject = (function () {
                     createChipDamage({ x: this.width - 8, y: this.y, width: Math.round(this.defaultWidth * damageAmount), height: this.height });
                     this.width = (this.defaultWidth - Math.round(this.defaultWidth * damagePercent));
                 }
-                saveData('population', { total: population.total, killed: population.killed });
                 phaserMaster.forceLet('population', population);
             };
             healthbar.onUpdate = function () {
@@ -499,7 +499,6 @@ var PhaserGameObject = (function () {
                 if (spawnMore === void 0) { spawnMore = true; }
                 var score = phaserMaster.get('score');
                 phaserMaster.forceLet('score', score += 100);
-                saveData('score', score);
                 var scoreText = phaserTexts.get('scoreText');
                 scoreText.updateScore();
                 var tween = {
@@ -681,14 +680,23 @@ var PhaserGameObject = (function () {
                 this.checkLocation();
             };
         }
-        function createBullet(options) {
-            BULLET_CLASS;
+        function createBullet(options, isCenter) {
+            if (isCenter === void 0) { isCenter = false; }
             var game = phaserMaster.game();
             var bulletCount = phaserSprites.getGroup('bullets').length;
             var primaryWeapon = phaserMaster.get('primaryWeapon');
-            var bullet = phaserSprites.add({ x: options.x, y: options.y, name: "bullet_" + game.rnd.integer(), group: 'bullets', reference: 'bullet' });
+            var bullet = phaserSprites.add({ y: options.y, name: "bullet_" + game.rnd.integer(), group: 'bullets', reference: 'bullet' });
+            if (options.offset === 0) {
+                bullet.x = options.x - bullet.width / 2;
+            }
+            if (options.offset < 0) {
+                bullet.x = options.x + options.offset - bullet.width;
+            }
+            if (options.offset > 0) {
+                bullet.x = options.x + options.offset - bullet.width / 2;
+            }
             game.physics.enable(bullet, Phaser.Physics.ARCADE);
-            bullet.body.velocity.y = -100;
+            bullet.body.velocity.y = primaryWeapon.initialVelocity;
             phaserGroup.add(2, bullet);
             bullet.accelerate = function () {
                 this.body.velocity.y -= primaryWeapon.velocity;
@@ -891,14 +899,38 @@ var PhaserGameObject = (function () {
                     player.onUpdate();
                 }
                 if (phaserControls.checkWithDelay({ isActive: true, key: 'A', delay: primaryWeapon.cooldown - (phaserControls.read('A').state * 75) })) {
-                    createBullet({ x: player.x, y: player.y, spread: 0, damageMod: 1 });
-                    if (primaryWeapon.number > 1) {
-                        createBullet({ x: player.x + 15, y: player.y, spread: primaryWeapon.spread * -1, damageMod: 0.5 });
-                        createBullet({ x: player.x - 15, y: player.y, spread: primaryWeapon.spread * 1, damageMod: 0.5 });
+                    if (primaryWeapon.number === 1) {
+                        createBullet({ x: player.x, offset: 0, y: player.y, spread: 0, damageMod: 1 });
                     }
-                    if (primaryWeapon.number > 2) {
-                        createBullet({ x: player.x + 30, y: player.y, spread: primaryWeapon.spread * -2, damageMod: 0.5 });
-                        createBullet({ x: player.x - 30, y: player.y, spread: primaryWeapon.spread * -2, damageMod: 0.5 });
+                    if (primaryWeapon.number === 2) {
+                        createBullet({ x: player.x, offset: -20, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: .75 });
+                        createBullet({ x: player.x, offset: 20, y: player.y, spread: primaryWeapon.spread / 2, damageMod: .75 });
+                    }
+                    if (primaryWeapon.number === 3) {
+                        createBullet({ x: player.x, offset: 0, y: player.y, spread: 0, damageMod: 1 });
+                        createBullet({ x: player.x, offset: -30, y: player.y - 10, spread: -primaryWeapon.spread / 2, damageMod: .5 });
+                        createBullet({ x: player.x, offset: 30, y: player.y - 10, spread: primaryWeapon.spread / 2, damageMod: .5 });
+                    }
+                    if (primaryWeapon.number === 4) {
+                        createBullet({ x: player.x, offset: -15, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: .75 });
+                        createBullet({ x: player.x, offset: 15, y: player.y, spread: primaryWeapon.spread / 2, damageMod: .75 });
+                        createBullet({ x: player.x, offset: -40, y: player.y + 10, spread: -primaryWeapon.spread, damageMod: .50 });
+                        createBullet({ x: player.x, offset: 40, y: player.y + 10, spread: primaryWeapon.spread, damageMod: .50 });
+                    }
+                    if (primaryWeapon.number === 5) {
+                        createBullet({ x: player.x, offset: 0, y: player.y, spread: 0, damageMod: 1 });
+                        createBullet({ x: player.x, offset: -30, y: player.y + 10, spread: -primaryWeapon.spread / 2, damageMod: .5 });
+                        createBullet({ x: player.x, offset: 30, y: player.y + 10, spread: primaryWeapon.spread / 2, damageMod: .5 });
+                        createBullet({ x: player.x, offset: -50, y: player.y + 20, spread: -primaryWeapon.spread, damageMod: .25 });
+                        createBullet({ x: player.x, offset: 50, y: player.y + 20, spread: primaryWeapon.spread, damageMod: .25 });
+                    }
+                    if (primaryWeapon.number === 6) {
+                        createBullet({ x: player.x, offset: -15, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: .75 });
+                        createBullet({ x: player.x, offset: 15, y: player.y, spread: primaryWeapon.spread / 2, damageMod: .75 });
+                        createBullet({ x: player.x, offset: -40, y: player.y + 10, spread: -primaryWeapon.spread, damageMod: .50 });
+                        createBullet({ x: player.x, offset: 40, y: player.y + 10, spread: primaryWeapon.spread, damageMod: .50 });
+                        createBullet({ x: player.x, offset: -60, y: player.y + 20, spread: -primaryWeapon.spread, damageMod: .25 });
+                        createBullet({ x: player.x, offset: 60, y: player.y + 20, spread: primaryWeapon.spread, damageMod: .25 });
                     }
                 }
                 if (phaserControls.checkWithDelay({ isActive: true, key: 'B', delay: secondaryWeapon.cooldown })) {
@@ -927,6 +959,10 @@ var PhaserGameObject = (function () {
                 var level = gameData.level++;
                 level++;
                 saveData('level', level);
+                var score = phaserMaster.get('score');
+                saveData('score', score);
+                var population = phaserMaster.get('population');
+                saveData('population', { total: population.total, killed: population.killed });
                 for (var i = 0; i < 20; i++) {
                     setTimeout(function () {
                         createExplosion(game.rnd.integerInRange(0, game.world.width), game.rnd.integerInRange(0, game.world.height), game.rnd.integerInRange(1, 4));
@@ -986,7 +1022,7 @@ var PhaserGameObject = (function () {
             });
         }
         function endGame() {
-            parent.nextLevel();
+            parent.loadShop();
         }
         parent.game = this;
         this.game = phaserMaster.game();

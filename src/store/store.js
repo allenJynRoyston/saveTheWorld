@@ -4,26 +4,69 @@ import weapons from './../phaser/saveTheWorld/resources/json/weaponData.json'
 
 Vue.use(Vuex)
 
+/*  LOAD LOCAL STORAGE AND CHECK IT AGAINST CHECKSUM */
 const primaryWeapon = weapons.primaryWeapons;
 const secondaryWeapon = weapons.secondaryWeapons;
+let localData;
 
+function getChecksumValue(val){
+  let checksum = 0;
+  for (let i = 0; i < val.length; i++) {
+    checksum += val.charCodeAt(i);
+  }
+  return checksum;
+}
 
+function checkChecksum(_localchecksum){
+  let _checksum = getChecksumValue(JSON.stringify(localData))
+  return _checksum === _localchecksum
+}
+
+function createNewLocalData(){
+  let localData = {
+    gameData: {
+      score: 0,
+      level: 1,
+      money: 1000, 
+      primaryWeapon: primaryWeapon.LASER_1,
+      secondaryWeapon: secondaryWeapon.CLUSTER_1,
+      purchaseHistory: [0, 21, 50],
+      population: {
+        total: 100,
+        killed: 0
+      }
+    }
+  };
+  localStorage.setItem('checksum', getChecksumValue(JSON.stringify(localData)) )
+  localStorage.setItem('localData', JSON.stringify(localData));
+  return localData;
+}
+
+try{
+  localData = JSON.parse(localStorage.getItem('localData'));
+  let _localchecksum = parseInt(localStorage.getItem('checksum'));
+  if(localData === null || !checkChecksum(_localchecksum)){
+    localData = createNewLocalData();
+  }
+}
+catch(err){
+  localData = createNewLocalData();
+}
+
+function saveToLocal(gameData){
+  localData.gameData = gameData;
+  localStorage.setItem('checksum', getChecksumValue(JSON.stringify(localData)) )
+  localStorage.setItem('localData', JSON.stringify(localData));
+}
+
+/* STORE DATA */
 export default new Vuex.Store({
   state: {
     appReady: false,
     isActive: false,
     progressBar: 0,
     headerIsOpen: true,
-    gameData: {
-      score: 0,
-      level: 1,
-      primaryWeapon: primaryWeapon.LASER_1,
-      secondaryWeapon: secondaryWeapon.CLUSTER_1,
-      population: {
-        total: 100,
-        killed: 0
-      }
-    }
+    gameData: localData.gameData
   },
   getters: {
     _appReady: state => () => state.appReady,
@@ -50,6 +93,7 @@ export default new Vuex.Store({
     },
     setGamedata (state, value) {
       state.gameData = value
+      saveToLocal(state.gameData)
     }
   }
 })

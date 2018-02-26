@@ -1,93 +1,113 @@
 {
   "primaryWeapons":{
     "LASER_1": {
-      "type": "laser",
+      "id": 0,
+      "type": "primaryWeapon",
       "name": "Laser",
       "damage": 10,
+      "initialVelocity": -200,
       "velocity": 35,
-      "number": 3,
+      "number": 2,
       "cooldown": 500,
       "pierce": true,
       "spread": 0,
       "secondaryExplosion": false,
       "description":"Description laser 1",
-      "sprite": "powerup1"
+      "sprite": "powerup1",
+      "price": 0
     },
     "LASER_2": {
-      "type": "laser",
+      "id": 1,
+      "type": "primaryWeapon",
       "name": "Laser",
       "damage": 10,
+      "initialVelocity": -200,
       "velocity": 35,
-      "number": 3,
+      "number": 4,
       "cooldown": 500,
       "pierce": true,
       "spread": 0,
       "secondaryExplosion": false,
       "description":"Description laser 2",
-      "sprite": "powerup1"
+      "sprite": "powerup1",
+      "price": 100
     },
     "LASER_3": {
-      "type": "laser",
+      "id": 2,
+      "type": "primaryWeapon",
       "name": "Laser",
       "damage": 10,
+      "initialVelocity": -200,
       "velocity": 35,
-      "number": 3,
+      "number": 6,
       "cooldown": 500,
       "pierce": true,
       "spread": 0,
       "secondaryExplosion": false,
       "description":"Description laser 3",
-      "sprite": "powerup1"
-    },    
+      "sprite": "powerup1",
+      "price": 100
+    },
     "MISSLES_1": {
-      "type": "spread_missles",
+      "id": 21,
+      "type": "primaryWeapon",
       "name": "Spread Missles",
       "damage": 100,
+      "initialVelocity": 50,
       "velocity": 10,
-      "number": 3,
-      "cooldown": 700,
+      "number": 1,
+      "cooldown": 800,
       "pierce": false,
-      "spread": 2,
+      "spread": 0,
       "secondaryExplosion": true,
       "description":"Description missle 1",
-      "sprite": "powerup1"
+      "sprite": "powerup1",
+      "price": 0
     },
     "MISSLES_2": {
-      "type": "spread_missles",
+      "id": 22,
+      "type": "primaryWeapon",
       "name": "Spread Missles",
       "damage": 100,
+      "initialVelocity": 50,
       "velocity": 10,
-      "number": 3,
+      "number": 2,
       "cooldown": 700,
       "pierce": false,
-      "spread": 2,
+      "spread": 0.5,
       "secondaryExplosion": true,
       "description":"Description missle 2",
-      "sprite": "powerup1"
+      "sprite": "powerup1",
+      "price": 100
     },
     "MISSLES_3": {
-      "type": "spread_missles",
+      "id": 23,
+      "type": "primaryWeapon",
       "name": "Spread Missles",
       "damage": 100,
+      "initialVelocity": 150,
       "velocity": 10,
       "number": 3,
       "cooldown": 700,
       "pierce": false,
-      "spread": 2,
+      "spread": 1,
       "secondaryExplosion": true,
       "description":"Description missle 3",
-      "sprite": "powerup1"
+      "sprite": "powerup1",
+      "price": 100
     }
   },
   "secondaryWeapons":{
     "CLUSTER_1": {
-      "type": "cluster",
+      "id": 50,
+      "type": "secondaryWeapon",
       "name": "Cluster Bombs",
       "damage": 100,
       "cooldown": 4000,
       "bomblets": 10,
       "description":"Description cluster 1",
-      "sprite": "powerup1"
+      "sprite": "powerup1",
+      "price": 100
     }
   }
 
