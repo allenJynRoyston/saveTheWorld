@@ -26,8 +26,8 @@ export default {
   },
   methods: {
     init(){
-      // this.loadGame('level1.js')
-      this.loadGame('powerUpMenu.js')
+      this.loadGame('level1.js')
+      //this.loadGame('powerUpMenu.js')
     },
     loadGame(fileName){
       // remove old game first

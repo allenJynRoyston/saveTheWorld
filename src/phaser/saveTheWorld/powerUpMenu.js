@@ -19,11 +19,7 @@ var PhaserGameObject = (function () {
             game.load.enableParallel = true;
             game.stage.backgroundColor = '#2f2f2f';
             var folder = 'src/phaser/saveTheWorld/resources';
-            game.load.image('texture', folder + "/images/cyberglow.png");
-            game.load.image('equipped', folder + "/images/gem.png");
-            game.load.image('purchased', folder + "/images/player.png");
-            game.load.image('powerup1', folder + "/images/bulletBtn.png");
-            game.load.image('pointer', folder + "/images/ship.png");
+            game.load.atlas('atlas', folder + "/spritesheets/sprites.png", folder + "/spritesheets/sprites.json", Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
             game.load.bitmapFont('gem', folder + "/fonts/gem.png", folder + "/fonts/gem.xml");
             game.load.json('weaponData', folder + "/json/weaponData.json");
             phaserMaster.changeState('PRELOAD');
@@ -64,6 +60,22 @@ var PhaserGameObject = (function () {
                     callback();
                 }, duration);
             };
+            var tilebg1 = phaserSprites.addTilespriteFromAtlas({ name: 'tilebg1', group: 'ui', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas', filename: 'asteroidsbg.png' });
+            phaserGroup.add(1, tilebg1);
+            tilebg1.count = 0;
+            tilebg1.onUpdate = function () {
+                this.count += 0.005;
+                this.tilePosition.x -= Math.sin(this.count) * 4;
+                this.tilePosition.y -= Math.cos(this.count) * 4;
+            };
+            var tilebg2 = phaserSprites.addTilespriteFromAtlas({ name: 'tilebg2', group: 'ui', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas', filename: 'asteroidsbg.png' });
+            tilebg2.count = 0;
+            tilebg2.onUpdate = function () {
+                this.count += 0.005;
+                this.tilePosition.x += Math.sin(this.count) * 2;
+                this.tilePosition.y += Math.cos(this.count) * 2;
+            };
+            phaserGroup.add(2, tilebg2);
             var padding = 15;
             var header = phaserTexts.add({ name: 'header', font: 'gem', size: 18, default: 'Purchase Powerups!' });
             phaserTexts.alignToTopCenter('header', 10);
@@ -120,7 +132,8 @@ var PhaserGameObject = (function () {
             var columns = 0;
             var centerX;
             weaponList.forEach(function (weapon, index) {
-                var sprite = phaserSprites.add({ name: "powerUp_" + index, reference: "" + weapon.sprite });
+                var sprite = phaserSprites.addFromAtlas({ name: "powerUp_" + index, atlas: 'atlas', group: 'powerup', filename: weapon.spriteIcon + ".png" });
+                sprite.scale.setTo(0.5, 0.5);
                 centerX = (game.canvas.width / desiredColumns) * (columns) + ((game.canvas.width / desiredColumns) / 2) - (sprite.width / 2);
                 sprite.x = centerX;
                 sprite.y = (rows * 200) + 100;
@@ -140,7 +153,7 @@ var PhaserGameObject = (function () {
                 phaserGroup.add(5, sprite);
                 phaserGroup.addMany(6, [equippedSprite, purchasedSprites]);
             });
-            var pointer = phaserSprites.add({ x: 0, y: 0, name: "pointer", reference: "pointer" });
+            var pointer = phaserSprites.addFromAtlas({ x: 0, y: 0, name: "pointer", atlas: 'atlas', filename: "pointer.png" });
             phaserGroup.add(6, pointer);
             checkForEquipped();
             checkForPurchases();
@@ -189,8 +202,8 @@ var PhaserGameObject = (function () {
         function updatePointer(index) {
             var powerUp = phaserSprites.get("powerUp_" + index);
             var pointer = phaserSprites.get('pointer');
-            pointer.x = powerUp.x - 27;
-            pointer.y = powerUp.y + powerUp.height + 20;
+            pointer.x = powerUp.x - 32;
+            pointer.y = powerUp.y + 30;
         }
         function updateDescription(index) {
             var weaponList = phaserMaster.get('weaponList');
@@ -254,23 +267,26 @@ var PhaserGameObject = (function () {
         }
         function update() {
             var game = phaserMaster.game();
+            phaserSprites.getGroup('ui').forEach(function (sprite) {
+                sprite.onUpdate();
+            });
             if (phaserMaster.checkState('READY')) {
-                if (phaserControls.checkWithDelay({ isActive: true, key: 'LEFT', delay: 250 })) {
+                if (phaserControls.checkWithDelay({ isActive: true, key: 'LEFT', delay: 150 })) {
                     updateColumn(-1);
                 }
-                if (phaserControls.checkWithDelay({ isActive: true, key: 'RIGHT', delay: 250 })) {
+                if (phaserControls.checkWithDelay({ isActive: true, key: 'RIGHT', delay: 150 })) {
                     updateColumn(1);
                 }
-                if (phaserControls.checkWithDelay({ isActive: true, key: 'UP', delay: 250 })) {
+                if (phaserControls.checkWithDelay({ isActive: true, key: 'UP', delay: 150 })) {
                     updateColumn(-(phaserMaster.get('columns')));
                 }
-                if (phaserControls.checkWithDelay({ isActive: true, key: 'DOWN', delay: 250 })) {
+                if (phaserControls.checkWithDelay({ isActive: true, key: 'DOWN', delay: 150 })) {
                     updateColumn((phaserMaster.get('columns')));
                 }
-                if (phaserControls.checkWithDelay({ isActive: true, key: 'START', delay: 250 })) {
+                if (phaserControls.checkWithDelay({ isActive: true, key: 'START', delay: 150 })) {
                     makePurchaseOrEquip();
                 }
-                if (phaserControls.checkWithDelay({ isActive: true, key: 'BACK', delay: 250 })) {
+                if (phaserControls.checkWithDelay({ isActive: true, key: 'BACK', delay: 150 })) {
                     end();
                 }
             }
@@ -1108,6 +1124,55 @@ var PHASER_SPRITE_MANAGER = (function () {
             console.log("Duplicate key name not allowed: " + params.name);
         }
     };
+    PHASER_SPRITE_MANAGER.prototype.addFromAtlas = function (params) {
+        var duplicateCheck = this.sprites.array.filter(function (obj) {
+            return obj.name === params.name;
+        });
+        if (duplicateCheck.length === 0) {
+            params.x = params.x !== undefined ? params.x : 0;
+            params.y = params.y !== undefined ? params.y : 0;
+            params.group = params.group !== undefined ? params.group : null;
+            params.visible = params.visible !== undefined ? params.visible : true;
+            var newSprite = this.game.add.sprite(params.x, params.y, params.atlas, params.filename);
+            newSprite.name = params.name;
+            newSprite.group = params.group;
+            newSprite.defaultPosition = { x: params.x, y: params.y };
+            newSprite.visible = params.visible;
+            newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
+            newSprite.getDefaultPositions = function () { return this.defaultPosition; };
+            this.sprites.array.push(newSprite);
+            this.sprites.object[params.name] = newSprite;
+            return newSprite;
+        }
+        else {
+            console.log("Duplicate key name not allowed: " + params.name);
+        }
+    };
+    PHASER_SPRITE_MANAGER.prototype.addTilespriteFromAtlas = function (params) {
+        console.log(params);
+        var duplicateCheck = this.sprites.array.filter(function (obj) {
+            return obj.name === params.name;
+        });
+        if (duplicateCheck.length === 0) {
+            params.x = params.x !== undefined ? params.x : 0;
+            params.y = params.y !== undefined ? params.y : 0;
+            params.group = params.group !== undefined ? params.group : null;
+            params.visible = params.visible !== undefined ? params.visible : true;
+            var newSprite = this.game.add.tileSprite(params.x, params.y, params.width, params.height, params.atlas, params.filename);
+            newSprite.name = params.name;
+            newSprite.group = params.group;
+            newSprite.defaultPosition = { x: params.x, y: params.y };
+            newSprite.visible = params.visible;
+            newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
+            newSprite.getDefaultPositions = function () { return this.defaultPosition; };
+            this.sprites.array.push(newSprite);
+            this.sprites.object[params.name] = newSprite;
+            return newSprite;
+        }
+        else {
+            console.log("Duplicate key name not allowed: " + params.name);
+        }
+    };
     PHASER_SPRITE_MANAGER.prototype.destroy = function (name) {
         if (this.sprites.object[name] !== undefined) {
             var destroyed = [];
@@ -1385,37 +1450,4 @@ var PHASER_TEXT_MANAGER = (function () {
         return text;
     };
     return PHASER_TEXT_MANAGER;
-}());
-var BULLET_CLASS = (function () {
-    function BULLET_CLASS(Phaser, PHASER_MASTER, PHASER_GROUP, PHASER_SPRITES, WEAPON_DATA, COLLIDABLES, options) {
-        this.game = PHASER_MASTER.game();
-        var bulletCount = PHASER_SPRITES.getGroup('bullets').length;
-        var primaryWeapon = PHASER_MASTER.get('primaryWeapon');
-        this.bullet = PHASER_SPRITES.add({ x: options.x, y: options.y, name: "bullet_" + this.game.rnd.integer(), group: 'bullets', reference: 'bullet' });
-        this.game.physics.enable(this.bullet, Phaser.Physics.ARCADE);
-        this.bullet.body.velocity.y = -100;
-        PHASER_GROUP.add(2, this.bullet);
-        this.COLLIDABLES = COLLIDABLES;
-        this.bullet.onUpdate = this.onUpdate();
-    }
-    BULLET_CLASS.prototype.accelerate = function () {
-    };
-    BULLET_CLASS.prototype.destroyIt = function () {
-    };
-    BULLET_CLASS.prototype.onUpdate = function () {
-        var _this = this;
-        this.accelerate();
-        if (this.y < 0) {
-            this.destroyIt();
-        }
-        this.COLLIDABLES.forEach(function (target) {
-            target.game.physics.arcade.overlap(_this, target, function (bullet, target) {
-                if (!_this.WEAPON_DATA.pierce) {
-                    bullet.destroyIt();
-                }
-                target.damageIt(_this.WEAPON_DATA.damage * _this.options.damageMod);
-            }, null, _this);
-        });
-    };
-    return BULLET_CLASS;
 }());

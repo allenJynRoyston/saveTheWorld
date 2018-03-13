@@ -19,14 +19,10 @@ var PhaserGameObject = (function () {
             game.load.enableParallel = true;
             game.stage.backgroundColor = '#2f2f2f';
             var folder = 'src/phaser/saveTheWorld/resources';
-            game.load.image('bullet', folder + "/images/bullet.png");
-            game.load.image('bomb', folder + "/images/enemy-bullet.png");
-            game.load.spritesheet('invader', folder + "/images/invader32x32x4.png", 32, 32);
-            game.load.image('player', folder + "/images/ship.png");
-            game.load.spritesheet('kaboom', folder + "/images/explode.png", 128, 128);
             game.load.image('background', folder + "/images/starfield.png");
-            game.load.image('particlefx', folder + "/images/gem.png");
-            game.load.image('earth', folder + "/images/earth.png");
+            game.load.atlas('atlas_main', folder + "/spritesheets/main/main.png", folder + "/spritesheets/main/main.json", Phaser.Loader.TEXTURE_atlas_main_JSON_HASH);
+            game.load.atlas('atlas_space', folder + "/spritesheets/space/space.png", folder + "/spritesheets/space/space.json", Phaser.Loader.TEXTURE_atlas_main_JSON_HASH);
+            game.load.json('weaponData', folder + "/json/weaponData.json");
             game.load.bitmapFont('gem', folder + "/fonts/gem.png", folder + "/fonts/gem.xml");
             phaserMaster.changeState('PRELOAD');
             new PHASER_PRELOADER({ game: game, delayInSeconds: 0, done: function () { preloadComplete(); } });
@@ -53,18 +49,18 @@ var PhaserGameObject = (function () {
             phaserBmd.assign(game);
             phaserTexts.assign(game);
             phaserButtons.assign(game);
-            phaserGroup.assign(game);
+            phaserGroup.assign(game, 15);
             phaserBitmapdata.assign(game);
             phaserMaster.let('score', gameData.score);
             phaserMaster.let('roundTime', 30);
             phaserMaster.let('clock', game.time.create(false));
             phaserMaster.let('elapsedTime', 0);
-            phaserMaster.let('devMode', false);
+            phaserMaster.let('devMode', true);
             phaserMaster.let('starMomentum', { x: 0, y: 0 });
             phaserMaster.let('population', { total: gameData.population.total, killed: gameData.population.killed });
-            var primaryWeapon = phaserMaster.let('primaryWeapon', gameData.primaryWeapon);
-            phaserMaster.let('secondaryWeapon', gameData.secondaryWeapon);
-            console.log(gameData);
+            var weaponData = game.cache.getJSON('weaponData');
+            var pw = phaserMaster.let('primaryWeapon', weaponData.primaryWeapons[gameData.primaryWeapon]);
+            var sw = phaserMaster.let('secondaryWeapon', weaponData.secondaryWeapons[gameData.secondaryWeapon]);
             game.onPause.add(function () {
                 pauseGame();
             }, this);
@@ -101,16 +97,14 @@ var PhaserGameObject = (function () {
             filter.setResolution(1920, 1080);
             sprite.filters = [filter];
             phaserGroup.add(0, sprite);
-            var particlesSprite = phaserBmd.addGradient({ name: 'blockBmp', group: 'particles', start: '#FFFF00', end: '#ff8100', width: 2, height: 2, render: false });
-            var emitter = phaserMaster.let('emitter', game.add.emitter(game, 0, 0, 1000));
-            emitter.makeParticles(particlesSprite);
+            var emitter = phaserMaster.let('emitter', game.add.emitter(game, 0, 0, 5000));
+            emitter.makeParticles('atlas_main', 'particle.png');
             emitter.gravity = 0;
             phaserGroup.layer(1).add(emitter);
-            var stars = phaserBmd.addGradient({ name: 'starBmp', group: 'blockBmpGroup', start: '#ffffff', end: '#ffffff', width: 1, height: 1, render: false });
             var _loop_1 = function () {
-                var star = phaserSprites.add({ name: "star_" + i, group: 'movingStarField', x: game.rnd.integerInRange(0, game.world.width), y: game.rnd.integerInRange(0, game.world.height), reference: stars });
+                var star = phaserSprites.addFromAtlas({ x: game.rnd.integerInRange(0, game.world.width), y: game.rnd.integerInRange(0, game.world.height), name: "star_" + i, group: 'movingStarField', filename: "stars_layer_" + game.rnd.integerInRange(1, 3) + ".png", atlas: 'atlas_main', visible: true });
                 star.starType = game.rnd.integerInRange(1, 3);
-                star.scale.setTo(star.starType, star.starType);
+                star.scale.setTo(star.starType / 2, star.starType / 2);
                 star.onUpdate = function () {
                     var baseMomentum = 0.25 + (3 - star.starType) * 5;
                     var starMomentum = phaserMaster.get('starMomentum');
@@ -137,7 +131,7 @@ var PhaserGameObject = (function () {
                         starMomentum.y += 0.05;
                     }
                     this.x += (3 - star.starType) * starMomentum.x;
-                    this.y += (baseMomentum + starMomentum.y);
+                    this.y += (baseMomentum + ((3 - star.starType) * starMomentum.y));
                 };
                 star.fadeOut = function () {
                     this.game.add.tween(this).to({ alpha: 0 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, game.rnd.integerInRange(0, 500), 0, false).autoDestroy = true;
@@ -147,8 +141,20 @@ var PhaserGameObject = (function () {
             for (var i = 0; i < 25; i++) {
                 _loop_1();
             }
-            var earth = phaserSprites.add({ reference: 'earth', name: 'earth', group: 'earth', x: this.game.world.centerX, y: this.game.canvas.height + 900 });
-            earth.scale.setTo(3.5, 3.5);
+            var nebula1 = phaserSprites.addTilespriteFromAtlas({ name: 'nebula1', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_space', filename: 'Nebula1.png' });
+            nebula1.count = 0;
+            nebula1.onUpdate = function () {
+                this.count += 0.005;
+                this.tilePosition.x -= Math.sin(this.count) * 0.2;
+            };
+            var nebula2 = phaserSprites.addTilespriteFromAtlas({ name: 'nebula2', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_space', filename: 'Nebula2.png' });
+            nebula2.count = 0;
+            nebula2.onUpdate = function () {
+                this.count += 0.005;
+                this.tilePosition.y += 0.2;
+            };
+            var earth = phaserSprites.addFromAtlas({ x: this.game.world.centerX, y: this.game.canvas.height + 400, name: "earth", group: 'spaceGroup', filename: 'earth.png', atlas: 'atlas_space', visible: true });
+            earth.scale.setTo(2, 2);
             earth.anchor.setTo(0.5, 0.5);
             earth.onUpdate = function () {
                 earth.angle += 0.01;
@@ -165,8 +171,56 @@ var PhaserGameObject = (function () {
                     }, 100 * i_1);
                 }
             };
-            phaserGroup.add(2, earth);
-            var timeSeconds = phaserTexts.add({ name: 'timeSeconds', group: 'timeKeeper', font: 'gem', size: 65, default: "25", visible: false });
+            phaserGroup.addMany(2, [earth]);
+            phaserGroup.addMany(1, [nebula1, nebula2]);
+            var timeContainer = phaserSprites.addFromAtlas({ name: "timerContainer", group: 'ui', filename: 'ui_container1.png', atlas: 'atlas_main', visible: false });
+            phaserSprites.centerOnPoint('timerContainer', this.game.world.centerX, -200);
+            timeContainer.reveal = function () {
+                this.visible = true;
+                this.game.add.tween(this).to({ y: 5 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
+            };
+            timeContainer.hide = function () {
+            };
+            var roundContainer = phaserSprites.addFromAtlas({ name: "roundContainer", group: 'ui', filename: 'ui_container2.png', atlas: 'atlas_main', visible: false });
+            roundContainer.reveal = function () {
+                this.x = 10;
+                this.y = -200;
+                this.visible = true;
+                this.game.add.tween(this).to({ y: 5 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
+            };
+            roundContainer.hide = function () {
+            };
+            var healthContainer = phaserSprites.addFromAtlas({ name: "healthContainer", group: 'ui', filename: 'ui_healthbar.png', atlas: 'atlas_main', visible: false });
+            healthContainer.reveal = function () {
+                this.x = -this.width;
+                this.y = this.game.world.height - this.height - 10;
+                this.visible = true;
+                this.game.add.tween(this).to({ x: 10 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false).
+                    onComplete.add(function () {
+                    var healthBar = phaserSprites.addFromAtlas({ x: healthContainer.x + 84, y: healthContainer.y + 46, name: "healthBar", group: 'ui_overlay', filename: 'ui_health.png', atlas: 'atlas_main', visible: true });
+                    var maskhealth = phaserMaster.let('healthBar', phaserSprites.addBasicMaskToSprite(healthBar));
+                    maskhealth.x = -healthBar.width;
+                    updateShipHealthbar(100);
+                    var specialBar = phaserSprites.addFromAtlas({ x: healthContainer.x + 84, y: healthContainer.y + 26, name: "specialBar", group: 'ui_overlay', filename: 'specialBar.png', atlas: 'atlas_main', visible: true });
+                    var maskspecial = phaserMaster.let('specialBar', phaserSprites.addBasicMaskToSprite(specialBar));
+                    maskspecial.x = -specialBar.width;
+                    updateShipSpecial(100);
+                    phaserGroup.addMany(14, [healthBar, specialBar]);
+                });
+            };
+            healthContainer.hide = function () {
+            };
+            var shieldContainer = phaserSprites.addFromAtlas({ name: "shieldContainer", group: 'ui', filename: 'ui_shield.png', atlas: 'atlas_main', visible: false });
+            shieldContainer.reveal = function () {
+                this.x = this.game.world.width + this.width;
+                this.y = this.game.world.height - this.height - 10;
+                this.visible = true;
+                this.game.add.tween(this).to({ x: this.game.world.width - this.width - 10 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
+            };
+            shieldContainer.hide = function () {
+            };
+            phaserGroup.addMany(13, [timeContainer, healthContainer, shieldContainer]);
+            var timeSeconds = phaserTexts.add({ name: 'timeSeconds', group: 'timeKeeper', font: 'gem', size: 65, default: "00", visible: false });
             phaserTexts.alignToTopCenter('timeSeconds', 20);
             timeSeconds.onUpdate = function () {
                 var totalTime = phaserMaster.get('elapsedTime');
@@ -193,15 +247,10 @@ var PhaserGameObject = (function () {
             var scoreText = phaserTexts.add({ name: 'scoreText', group: 'ui', x: 10, y: 10, font: 'gem', size: 18, default: "Score: " + phaserMaster.get('score'), visible: false });
             scoreText.onUpdate = function () { };
             scoreText.updateScore = function () {
-                this.setText("Score: " + phaserMaster.get('score'));
             };
             scoreText.reveal = function () {
-                this.y = -this.height;
-                this.visible = true;
-                game.add.tween(this).to({ y: 10 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
             };
             scoreText.hide = function () {
-                game.add.tween(this).to({ y: -100 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
             };
             var roundText = phaserTexts.add({ name: 'roundText', group: 'ui', x: game.world.width - 100, y: 10, font: 'gem', size: 18, default: "Round: " + gameData.level, visible: false });
             roundText.onUpdate = function () { };
@@ -215,18 +264,12 @@ var PhaserGameObject = (function () {
             };
             var healthText = phaserTexts.add({ name: 'healthText', group: 'ui', font: 'gem', x: 15, y: game.canvas.height - 23, size: 16, default: '', visible: false });
             healthText.onUpdate = function () {
-                var pop = phaserMaster.get('population');
-                this.setText("Population: " + (pop.total - pop.killed) * 7000000);
             };
             healthText.reveal = function () {
-                this.x = -this.width;
-                this.visible = true;
-                this.game.add.tween(this).to({ x: 15 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
             };
             healthText.hide = function () {
-                this.game.add.tween(this).to({ x: -this.width - 100 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
             };
-            phaserGroup.addMany(9, [scoreText, roundText, timeSeconds]);
+            phaserGroup.addMany(11, [scoreText, roundText, timeSeconds]);
             var overlaybmd = phaserBitmapdata.addGradient({ name: 'overlaybmd', start: '#2f2f2f', end: '#2f2f2f', width: 5, height: 5, render: false });
             var overlay = phaserSprites.add({ x: 0, y: 0, name: "overlay", reference: overlaybmd.cacheBitmapData, visible: true });
             overlay.width = game.canvas.width;
@@ -250,74 +293,37 @@ var PhaserGameObject = (function () {
             healthbar.defaultWidth = healthbar.width;
             healthbar.width = (healthbar.width - Math.round(healthbar.width * (gameData.population.killed / gameData.population.total)));
             healthbar.takeDamage = function (val) {
-                var population = phaserMaster.get('population');
-                population.killed += val;
-                var damageAmount = (val / population.total);
-                var damagePercent = (population.killed / population.total);
-                if (damagePercent >= 1) {
-                    population = { total: population.total, killed: population.total };
-                    if (phaserMaster.getCurrentState() !== 'GAMEOVER') {
-                        var healthText_1 = phaserTexts.get('healthText');
-                        healthText_1.setText("");
-                        this.width = 0;
-                        gameOver();
-                    }
-                }
-                else {
-                    createChipDamage({ x: this.width - 8, y: this.y, width: Math.round(this.defaultWidth * damageAmount), height: this.height });
-                    this.width = (this.defaultWidth - Math.round(this.defaultWidth * damagePercent));
-                }
-                phaserMaster.forceLet('population', population);
             };
             healthbar.onUpdate = function () {
             };
             healthbar.reveal = function () {
-                this.y = game.canvas.height + 100;
-                this.visible = true;
-                this.game.add.tween(this).to({ y: game.canvas.height - 25 }, 1500, Phaser.Easing.Linear.In, true, 0, 0, false);
             };
             healthbar.hide = function () {
-                this.game.add.tween(this).to({ y: game.canvas.height + 100 }, 1500, Phaser.Easing.Elastic.InOut, true, 0, 0, false);
             };
             phaserBitmapdata.addGradient({ name: 'chipDamageBmp', group: 'chipdamage', start: '#2f3640', end: '#e84118', width: 1, height: 20, render: false });
             phaserGroup.addMany(9, [healthbar]);
-            var specialWeapon = phaserSprites.add({ x: -100, y: game.canvas.height - 55, name: "specialWeapon", group: 'ui', reference: 'bomb', visible: false });
+            var specialWeapon = phaserSprites.addFromAtlas({ x: -150, y: game.canvas.height - 55, name: "specialWeapon", group: 'ui', filename: 'clusterBomb.png', atlas: 'atlas_main', visible: false });
+            specialWeapon.angle = 90;
             specialWeapon.anchor.setTo(0.5, 0.5);
-            specialWeapon.scale.setTo(2, 2);
-            specialWeapon.onUpdate = function () { };
+            specialWeapon.scale.setTo(1, 1);
+            specialWeapon.onUpdate = function () {
+                this.angle += 2;
+            };
             specialWeapon.reveal = function () {
-                this.visible = true;
-                this.game.add.tween(this).to({ x: 30 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
             };
             specialWeapon.hide = function () {
-                this.visible = true;
-                this.game.add.tween(this).to({ x: -100 }, Phaser.Timer.SECOND, Phaser.Easing.Back.OutIn, true, 0, 0, false);
             };
             specialWeapon.onPress = function (delay) {
-                var _this = this;
-                var spt = phaserTexts.get('specialWeaponText');
-                this.alpha = 0.25;
-                spt.alpha = 0.5;
-                spt.setText('Reloading...');
-                this.game.add.tween(this).to({ alpha: 1 }, delay - 50, Phaser.Easing.Linear.In, true, 0, 0, false);
-                game.time.events.add(delay - 50, function () {
-                    _this.alpha = 1;
-                    spt.alpha = 1;
-                    spt.resetText();
-                }, this);
             };
-            var specialWeaponText = phaserTexts.add({ name: 'specialWeaponText', group: 'ui', font: 'gem', x: -100, y: game.canvas.height - 63, size: 16, default: '', visible: false });
+            var specialWeaponText = phaserTexts.add({ name: 'specialWeaponText', group: 'ui', font: 'gem', x: -150, y: game.canvas.height - 63, size: 16, default: '', visible: false });
             specialWeaponText.resetText = function () {
-                this.setText('Cluster Bombs');
+                var swpn = phaserMaster.get('secondaryWeapon');
+                this.setText(swpn.name);
             };
             specialWeaponText.onUpdate = function () { };
             specialWeaponText.reveal = function () {
-                this.resetText();
-                this.visible = true;
-                this.game.add.tween(this).to({ x: 55 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
             };
             specialWeaponText.hide = function () {
-                this.game.add.tween(this).to({ x: -100 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false);
             };
             phaserGroup.addMany(9, [specialWeapon, specialWeaponText]);
         }
@@ -325,7 +331,7 @@ var PhaserGameObject = (function () {
             var game = phaserMaster.game();
             var isDevMode = phaserMaster.get('devMode');
             var player = createPlayer();
-            phaserSprites.get('overlay').fadeOut(Phaser.Timer.SECOND / 2, function () {
+            phaserSprites.get('overlay').fadeOut(isDevMode ? 0 : Phaser.Timer.SECOND / 2, function () {
                 playSequence('SAVE THE WORLD', function () {
                     player.moveToStart();
                     game.time.events.add(isDevMode ? Phaser.Timer.SECOND * 0 : Phaser.Timer.SECOND * 1, function () {
@@ -348,6 +354,23 @@ var PhaserGameObject = (function () {
                 });
             });
         }
+        function updateShipHealthbar(remaining, immediate, duration) {
+            if (immediate === void 0) { immediate = false; }
+            if (duration === void 0) { duration = Phaser.Timer.SECOND / 3; }
+            var game = phaserMaster.game();
+            var mask = phaserMaster.get('healthBar');
+            var bars = Math.ceil(30 * (remaining * .01));
+            game.add.tween(mask).to({ x: -231 + (7.7 * bars) }, immediate ? 1 : duration, Phaser.Easing.Linear.Out, true, 0, 0, false);
+        }
+        function updateShipSpecial(remaining, immediate, duration) {
+            if (immediate === void 0) { immediate = false; }
+            if (duration === void 0) { duration = Phaser.Timer.SECOND / 3; }
+            var game = phaserMaster.game();
+            var mask = phaserMaster.get('specialBar');
+            var bars = Math.ceil(6 * (remaining * .01));
+            console.log(duration);
+            game.add.tween(mask).to({ x: -48 + (8 * bars) }, immediate ? 1 : duration, Phaser.Easing.Linear.Out, true, 0, 0, false);
+        }
         function playSequence(wordString, callback) {
             var game = phaserMaster.game();
             var wordlist = wordString.split(" ");
@@ -368,21 +391,44 @@ var PhaserGameObject = (function () {
             });
             game.time.events.add(Phaser.Timer.SECOND / 2.5 * wordlist.length, callback, this).autoDestroy = true;
         }
+        function createShipExhaust() {
+            var shipExhaust = phaserSprites.addFromAtlas({ name: 'exhaust', group: 'playership', atlas: 'atlas_main', filename: 'exhaust_red_1.png', visible: false });
+            shipExhaust.animations.add('exhaust_animation', Phaser.Animation.generateFrameNames('exhaust_red_', 1, 8, '.png'), 1, true);
+            shipExhaust.animations.play('exhaust_animation', 30, true);
+            phaserGroup.add(8, shipExhaust);
+            shipExhaust.onUpdate = function () {
+                var player = phaserSprites.get('player');
+                var x = player.x, width = player.width, height = player.height, y = player.y, visible = player.visible;
+                this.visible = !phaserMaster.checkState('ENDLEVEL') ? visible : false;
+                this.x = x - 17;
+                this.y = y + 8;
+            };
+            shipExhaust.updateCords = function (x, y) {
+                this.x = x - 17;
+                this.y = y + 8;
+            };
+            shipExhaust.destroyIt = function () {
+                phaserSprites.destroy('exhaust');
+            };
+        }
         function createPlayer() {
             var game = phaserMaster.game();
-            var player = phaserSprites.add({ name: 'player', reference: 'player', visible: false });
+            var player = phaserSprites.addFromAtlas({ name: 'player', group: 'playership', atlas: 'atlas_main', filename: 'ship_body.png', visible: false });
             player.anchor.setTo(0.5, 0.5);
-            player.scale.setTo(0.5, 0.5);
+            player.scale.setTo(1, 1);
             player.isInvincible = true;
             game.physics.enable(player, Phaser.Physics.ARCADE);
             phaserGroup.add(8, player);
+            createShipExhaust();
             player.onUpdate = function () {
+            };
+            player.createTrail = function () {
                 var trailCount = phaserSprites.getGroup('trails').length;
                 if (trailCount < phaserMaster.checkState('ENDLEVEL') ? 20 : 10) {
-                    var trail = phaserSprites.add({ name: "trail_" + game.rnd.integer(), group: 'trails', x: this.x, y: this.y, reference: 'player', visible: true });
+                    var trail = phaserSprites.addFromAtlas({ name: "trail_" + game.rnd.integer(), group: 'trails', x: this.x, y: this.y, filename: 'ship_body.png', atlas: 'atlas_main', visible: true });
                     trail.anchor.setTo(0.5, 0.5);
                     trail.scale.setTo(this.scale.x, this.scale.y);
-                    trail.alpha = 0.5;
+                    trail.alpha = 0.6;
                     trail.tint = 1 * 0x0000ff;
                     phaserGroup.add(7, trail);
                     trail.destroySelf = function () {
@@ -397,11 +443,12 @@ var PhaserGameObject = (function () {
             };
             player.selfDestruct = function () {
                 var _this = this;
-                game.add.tween(this.scale).to({ x: 0.25, y: 0.25 }, 350, Phaser.Easing.Linear.In, true, 0).
-                    game.add.tween(this).to({ angle: 720 }, 350, Phaser.Easing.Linear.In, true, 0).
+                phaserSprites.get('exhaust').destroyIt();
+                game.add.tween(this.scale).to({ x: 0.25, y: 0.25 }, 3400, Phaser.Easing.Linear.In, true, 0).
+                    game.add.tween(this).to({ angle: 720 }, 3400, Phaser.Easing.Linear.In, true, 0).
                     onComplete.add(function () {
                     phaserSprites.destroy(_this.name);
-                    createExplosion(_this.x, _this.y, 1.5);
+                    createExplosion(_this.x, _this.y, 0.5);
                 }, this);
             };
             player.moveToStart = function () {
@@ -412,10 +459,14 @@ var PhaserGameObject = (function () {
             };
             player.moveX = function (val) {
                 this.x += val;
+                phaserSprites.get('exhaust').updateCords(this.x, this.y);
+                this.createTrail();
                 this.checkLimits();
             };
             player.moveY = function (val) {
                 this.y += val;
+                phaserSprites.get('exhaust').updateCords(this.x, this.y);
+                this.createTrail();
                 this.checkLimits();
             };
             player.checkLimits = function () {
@@ -464,7 +515,7 @@ var PhaserGameObject = (function () {
         }
         function createAlien(options) {
             var game = phaserMaster.game();
-            var alien = phaserSprites.add({ x: options.x, y: options.y, name: "alien_" + game.rnd.integer(), group: 'aliens', reference: 'invader', visible: true });
+            var alien = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "alien_" + game.rnd.integer(), group: 'aliens', atlas: 'atlas_main', filename: "asteroid_mid_layer_" + game.rnd.integerInRange(1, 3) + ".png", visible: true });
             alien.anchor.setTo(0.5, 0.5);
             alien.scale.setTo(1.5, 1.5);
             game.physics.enable(alien, Phaser.Physics.ARCADE);
@@ -479,10 +530,6 @@ var PhaserGameObject = (function () {
             phaserGroup.add(3, alien);
             alien.damageIt = function (val) {
                 if (!this.atTarget) {
-                    var emitter = phaserMaster.get('emitter');
-                    emitter.x = this.x;
-                    emitter.y = this.y;
-                    emitter.start(true, 1500, null, 5);
                     this.health -= val;
                     this.tint = 1 * 0xff0000;
                     this.game.add.tween(this).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
@@ -560,6 +607,7 @@ var PhaserGameObject = (function () {
                 }
             };
             alien.onUpdate = function () {
+                this.rotate += 2;
                 if (!alien.atTarget) {
                     if (this.body !== null) {
                         if (this.body.velocity.y + 2 < 100) {
@@ -576,9 +624,111 @@ var PhaserGameObject = (function () {
                 }
             };
         }
+        function createBoss(options) {
+            var game = phaserMaster.game();
+            var obj = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "boss_" + game.rnd.integer(), group: 'boss', atlas: 'atlas_main', filename: "asteroid_large_layer_" + game.rnd.integerInRange(1, 3) + ".png", visible: true });
+            obj.anchor.setTo(0.5, 0.5);
+            game.physics.enable(obj, Phaser.Physics.ARCADE);
+            obj.body.velocity.y = options.iy;
+            obj.body.velocity.x = options.ix;
+            obj.angleMomentum = game.rnd.integerInRange(-5, 5);
+            obj.body.bounce.setTo(1, 1);
+            obj.atTarget = false;
+            obj.maxHealth = 40000;
+            obj.health = obj.maxHealth;
+            obj.fallThreshold = game.rnd.integerInRange(0, 75);
+            phaserGroup.add(3, obj);
+            obj.damageIt = function (val) {
+                if (!this.atTarget) {
+                    this.health -= val;
+                    this.tint = 1 * 0xff0000;
+                    this.game.add.tween(this).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                    if (this.health <= 0) {
+                        this.destroyIt();
+                    }
+                }
+            };
+            obj.removeIt = function () {
+                phaserSprites.destroy(this.name);
+            };
+            obj.destroyIt = function (spawnMore) {
+                var _this = this;
+                if (spawnMore === void 0) { spawnMore = true; }
+                var score = phaserMaster.get('score');
+                phaserMaster.forceLet('score', score += 100);
+                var scoreText = phaserTexts.get('scoreText');
+                scoreText.updateScore();
+                var tween = {
+                    angle: 720,
+                    x: this.x - game.rnd.integerInRange(-10, 10),
+                    y: this.y - game.rnd.integerInRange(10, 10),
+                    alpha: .15
+                };
+                this.game.add.tween(this).to(tween, Phaser.Timer.SECOND * 2, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                this.game.add.tween(this.scale).to({ x: 0.5, y: 0.5 }, Phaser.Timer.SECOND * 2, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                this.body = null;
+                game.time.events.add(Phaser.Timer.SECOND * 2, function () {
+                    var _a = _this, x = _a.x, y = _a.y;
+                    impactExplosion(x, y, 2, 100);
+                    phaserSprites.destroy(_this.name);
+                }, this).autoDestroy = true;
+            };
+            obj.fallToPlanet = function () {
+                var _this = this;
+                this.tint = 1 * 0x000000;
+                this.atTarget = true;
+                this.body = null;
+                this.game.add.tween(this).to({ y: this.y + 60, angle: 720 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.In, true, 0).autoDestroy = true;
+                setTimeout(function () {
+                    _this.game.add.tween(_this.scale).to({ x: 0, y: 0 }, Phaser.Timer.SECOND * 3, Phaser.Easing.Linear.In, true, game.rnd.integerInRange(0, 500)).
+                        onComplete.add(function () {
+                        _this.removeIt();
+                        phaserSprites.get('healthbar').takeDamage(10);
+                        createExplosion(_this.x, _this.y, .85);
+                    }).autoDestroy = true;
+                }, 300);
+            };
+            obj.checkLocation = function () {
+                this.angle += obj.angleMomentum;
+                if (this.angleMomentum > 0) {
+                    this.angleMomentum -= 0.002;
+                }
+                if (this.angleMomentum < 0) {
+                    this.angleMomentum += 0.002;
+                }
+                if (this.y > this.height) {
+                    if (this.body !== null) {
+                        this.body.collideWorldBounds = true;
+                    }
+                }
+                if (this.y > this.game.canvas.height - (75 + this.fallThreshold)) {
+                    if (this.body !== null && !this.atTarget) {
+                        this.body.collideWorldBounds = false;
+                        this.fallToPlanet();
+                    }
+                }
+            };
+            obj.onUpdate = function () {
+                this.rotate += 2;
+                if (!this.atTarget) {
+                    if (this.body !== null) {
+                        if (this.body.velocity.y + 1 < 25) {
+                            this.body.velocity.y += 1;
+                        }
+                        if (this.body.velocity.x > 0) {
+                            this.body.velocity.x -= 0.2;
+                        }
+                        if (this.body.velocity.x < 0) {
+                            this.body.velocity.x += 0.2;
+                        }
+                    }
+                    this.checkLocation();
+                }
+            };
+        }
         function createTrash(options) {
             var game = phaserMaster.game();
-            var trash = phaserSprites.add({ x: options.x, y: options.y, name: "trash_" + game.rnd.integer(), group: 'trashes', reference: 'invader', visible: true });
+            var trash = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "trash_" + game.rnd.integer(), group: 'trashes', atlas: 'atlas_main', filename: "asteroid_small_layer_" + game.rnd.integerInRange(1, 3) + ".png", visible: true });
             trash.anchor.setTo(0.5, 0.5);
             trash.scale.setTo(1, 1);
             game.physics.enable(trash, Phaser.Physics.ARCADE);
@@ -592,10 +742,6 @@ var PhaserGameObject = (function () {
             trash.fallThrehold = game.rnd.integerInRange(0, 75);
             phaserGroup.add(3, trash);
             trash.damageIt = function (val) {
-                var emitter = phaserMaster.get('emitter');
-                emitter.x = this.x;
-                emitter.y = this.y;
-                emitter.start(true, 1500, null, 5);
                 this.health -= val;
                 this.tint = 1 * 0xff0000;
                 this.game.add.tween(this).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
@@ -638,7 +784,7 @@ var PhaserGameObject = (function () {
                 this.game.add.tween(this).to(tween, game.rnd.integerInRange(50, 200), Phaser.Easing.Linear.Out, true, 0, 0, false);
                 this.body = null;
                 game.time.events.add(Phaser.Timer.SECOND / 3, function () {
-                    createExplosion(_this.x, _this.y, 1);
+                    createExplosion(_this.x, _this.y, 0.5);
                     phaserSprites.destroy(_this.name);
                 }, this).autoDestroy = true;
             };
@@ -666,6 +812,7 @@ var PhaserGameObject = (function () {
                 }
             };
             trash.onUpdate = function () {
+                this.rotate += 4;
                 if (this.body !== null) {
                     if (this.body.velocity.y + 1 < 50) {
                         this.body.velocity.y += 1;
@@ -685,16 +832,9 @@ var PhaserGameObject = (function () {
             var game = phaserMaster.game();
             var bulletCount = phaserSprites.getGroup('bullets').length;
             var primaryWeapon = phaserMaster.get('primaryWeapon');
-            var bullet = phaserSprites.add({ y: options.y, name: "bullet_" + game.rnd.integer(), group: 'bullets', reference: 'bullet' });
-            if (options.offset === 0) {
-                bullet.x = options.x - bullet.width / 2;
-            }
-            if (options.offset < 0) {
-                bullet.x = options.x + options.offset - bullet.width;
-            }
-            if (options.offset > 0) {
-                bullet.x = options.x + options.offset - bullet.width / 2;
-            }
+            var bullet = phaserSprites.addFromAtlas({ y: options.y, name: "bullet_" + game.rnd.integer(), group: 'primaryWpnSprite', atlas: 'atlas_main', filename: "beam_frame_1.png" });
+            bullet.angle = -90;
+            bullet.x = options.x + options.offset - bullet.width / 2;
             game.physics.enable(bullet, Phaser.Physics.ARCADE);
             bullet.body.velocity.y = primaryWeapon.initialVelocity;
             phaserGroup.add(2, bullet);
@@ -724,15 +864,108 @@ var PhaserGameObject = (function () {
                 });
             };
         }
-        function createBomb(options) {
+        function createLaser(options, isCenter) {
+            if (isCenter === void 0) { isCenter = false; }
+            var game = phaserMaster.game();
+            var bulletCount = phaserSprites.getGroup('bullets').length;
+            var primaryWeapon = phaserMaster.get('primaryWeapon');
+            var bullet = phaserSprites.addFromAtlas({ y: options.y, name: "bullet_" + game.rnd.integer(), group: 'primaryWpnSprite', atlas: 'atlas_main', filename: "beam_frame_1.png" });
+            bullet.animations.add('shoot', Phaser.Animation.generateFrameNames('beam_frame_', 1, 4, '.png'), 1, true);
+            bullet.animations.play('shoot', 30, true);
+            bullet.scale.setTo(0.5, 0.5);
+            bullet.x = options.x + options.offset - bullet.width / 2;
+            game.physics.enable(bullet, Phaser.Physics.ARCADE);
+            bullet.body.velocity.y = primaryWeapon.initialVelocity;
+            phaserGroup.add(2, bullet);
+            bullet.accelerate = function () {
+                this.body.velocity.y -= primaryWeapon.velocity;
+                this.body.velocity.x += options.spread;
+            };
+            bullet.destroyIt = function () {
+                if (primaryWeapon.secondaryExplosion) {
+                    impactExplosion(this.x, this.y, .25, (primaryWeapon.damage * options.damageMod));
+                }
+                phaserSprites.destroy(this.name);
+            };
+            bullet.onUpdate = function () {
+                var _this = this;
+                this.accelerate();
+                if (this.y < 0) {
+                    this.destroyIt();
+                }
+                returnAllCollidables().forEach(function (target) {
+                    target.game.physics.arcade.overlap(_this, target, function (bullet, target) {
+                        if (!primaryWeapon.pierce) {
+                            bullet.destroyIt();
+                        }
+                        target.damageIt(primaryWeapon.damage * options.damageMod);
+                    }, null, _this);
+                });
+            };
+        }
+        function createMissle(options, isCenter) {
+            if (isCenter === void 0) { isCenter = false; }
+            var game = phaserMaster.game();
+            var bulletCount = phaserSprites.getGroup('bullets').length;
+            var primaryWeapon = phaserMaster.get('primaryWeapon');
+            var bullet = phaserSprites.addFromAtlas({ y: options.y, name: "bullet_" + game.rnd.integer(), group: 'primaryWpnSprite', atlas: 'atlas_main', filename: "missle1.png" });
+            bullet.angle = -90;
+            bullet.x = options.x + options.offset;
+            bullet.isActive = false;
+            bullet.scale.setTo(0.25, 0.25);
+            bullet.anchor.setTo(0.5, 0.5);
+            phaserGroup.add(2, bullet);
+            bullet.game.add.tween(bullet.scale).to({ x: 1, y: 1 }, 150, Phaser.Easing.Linear.Out, true, 150)
+                .onComplete.add(function () {
+                game.physics.enable(bullet, Phaser.Physics.ARCADE);
+                bullet.body.velocity.y = primaryWeapon.initialVelocity;
+                bullet.isActive = true;
+            });
+            bullet.accelerate = function () {
+                this.body.velocity.y -= primaryWeapon.velocity;
+                this.body.velocity.x += options.spread;
+            };
+            bullet.destroyIt = function () {
+                if (primaryWeapon.secondaryExplosion) {
+                    impactExplosion(this.x, this.y, 1, (primaryWeapon.damage * options.damageMod));
+                }
+                phaserSprites.destroy(this.name);
+            };
+            bullet.onUpdate = function () {
+                var _this = this;
+                if (bullet.isActive) {
+                    this.accelerate();
+                    if (this.y < 0) {
+                        this.destroyIt();
+                    }
+                    returnAllCollidables().forEach(function (target) {
+                        target.game.physics.arcade.overlap(_this, target, function (bullet, target) {
+                            if (!primaryWeapon.pierce) {
+                                bullet.destroyIt();
+                            }
+                            target.damageIt(primaryWeapon.damage * options.damageMod);
+                        }, null, _this);
+                    });
+                }
+            };
+        }
+        function createClusterbomb(options) {
             var game = phaserMaster.game();
             var bombCount = phaserSprites.getGroup('bombCount').length;
-            var bomb = phaserSprites.add({ x: options.x, y: options.y, name: "bomb_" + game.rnd.integer(), group: 'bombs', reference: 'bomb' });
+            var bomb = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "secondary_" + game.rnd.integer(), group: 'secondaryWpnSprite', atlas: 'atlas_main', filename: 'clusterBomb.png' });
             bomb.anchor.setTo(0.5, 0.5);
-            bomb.scale.setTo(2, 2);
+            bomb.scale.setTo(1.5, 1.5);
             game.physics.enable(bomb, Phaser.Physics.ARCADE);
             bomb.body.velocity.y = options.velocity;
             phaserGroup.add(2, bomb);
+            bomb.angle = 90;
+            bomb.hasDetonated = false;
+            setTimeout(function () {
+                if (!bomb.hasDetonated) {
+                    bomb.hasDetonated = true;
+                    bomb.destroyIt();
+                }
+            }, 800);
             bomb.destroyIt = function () {
                 createExplosion(this.x, this.y, 1.25);
                 for (var i = 0; i < options.bomblets; i++) {
@@ -740,7 +973,7 @@ var PhaserGameObject = (function () {
                         x: this.x,
                         y: this.y,
                         ix: game.rnd.integerInRange(-400, 400),
-                        iy: -game.rnd.integerInRange(-50, 400),
+                        iy: game.rnd.integerInRange(-400, 100),
                         damage: options.damage / 4
                     });
                 }
@@ -749,9 +982,34 @@ var PhaserGameObject = (function () {
             bomb.onUpdate = function () {
                 var _this = this;
                 this.angle += 5;
-                if (this.y < 200) {
-                    this.destroyIt();
-                }
+                returnAllCollidables().forEach(function (target) {
+                    target.game.physics.arcade.overlap(_this, target, function (bomb, target) {
+                        if (!bomb.hasDetonated) {
+                            bomb.hasDetonated = true;
+                            bomb.destroyIt();
+                        }
+                        target.damageIt(options.damage);
+                    }, null, _this);
+                });
+            };
+        }
+        function createTriplebomb(options) {
+            var game = phaserMaster.game();
+            var bomb = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "secondary_" + game.rnd.integer(), group: 'secondaryWpnSprite', atlas: 'atlas_main', filename: 'clusterBomb.png' });
+            bomb.anchor.setTo(0.5, 0.5);
+            game.physics.enable(bomb, Phaser.Physics.ARCADE);
+            bomb.body.velocity.y = options.initialVelocity;
+            phaserGroup.add(2, bomb);
+            bomb.accelerate = function () {
+                this.body.velocity.y -= (options.velocity * options.delay);
+            };
+            bomb.destroyIt = function () {
+                impactExplosion(this.x, this.y, 2.5, options.damage);
+                phaserSprites.destroy(this.name);
+            };
+            bomb.onUpdate = function () {
+                var _this = this;
+                this.accelerate();
                 returnAllCollidables().forEach(function (target) {
                     target.game.physics.arcade.overlap(_this, target, function (bomb, target) {
                         bomb.destroyIt();
@@ -760,10 +1018,70 @@ var PhaserGameObject = (function () {
                 });
             };
         }
+        function createTurret(options) {
+            var game = phaserMaster.game();
+            var turret = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "secondary_" + game.rnd.integer(), group: 'secondaryWpnSprite', atlas: 'atlas_main', filename: 'clusterBomb.png' });
+            game.physics.enable(turret, Phaser.Physics.ARCADE);
+            phaserGroup.add(2, turret);
+            setTimeout(function () {
+                turret.destroyIt();
+            }, options.lifespan);
+            turret.fireInterval = setInterval(function () {
+                var x = turret.x, y = turret.y, width = turret.width;
+                createBullet({ x: x + width / 2, offset: 0, y: y, spread: 0, damageMod: 1 });
+                createBullet({ x: x + width / 2 + 20, offset: 0, y: y, spread: 0, damageMod: 1 });
+                createBullet({ x: x + width / 2 - 20, offset: 0, y: y, spread: 0, damageMod: 1 });
+            }, 200);
+            turret.fireInterval;
+            turret.destroyIt = function () {
+                impactExplosion(this.x, this.y, 2.5, options.damage);
+                clearInterval(this.fireInterval);
+                phaserSprites.destroy(this.name);
+            };
+            turret.onUpdate = function () {
+                var _this = this;
+                returnAllCollidables().forEach(function (target) {
+                    target.game.physics.arcade.overlap(_this, target, function (turret, target) {
+                        turret.destroyIt();
+                        target.damageIt(options.damage);
+                    }, null, _this);
+                });
+            };
+        }
+        function createMine(options) {
+            var game = phaserMaster.game();
+            var mine = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "secondary_" + game.rnd.integer(), group: 'secondaryWpnSprite', atlas: 'atlas_main', filename: 'clusterBomb.png' });
+            mine.anchor.setTo(0.5, 0.5);
+            mine.scale.setTo(1.5, 1.5);
+            game.physics.enable(mine, Phaser.Physics.ARCADE);
+            phaserGroup.add(2, mine);
+            if (phaserSprites.getGroup('secondaryWpnSprite').length > options.limit) {
+                phaserSprites.getGroup('secondaryWpnSprite')[0].destroyIt();
+            }
+            mine.destroyIt = function () {
+                var _a = this, x = _a.x, y = _a.y;
+                impactExplosion(x, y, 3, options.damage);
+                setTimeout(function () {
+                    impactExplosion(x, y, 2, options.damage);
+                }, 500);
+                clearInterval(this.fireInterval);
+                phaserSprites.destroy(this.name);
+            };
+            mine.onUpdate = function () {
+                var _this = this;
+                this.angle += 5;
+                returnAllCollidables().forEach(function (target) {
+                    target.game.physics.arcade.overlap(_this, target, function (mine, target) {
+                        mine.destroyIt();
+                        target.damageIt(options.damage);
+                    }, null, _this);
+                });
+            };
+        }
         function createBomblet(options) {
             var game = phaserMaster.game();
             var bombCount = phaserSprites.getGroup('bombCount').length;
-            var bomblet = phaserSprites.add({ x: options.x, y: options.y, name: "bomblet_" + game.rnd.integer(), group: 'bomblets', reference: 'bomb' });
+            var bomblet = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "bomblet_" + game.rnd.integer(), group: 'secondaryWpnSprite', atlas: 'atlas_main', filename: 'clusterBomb.png' });
             bomblet.anchor.setTo(0.5, 0.5);
             bomblet.scale.setTo(0.5, 0.5);
             game.physics.enable(bomblet, Phaser.Physics.ARCADE);
@@ -792,23 +1110,23 @@ var PhaserGameObject = (function () {
         }
         function createExplosion(x, y, scale) {
             var game = phaserMaster.game();
-            var explosion = phaserSprites.add({ name: "explosion_" + game.rnd.integer(), group: 'explosions', x: x, y: y, reference: 'kaboom' });
+            var explosion = phaserSprites.addFromAtlas({ name: "explosion_" + game.rnd.integer(), group: 'explosions', x: x, y: y, atlas: 'atlas_main', filename: "explosions_Layer_1.png" });
             explosion.scale.setTo(scale, scale);
             explosion.anchor.setTo(0.5, 0.5);
-            explosion.animations.add('kaboom');
-            explosion.play('kaboom', 30, false, true);
+            explosion.animations.add('explosion', Phaser.Animation.generateFrameNames('explosions_Layer_', 1, 16, '.png'), 1, true);
+            explosion.animations.play('explosion', 30, true);
             phaserGroup.add(6, explosion);
-            game.time.events.add(Phaser.Timer.SECOND / 2, function () {
+            setTimeout(function () {
                 phaserSprites.destroy(explosion.name);
-            }).autoDestroy = true;
+            }, Phaser.Timer.SECOND / 2);
         }
         function impactExplosion(x, y, scale, damage) {
             var game = phaserMaster.game();
-            var impactExplosion = phaserSprites.add({ name: "impactExplosion_" + game.rnd.integer(), group: 'impactExplosions', x: x, y: y, reference: 'kaboom' });
+            var impactExplosion = phaserSprites.addFromAtlas({ name: "impactExplosion_" + game.rnd.integer(), group: 'impactExplosions', x: x, y: y, atlas: 'atlas_main', filename: "explosions_Layer_1.png" });
             impactExplosion.scale.setTo(scale, scale);
             impactExplosion.anchor.setTo(0.5, 0.5);
-            impactExplosion.animations.add('kaboom');
-            impactExplosion.play('kaboom', 30, false, true);
+            impactExplosion.animations.add('explosion', Phaser.Animation.generateFrameNames('explosions_Layer_', 1, 16, '.png'), 1, true);
+            impactExplosion.animations.play('explosion', 30, true);
             game.physics.enable(impactExplosion, Phaser.Physics.ARCADE);
             phaserGroup.add(6, impactExplosion);
             game.time.events.add(Phaser.Timer.SECOND / 2, function () {
@@ -824,7 +1142,7 @@ var PhaserGameObject = (function () {
             };
         }
         function returnAllCollidables() {
-            return phaserSprites.getGroup('aliens').concat(phaserSprites.getGroup('trashes'));
+            return phaserSprites.getGroup('aliens').concat(phaserSprites.getGroup('trashes'), phaserSprites.getGroup('boss'));
         }
         function pauseGame() {
             phaserMaster.get('clock').stop();
@@ -841,12 +1159,42 @@ var PhaserGameObject = (function () {
             var specialWeapon = phaserSprites.get('specialWeapon');
             var primaryWeapon = phaserMaster.get('primaryWeapon');
             var secondaryWeapon = phaserMaster.get('secondaryWeapon');
-            phaserSprites.get('earth').onUpdate();
-            phaserSprites.getGroup('movingStarField').forEach(function (star) {
-                star.onUpdate();
+            var elapsedTime = parseInt(phaserMaster.get('elapsedTime').toFixed(0));
+            phaserSprites.getGroup('spaceGroup').forEach(function (obj) {
+                obj.onUpdate();
+            });
+            phaserSprites.getGroup('movingStarField').forEach(function (obj) {
+                obj.onUpdate();
+            });
+            phaserSprites.getGroup('primaryWpnSprite').forEach(function (obj) {
+                obj.onUpdate();
+            });
+            phaserSprites.getGroup('secondaryWpnSprite').forEach(function (obj) {
+                obj.onUpdate();
+            });
+            phaserSprites.getGroup('impactExplosions').forEach(function (obj) {
+                obj.onUpdate();
+            });
+            phaserSprites.getGroup('playership').forEach(function (obj) {
+                obj.onUpdate();
             });
             if (phaserMaster.checkState('READY')) {
-                if (phaserSprites.getGroup('aliens').length < 5) {
+                phaserTexts.getGroup('ui').forEach(function (text) {
+                    text.onUpdate();
+                });
+                phaserTexts.getGroup('timeKeeper').forEach(function (text) {
+                    text.onUpdate();
+                });
+                phaserSprites.getGroup('aliens').forEach(function (obj) {
+                    obj.onUpdate();
+                });
+                phaserSprites.getGroup('boss').forEach(function (obj) {
+                    obj.onUpdate();
+                });
+                phaserSprites.getGroup('trashes').forEach(function (obj) {
+                    obj.onUpdate();
+                });
+                if (elapsedTime < 15 && phaserSprites.getGroup('aliens').length < 5) {
                     createAlien({
                         x: game.rnd.integerInRange(0, game.canvas.width),
                         y: game.rnd.integerInRange(-50, -100),
@@ -854,88 +1202,75 @@ var PhaserGameObject = (function () {
                         iy: game.rnd.integerInRange(0, 150)
                     });
                 }
-                phaserTexts.getGroup('ui').forEach(function (text) {
-                    text.onUpdate();
-                });
-                phaserTexts.getGroup('timeKeeper').forEach(function (text) {
-                    text.onUpdate();
-                });
-                phaserSprites.getGroup('bullets').forEach(function (bullet) {
-                    bullet.onUpdate();
-                });
-                phaserSprites.getGroup('aliens').forEach(function (alien) {
-                    alien.onUpdate();
-                });
-                phaserSprites.getGroup('trashes').forEach(function (trash) {
-                    trash.onUpdate();
-                });
-                phaserSprites.getGroup('bombs').forEach(function (bomb) {
-                    bomb.onUpdate();
-                });
-                phaserSprites.getGroup('bomblets').forEach(function (bomblet) {
-                    bomblet.onUpdate();
-                });
-                phaserSprites.getGroup('impactExplosions').forEach(function (impactExplosion) {
-                    impactExplosion.onUpdate();
-                });
+                if (elapsedTime === 15 && phaserSprites.getGroup('boss').length === 0) {
+                    createBoss({
+                        x: game.rnd.integerInRange(100, game.canvas.width - 100),
+                        y: game.rnd.integerInRange(-50, -100),
+                        ix: game.rnd.integerInRange(-100, 100),
+                        iy: 5
+                    });
+                }
                 if (phaserControls.read('RIGHT').active) {
                     starMomentum.x = -2;
                     player.moveX(5);
-                    player.onUpdate();
                 }
                 if (phaserControls.read('LEFT').active) {
                     starMomentum.x = 2;
                     player.moveX(-5);
-                    player.onUpdate();
                 }
                 if (phaserControls.read('UP').active) {
                     starMomentum.y = 5;
                     player.moveY(-5);
-                    player.onUpdate();
                 }
                 if (phaserControls.read('DOWN').active) {
                     starMomentum.y = -2;
                     player.moveY(5);
-                    player.onUpdate();
                 }
-                if (phaserControls.checkWithDelay({ isActive: true, key: 'A', delay: primaryWeapon.cooldown - (phaserControls.read('A').state * 75) })) {
-                    if (primaryWeapon.number === 1) {
-                        createBullet({ x: player.x, offset: 0, y: player.y, spread: 0, damageMod: 1 });
+                if (phaserControls.checkWithDelay({ isActive: true, key: 'A', delay: primaryWeapon.cooldown - (phaserControls.read('A').state * primaryWeapon.rapidFireSpd) })) {
+                    if (primaryWeapon.wpnType === 'LASER') {
+                        createLaser({ x: player.x, offset: -15, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: 1 });
+                        createLaser({ x: player.x, offset: 15, y: player.y, spread: primaryWeapon.spread / 2, damageMod: 1 });
+                        createLaser({ x: player.x, offset: -50, y: player.y, spread: -primaryWeapon.spread, damageMod: 1 });
+                        createLaser({ x: player.x, offset: 50, y: player.y, spread: primaryWeapon.spread, damageMod: 1 });
                     }
-                    if (primaryWeapon.number === 2) {
-                        createBullet({ x: player.x, offset: -20, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: .75 });
-                        createBullet({ x: player.x, offset: 20, y: player.y, spread: primaryWeapon.spread / 2, damageMod: .75 });
+                    if (primaryWeapon.wpnType === 'MISSLES') {
+                        createMissle({ x: player.x, offset: 0, y: player.y, spread: 0, damageMod: 1 });
+                        createMissle({ x: player.x, offset: -30, y: player.y - 10, spread: -primaryWeapon.spread / 2, damageMod: 1 });
+                        createMissle({ x: player.x, offset: 30, y: player.y - 10, spread: primaryWeapon.spread / 2, damageMod: 1 });
                     }
-                    if (primaryWeapon.number === 3) {
-                        createBullet({ x: player.x, offset: 0, y: player.y, spread: 0, damageMod: 1 });
-                        createBullet({ x: player.x, offset: -30, y: player.y - 10, spread: -primaryWeapon.spread / 2, damageMod: .5 });
-                        createBullet({ x: player.x, offset: 30, y: player.y - 10, spread: primaryWeapon.spread / 2, damageMod: .5 });
-                    }
-                    if (primaryWeapon.number === 4) {
-                        createBullet({ x: player.x, offset: -15, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: .75 });
-                        createBullet({ x: player.x, offset: 15, y: player.y, spread: primaryWeapon.spread / 2, damageMod: .75 });
-                        createBullet({ x: player.x, offset: -40, y: player.y + 10, spread: -primaryWeapon.spread, damageMod: .50 });
-                        createBullet({ x: player.x, offset: 40, y: player.y + 10, spread: primaryWeapon.spread, damageMod: .50 });
-                    }
-                    if (primaryWeapon.number === 5) {
-                        createBullet({ x: player.x, offset: 0, y: player.y, spread: 0, damageMod: 1 });
-                        createBullet({ x: player.x, offset: -30, y: player.y + 10, spread: -primaryWeapon.spread / 2, damageMod: .5 });
-                        createBullet({ x: player.x, offset: 30, y: player.y + 10, spread: primaryWeapon.spread / 2, damageMod: .5 });
-                        createBullet({ x: player.x, offset: -50, y: player.y + 20, spread: -primaryWeapon.spread, damageMod: .25 });
-                        createBullet({ x: player.x, offset: 50, y: player.y + 20, spread: primaryWeapon.spread, damageMod: .25 });
-                    }
-                    if (primaryWeapon.number === 6) {
-                        createBullet({ x: player.x, offset: -15, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: .75 });
-                        createBullet({ x: player.x, offset: 15, y: player.y, spread: primaryWeapon.spread / 2, damageMod: .75 });
-                        createBullet({ x: player.x, offset: -40, y: player.y + 10, spread: -primaryWeapon.spread, damageMod: .50 });
-                        createBullet({ x: player.x, offset: 40, y: player.y + 10, spread: primaryWeapon.spread, damageMod: .50 });
-                        createBullet({ x: player.x, offset: -60, y: player.y + 20, spread: -primaryWeapon.spread, damageMod: .25 });
-                        createBullet({ x: player.x, offset: 60, y: player.y + 20, spread: primaryWeapon.spread, damageMod: .25 });
+                    if (primaryWeapon.wpnType === 'BULLET') {
+                        createBullet({ x: player.x, offset: -15, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: 1 });
+                        createBullet({ x: player.x, offset: 15, y: player.y, spread: primaryWeapon.spread / 2, damageMod: 1 });
+                        createBullet({ x: player.x, offset: -40, y: player.y + 10, spread: -primaryWeapon.spread, damageMod: 1 });
+                        createBullet({ x: player.x, offset: 40, y: player.y + 10, spread: primaryWeapon.spread, damageMod: 1 });
+                        createBullet({ x: player.x, offset: -60, y: player.y + 20, spread: -primaryWeapon.spread, damageMod: 1 });
+                        createBullet({ x: player.x, offset: 60, y: player.y + 20, spread: primaryWeapon.spread, damageMod: 1 });
                     }
                 }
                 if (phaserControls.checkWithDelay({ isActive: true, key: 'B', delay: secondaryWeapon.cooldown })) {
-                    specialWeapon.onPress(4000);
-                    createBomb({ x: player.x, y: player.y, velocity: -400, damage: secondaryWeapon.damage, bomblets: secondaryWeapon.bomblets });
+                    specialWeapon.onPress(secondaryWeapon.cooldown);
+                    updateShipSpecial(0, true);
+                    game.time.events.add(50, function () {
+                        updateShipSpecial(100, false, secondaryWeapon.cooldown - 50);
+                    }).autoDestroy = true;
+                    if (secondaryWeapon.wpnType === 'CLUSTERBOMB') {
+                        var x = player.x, y = player.y;
+                        createClusterbomb({ x: x, y: y, velocity: secondaryWeapon.velocity, damage: secondaryWeapon.damage, bomblets: secondaryWeapon.bomblets });
+                    }
+                    if (secondaryWeapon.wpnType === 'TRIPLEBOMB') {
+                        var x = player.x, y = player.y;
+                        createTriplebomb({ x: x, y: y, initialVelocity: secondaryWeapon.initialVelocity, velocity: secondaryWeapon.velocity, damage: secondaryWeapon.damage, delay: 1 });
+                        createTriplebomb({ x: x, y: y, initialVelocity: secondaryWeapon.initialVelocity, velocity: secondaryWeapon.velocity, damage: secondaryWeapon.damage, delay: 2 });
+                        createTriplebomb({ x: x, y: y, initialVelocity: secondaryWeapon.initialVelocity, velocity: secondaryWeapon.velocity, damage: secondaryWeapon.damage, delay: 3 });
+                    }
+                    if (secondaryWeapon.wpnType === 'TURRET') {
+                        var x = player.x, y = player.y;
+                        createTurret({ x: x, y: y, damage: secondaryWeapon.damage, lifespan: secondaryWeapon.lifespan });
+                    }
+                    if (secondaryWeapon.wpnType === 'MINES') {
+                        var x = player.x, y = player.y;
+                        createMine({ x: x, y: y, damage: secondaryWeapon.damage, limit: secondaryWeapon.limit });
+                    }
                 }
             }
             if (phaserMaster.checkState('ENDLEVEL')) {
@@ -949,11 +1284,14 @@ var PhaserGameObject = (function () {
             phaserTexts.getGroup('ui').forEach(function (text) {
                 text.hide();
             });
-            phaserSprites.getGroup('ui').forEach(function (sprite) {
-                sprite.hide();
-            });
             phaserTexts.getGroup('timeKeeper').forEach(function (text) {
                 text.hide();
+            });
+            phaserSprites.getGroup('ui').forEach(function (obj) {
+                obj.hide();
+            });
+            phaserSprites.getGroup('secondaryWpnSprite').forEach(function (obj) {
+                obj.destroyIt();
             });
             phaserSprites.get('player').playEndSequence(function () {
                 var level = gameData.level++;
@@ -1854,6 +2192,61 @@ var PHASER_SPRITE_MANAGER = (function () {
             console.log("Duplicate key name not allowed: " + params.name);
         }
     };
+    PHASER_SPRITE_MANAGER.prototype.addFromAtlas = function (params) {
+        var duplicateCheck = this.sprites.array.filter(function (obj) {
+            return obj.name === params.name;
+        });
+        if (duplicateCheck.length === 0) {
+            params.x = params.x !== undefined ? params.x : 0;
+            params.y = params.y !== undefined ? params.y : 0;
+            params.group = params.group !== undefined ? params.group : null;
+            params.visible = params.visible !== undefined ? params.visible : true;
+            var newSprite = this.game.add.sprite(params.x, params.y, params.atlas, params.filename);
+            newSprite.name = params.name;
+            newSprite.group = params.group;
+            newSprite.defaultPosition = { x: params.x, y: params.y };
+            newSprite.visible = params.visible;
+            newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
+            newSprite.getDefaultPositions = function () { return this.defaultPosition; };
+            this.sprites.array.push(newSprite);
+            this.sprites.object[params.name] = newSprite;
+            return newSprite;
+        }
+        else {
+            console.log("Duplicate key name not allowed: " + params.name);
+        }
+    };
+    PHASER_SPRITE_MANAGER.prototype.addTilespriteFromAtlas = function (params) {
+        var duplicateCheck = this.sprites.array.filter(function (obj) {
+            return obj.name === params.name;
+        });
+        if (duplicateCheck.length === 0) {
+            params.x = params.x !== undefined ? params.x : 0;
+            params.y = params.y !== undefined ? params.y : 0;
+            params.group = params.group !== undefined ? params.group : null;
+            params.visible = params.visible !== undefined ? params.visible : true;
+            var newSprite = this.game.add.tileSprite(params.x, params.y, params.width, params.height, params.atlas, params.filename);
+            newSprite.name = params.name;
+            newSprite.group = params.group;
+            newSprite.defaultPosition = { x: params.x, y: params.y };
+            newSprite.visible = params.visible;
+            newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
+            newSprite.getDefaultPositions = function () { return this.defaultPosition; };
+            this.sprites.array.push(newSprite);
+            this.sprites.object[params.name] = newSprite;
+            return newSprite;
+        }
+        else {
+            console.log("Duplicate key name not allowed: " + params.name);
+        }
+    };
+    PHASER_SPRITE_MANAGER.prototype.addBasicMaskToSprite = function (sprite) {
+        var mask = this.game.add.graphics(0, 0);
+        mask.beginFill(0xffffff);
+        mask.drawRect(sprite.x, sprite.y, sprite.width, sprite.height);
+        sprite.mask = mask;
+        return mask;
+    };
     PHASER_SPRITE_MANAGER.prototype.destroy = function (name) {
         if (this.sprites.object[name] !== undefined) {
             var destroyed = [];
@@ -2131,37 +2524,4 @@ var PHASER_TEXT_MANAGER = (function () {
         return text;
     };
     return PHASER_TEXT_MANAGER;
-}());
-var BULLET_CLASS = (function () {
-    function BULLET_CLASS(Phaser, PHASER_MASTER, PHASER_GROUP, PHASER_SPRITES, WEAPON_DATA, COLLIDABLES, options) {
-        this.game = PHASER_MASTER.game();
-        var bulletCount = PHASER_SPRITES.getGroup('bullets').length;
-        var primaryWeapon = PHASER_MASTER.get('primaryWeapon');
-        this.bullet = PHASER_SPRITES.add({ x: options.x, y: options.y, name: "bullet_" + this.game.rnd.integer(), group: 'bullets', reference: 'bullet' });
-        this.game.physics.enable(this.bullet, Phaser.Physics.ARCADE);
-        this.bullet.body.velocity.y = -100;
-        PHASER_GROUP.add(2, this.bullet);
-        this.COLLIDABLES = COLLIDABLES;
-        this.bullet.onUpdate = this.onUpdate();
-    }
-    BULLET_CLASS.prototype.accelerate = function () {
-    };
-    BULLET_CLASS.prototype.destroyIt = function () {
-    };
-    BULLET_CLASS.prototype.onUpdate = function () {
-        var _this = this;
-        this.accelerate();
-        if (this.y < 0) {
-            this.destroyIt();
-        }
-        this.COLLIDABLES.forEach(function (target) {
-            target.game.physics.arcade.overlap(_this, target, function (bullet, target) {
-                if (!_this.WEAPON_DATA.pierce) {
-                    bullet.destroyIt();
-                }
-                target.damageIt(_this.WEAPON_DATA.damage * _this.options.damageMod);
-            }, null, _this);
-        });
-    };
-    return BULLET_CLASS;
 }());

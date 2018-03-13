@@ -27,10 +27,8 @@ function createNewLocalData(){
     gameData: {
       score: 0,
       level: 1,
-      money: 1000, 
-      primaryWeapon: primaryWeapon.LASER_1,
-      secondaryWeapon: secondaryWeapon.CLUSTER_1,
-      purchaseHistory: [0, 21, 50],
+      primaryWeapon: 'LASER',
+      secondaryWeapon: 'CLUSTERBOMB',
       population: {
         total: 100,
         killed: 0
