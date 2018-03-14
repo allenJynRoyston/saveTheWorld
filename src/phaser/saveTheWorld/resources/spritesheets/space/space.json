@@ -2,7 +2,7 @@
 
 {
 	"filename": "earth.png",
-	"frame": {"x":794,"y":722,"w":607,"h":605},
+	"frame": {"x":803,"y":1269,"w":607,"h":605},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":57,"y":56,"w":607,"h":605},
@@ -10,7 +10,7 @@
 },
 {
 	"filename": "Nebula1.png",
-	"frame": {"x":1,"y":892,"w":751,"h":564},
+	"frame": {"x":794,"y":1,"w":751,"h":564},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":751,"h":564},
@@ -18,7 +18,7 @@
 },
 {
 	"filename": "Nebula2.png",
-	"frame": {"x":794,"y":1,"w":800,"h":719},
+	"frame": {"x":1,"y":892,"w":800,"h":719},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":800,"h":719},
@@ -31,14 +31,22 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":791,"h":889},
 	"sourceSize": {"w":791,"h":889}
+},
+{
+	"filename": "spacebg.png",
+	"frame": {"x":803,"y":567,"w":640,"h":700},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":700},
+	"sourceSize": {"w":640,"h":700}
 }],
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
 	"image": "space.png",
 	"format": "RGBA8888",
-	"size": {"w":1595,"h":1457},
+	"size": {"w":1546,"h":1875},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:36b5210b47894f1e3a7a2c86da3f8515:3e7a0bd4432d642eee42910c4013f953:5c66d13d521b19a155e36d6dbcb34ba3$"
+	"smartupdate": "$TexturePacker:SmartUpdate:b378dffad4033fef414e92e6fc90cfc2:e4764982d3943bfed9d807fb5a2882a1:5c66d13d521b19a155e36d6dbcb34ba3$"
 }
 }

@@ -26,7 +26,7 @@
 },
 {
 	"filename": "asteroid_mid_layer_1.png",
-	"frame": {"x":867,"y":197,"w":51,"h":57},
+	"frame": {"x":1298,"y":67,"w":51,"h":57},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
@@ -34,7 +34,7 @@
 },
 {
 	"filename": "asteroid_mid_layer_2.png",
-	"frame": {"x":920,"y":197,"w":51,"h":57},
+	"frame": {"x":1298,"y":126,"w":51,"h":57},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
@@ -42,7 +42,7 @@
 },
 {
 	"filename": "asteroid_mid_layer_3.png",
-	"frame": {"x":1193,"y":129,"w":51,"h":57},
+	"frame": {"x":1238,"y":129,"w":51,"h":57},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
@@ -50,7 +50,7 @@
 },
 {
 	"filename": "asteroid_small_layer_1.png",
-	"frame": {"x":833,"y":213,"w":32,"h":30},
+	"frame": {"x":951,"y":67,"w":32,"h":30},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
@@ -58,7 +58,7 @@
 },
 {
 	"filename": "asteroid_small_layer_2.png",
-	"frame": {"x":949,"y":67,"w":32,"h":30},
+	"frame": {"x":985,"y":67,"w":32,"h":30},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
@@ -66,7 +66,7 @@
 },
 {
 	"filename": "asteroid_small_layer_3.png",
-	"frame": {"x":983,"y":67,"w":32,"h":30},
+	"frame": {"x":1019,"y":67,"w":32,"h":30},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
@@ -114,7 +114,7 @@
 },
 {
 	"filename": "bullet_2.png",
-	"frame": {"x":822,"y":213,"w":8,"h":12},
+	"frame": {"x":957,"y":229,"w":8,"h":12},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":4,"y":2,"w":8,"h":12},
@@ -129,8 +129,16 @@
 	"sourceSize": {"w":15,"h":15}
 },
 {
+	"filename": "earthBar.png",
+	"frame": {"x":663,"y":101,"w":244,"h":14},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":14},
+	"sourceSize": {"w":244,"h":14}
+},
+{
 	"filename": "exhaust_red_1.png",
-	"frame": {"x":1205,"y":188,"w":34,"h":61},
+	"frame": {"x":1202,"y":185,"w":34,"h":61},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
@@ -138,7 +146,7 @@
 },
 {
 	"filename": "exhaust_red_2.png",
-	"frame": {"x":1241,"y":188,"w":34,"h":61},
+	"frame": {"x":1238,"y":188,"w":34,"h":61},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
@@ -146,7 +154,7 @@
 },
 {
 	"filename": "exhaust_red_3.png",
-	"frame": {"x":1277,"y":133,"w":34,"h":61},
+	"frame": {"x":1274,"y":188,"w":34,"h":61},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
@@ -154,7 +162,7 @@
 },
 {
 	"filename": "exhaust_red_4.png",
-	"frame": {"x":1133,"y":188,"w":34,"h":64},
+	"frame": {"x":1166,"y":133,"w":34,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":34,"h":64},
@@ -162,7 +170,7 @@
 },
 {
 	"filename": "exhaust_red_5.png",
-	"frame": {"x":1169,"y":188,"w":34,"h":64},
+	"frame": {"x":1188,"y":67,"w":34,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":34,"h":64},
@@ -170,7 +178,7 @@
 },
 {
 	"filename": "exhaust_red_6.png",
-	"frame": {"x":1133,"y":188,"w":34,"h":64},
+	"frame": {"x":1166,"y":133,"w":34,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":34,"h":64},
@@ -178,7 +186,7 @@
 },
 {
 	"filename": "exhaust_red_7.png",
-	"frame": {"x":1277,"y":133,"w":34,"h":61},
+	"frame": {"x":1274,"y":188,"w":34,"h":61},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
@@ -186,7 +194,7 @@
 },
 {
 	"filename": "exhaust_red_8.png",
-	"frame": {"x":1241,"y":188,"w":34,"h":61},
+	"frame": {"x":1238,"y":188,"w":34,"h":61},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
@@ -194,7 +202,7 @@
 },
 {
 	"filename": "explosions_Layer_1.png",
-	"frame": {"x":1067,"y":159,"w":64,"h":64},
+	"frame": {"x":1100,"y":177,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":32,"y":32,"w":64,"h":64},
@@ -202,7 +210,7 @@
 },
 {
 	"filename": "explosions_Layer_2.png",
-	"frame": {"x":958,"y":99,"w":72,"h":78},
+	"frame": {"x":956,"y":99,"w":72,"h":78},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":28,"y":25,"w":72,"h":78},
@@ -210,7 +218,7 @@
 },
 {
 	"filename": "explosions_Layer_3.png",
-	"frame": {"x":772,"y":115,"w":90,"h":96},
+	"frame": {"x":770,"y":117,"w":90,"h":96},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":19,"y":16,"w":90,"h":96},
@@ -226,7 +234,7 @@
 },
 {
 	"filename": "explosions_Layer_5.png",
-	"frame": {"x":851,"y":1,"w":96,"h":98},
+	"frame": {"x":672,"y":117,"w":96,"h":98},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":16,"y":15,"w":96,"h":98},
@@ -258,7 +266,7 @@
 },
 {
 	"filename": "explosions_Layer_9.png",
-	"frame": {"x":672,"y":117,"w":98,"h":98},
+	"frame": {"x":753,"y":1,"w":98,"h":98},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":15,"y":15,"w":98,"h":98},
@@ -282,7 +290,7 @@
 },
 {
 	"filename": "explosions_Layer_12.png",
-	"frame": {"x":753,"y":1,"w":96,"h":98},
+	"frame": {"x":853,"y":1,"w":96,"h":98},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":16,"y":15,"w":96,"h":98},
@@ -298,7 +306,7 @@
 },
 {
 	"filename": "explosions_Layer_14.png",
-	"frame": {"x":973,"y":179,"w":92,"h":76},
+	"frame": {"x":1030,"y":99,"w":92,"h":76},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":18,"y":26,"w":92,"h":76},
@@ -306,7 +314,7 @@
 },
 {
 	"filename": "explosions_Layer_15.png",
-	"frame": {"x":864,"y":115,"w":92,"h":80},
+	"frame": {"x":862,"y":117,"w":92,"h":80},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":18,"y":24,"w":92,"h":80},
@@ -314,7 +322,7 @@
 },
 {
 	"filename": "explosions_Layer_16.png",
-	"frame": {"x":1193,"y":67,"w":72,"h":60},
+	"frame": {"x":1224,"y":67,"w":72,"h":60},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":28,"y":34,"w":72,"h":60},
@@ -322,7 +330,7 @@
 },
 {
 	"filename": "landmine.png",
-	"frame": {"x":1129,"y":67,"w":62,"h":64},
+	"frame": {"x":1124,"y":67,"w":62,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":62,"h":64},
@@ -330,7 +338,7 @@
 },
 {
 	"filename": "laser_1.png",
-	"frame": {"x":949,"y":1,"w":5,"h":55},
+	"frame": {"x":1166,"y":199,"w":5,"h":55},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":5,"h":55},
@@ -353,32 +361,8 @@
 	"sourceSize": {"w":18,"h":18}
 },
 {
-	"filename": "shield_part_left.png",
-	"frame": {"x":663,"y":101,"w":8,"h":14},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":8,"h":14},
-	"sourceSize": {"w":8,"h":14}
-},
-{
-	"filename": "shield_part_mid.png",
-	"frame": {"x":683,"y":101,"w":7,"h":14},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":7,"h":14},
-	"sourceSize": {"w":7,"h":14}
-},
-{
-	"filename": "shield_part_right.png",
-	"frame": {"x":673,"y":101,"w":8,"h":14},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":8,"h":14},
-	"sourceSize": {"w":8,"h":14}
-},
-{
 	"filename": "ship_body.png",
-	"frame": {"x":1267,"y":67,"w":48,"h":64},
+	"frame": {"x":951,"y":1,"w":48,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":64},
@@ -386,7 +370,7 @@
 },
 {
 	"filename": "specialBar.png",
-	"frame": {"x":772,"y":213,"w":48,"h":12},
+	"frame": {"x":907,"y":229,"w":48,"h":12},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":12},
@@ -418,7 +402,7 @@
 },
 {
 	"filename": "ui_container1.png",
-	"frame": {"x":1032,"y":93,"w":95,"h":64},
+	"frame": {"x":1003,"y":179,"w":95,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":95,"h":64},
@@ -426,7 +410,7 @@
 },
 {
 	"filename": "ui_container2.png",
-	"frame": {"x":1017,"y":67,"w":72,"h":24},
+	"frame": {"x":833,"y":229,"w":72,"h":24},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":24},
@@ -434,7 +418,7 @@
 },
 {
 	"filename": "ui_health.png",
-	"frame": {"x":692,"y":101,"w":231,"h":12},
+	"frame": {"x":770,"y":215,"w":231,"h":12},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":231,"h":12},
@@ -442,7 +426,7 @@
 },
 {
 	"filename": "ui_healthbar.png",
-	"frame": {"x":958,"y":1,"w":346,"h":64},
+	"frame": {"x":1003,"y":1,"w":346,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":346,"h":64},
@@ -461,8 +445,8 @@
 	"version": "1.0",
 	"image": "main.png",
 	"format": "RGBA8888",
-	"size": {"w":1316,"h":256},
+	"size": {"w":1350,"h":255},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:38162cea8bb872396c9093e297e70473:673973e21ee0a4e65ae82f34ec7f1bd0:03f91ab73e0f4667800419161e658c40$"
+	"smartupdate": "$TexturePacker:SmartUpdate:548cb6b0381dc040258e090964bb96ad:55b3bbf1cee74d83ca3a5b7eddb9c9cd:03f91ab73e0f4667800419161e658c40$"
 }
 }
