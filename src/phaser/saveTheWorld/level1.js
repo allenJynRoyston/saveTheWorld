@@ -51,7 +51,7 @@ var PhaserGameObject = (function () {
             phaserBmd.assign(game);
             phaserTexts.assign(game);
             phaserButtons.assign(game);
-            phaserGroup.assign(game, 15);
+            phaserGroup.assign(game, 16);
             phaserBitmapdata.assign(game);
             phaserMaster.let('roundTime', 30);
             phaserMaster.let('clock', game.time.create(false));
@@ -361,7 +361,9 @@ var PhaserGameObject = (function () {
                             }).autoDestroy = true;
                             phaserMaster.get('clock').start();
                             phaserMaster.changeState('READY');
-                            victoryScreenSequence(function () { });
+                            setTimeout(function () {
+                                endLevel();
+                            }, 2000);
                         });
                     });
                 });
@@ -1456,8 +1458,6 @@ var PhaserGameObject = (function () {
                                     if (totalCount - countBy <= 0) {
                                         peopleCount.setText(0);
                                         clearInterval(countInterval);
-                                        callback();
-                                        console.log(medalsEarned);
                                     }
                                     else {
                                         totalSaved += countBy;
@@ -1518,7 +1518,14 @@ var PhaserGameObject = (function () {
                     });
                     setTimeout(function () {
                         playSequence('NICE JOB HERO', function () {
-                            phaserSprites.get('overlay').fadeIn(Phaser.Timer.SECOND * 1.5, function () {
+                            var background = phaserSprites.addTilespriteFromAtlas({ name: 'victory_bg', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_main', filename: 'victory_bg.png', alpha: 0 });
+                            background.count = 0;
+                            background.onUpdate = function () {
+                                this.tilePosition.x -= 10;
+                            };
+                            phaserGroup.add(11, background);
+                            game.add.tween(background).to({ alpha: 1 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false).autoDestroy = true;
+                            phaserSprites.get('overlay').fadeIn(Phaser.Timer.SECOND / 2, function () {
                                 victoryScreenSequence(function () {
                                     endGame();
                                 });
