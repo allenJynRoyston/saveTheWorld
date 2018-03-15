@@ -12,6 +12,9 @@ var PhaserGameObject = (function () {
         function saveData(prop, value) {
             var gameData = phaserMaster.get('gameData');
             gameData[prop] = value;
+        }
+        function updateStore() {
+            var gameData = phaserMaster.get('gameData');
             store.commit('setGamedata', gameData);
         }
         function preload() {
@@ -21,7 +24,6 @@ var PhaserGameObject = (function () {
             var folder = 'src/phaser/saveTheWorld/resources';
             game.load.image('background', folder + "/images/starfield.png");
             game.load.atlas('atlas_main', folder + "/spritesheets/main/main.png", folder + "/spritesheets/main/main.json", Phaser.Loader.TEXTURE_atlas_main_JSON_HASH);
-            game.load.atlas('atlas_space', folder + "/spritesheets/space/space.png", folder + "/spritesheets/space/space.json", Phaser.Loader.TEXTURE_atlas_main_JSON_HASH);
             game.load.json('weaponData', folder + "/json/weaponData.json");
             game.load.bitmapFont('gem', folder + "/fonts/gem.png", folder + "/fonts/gem.xml");
             phaserMaster.changeState('PRELOAD');
@@ -51,13 +53,12 @@ var PhaserGameObject = (function () {
             phaserButtons.assign(game);
             phaserGroup.assign(game, 15);
             phaserBitmapdata.assign(game);
-            phaserMaster.let('score', gameData.score);
             phaserMaster.let('roundTime', 30);
             phaserMaster.let('clock', game.time.create(false));
             phaserMaster.let('elapsedTime', 0);
             phaserMaster.let('devMode', true);
             phaserMaster.let('starMomentum', { x: 0, y: 0 });
-            phaserMaster.let('population', { total: gameData.population.total, killed: gameData.population.killed });
+            phaserMaster.let('pauseStatus', false);
             var weaponData = game.cache.getJSON('weaponData');
             var pw = phaserMaster.let('primaryWeapon', weaponData.primaryWeapons[gameData.primaryWeapon]);
             var sw = phaserMaster.let('secondaryWeapon', weaponData.secondaryWeapons[gameData.secondaryWeapon]);
@@ -67,7 +68,7 @@ var PhaserGameObject = (function () {
             game.onResume.add(function () {
                 unpauseGame();
             }, this);
-            var background = phaserSprites.addTilespriteFromAtlas({ name: 'background', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_space', filename: 'spacebg.png' });
+            var background = phaserSprites.addTilespriteFromAtlas({ name: 'background', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_main', filename: 'spacebg.png' });
             background.count = 0;
             background.onUpdate = function () {
                 this.count += 0.005;
@@ -78,7 +79,7 @@ var PhaserGameObject = (function () {
             emitter.makeParticles('atlas_main', 'particle.png');
             emitter.gravity = 0;
             phaserGroup.layer(1).add(emitter);
-            var _loop_1 = function () {
+            var _loop_1 = function (i) {
                 var star = phaserSprites.addFromAtlas({ x: game.rnd.integerInRange(0, game.world.width), y: game.rnd.integerInRange(0, game.world.height), name: "star_" + i, group: 'movingStarField', filename: "stars_layer_" + game.rnd.integerInRange(1, 3) + ".png", atlas: 'atlas_main', visible: true });
                 star.starType = game.rnd.integerInRange(1, 3);
                 star.scale.setTo(star.starType / 2, star.starType / 2);
@@ -116,22 +117,22 @@ var PhaserGameObject = (function () {
                 phaserGroup.layer(4 - star.starType).add(star);
             };
             for (var i = 0; i < 25; i++) {
-                _loop_1();
+                _loop_1(i);
             }
-            var nebula1 = phaserSprites.addTilespriteFromAtlas({ name: 'nebula1', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_space', filename: 'Nebula1.png' });
+            var nebula1 = phaserSprites.addTilespriteFromAtlas({ name: 'nebula1', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_main', filename: 'Nebula1.png' });
             nebula1.count = 0;
             nebula1.onUpdate = function () {
                 this.count += 0.005;
                 this.tilePosition.x -= Math.sin(this.count) * 0.2;
             };
-            var nebula2 = phaserSprites.addTilespriteFromAtlas({ name: 'nebula2', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_space', filename: 'Nebula2.png' });
+            var nebula2 = phaserSprites.addTilespriteFromAtlas({ name: 'nebula2', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_main', filename: 'Nebula2.png' });
             nebula2.count = 0;
             nebula2.onUpdate = function () {
                 this.count += 0.005;
                 this.tilePosition.y += 0.2;
                 this.tilePosition.x += 0.2;
             };
-            var earth = phaserSprites.addFromAtlas({ x: this.game.world.centerX, y: this.game.canvas.height + 400, name: "earth", group: 'spaceGroup', filename: 'earth.png', atlas: 'atlas_space', visible: true });
+            var earth = phaserSprites.addFromAtlas({ x: this.game.world.centerX, y: this.game.canvas.height + 400, name: "earth", group: 'spaceGroup', filename: 'earth.png', atlas: 'atlas_main', visible: true });
             earth.scale.setTo(2, 2);
             earth.anchor.setTo(0.5, 0.5);
             earth.onUpdate = function () {
@@ -143,10 +144,10 @@ var PhaserGameObject = (function () {
             earth.selfDestruct = function () {
                 var _this = this;
                 tweenTint(this, this.tint, 1 * 0xff0000, Phaser.Timer.SECOND * 8);
-                for (var i_1 = 0; i_1 < 100; i_1++) {
+                for (var i = 0; i < 100; i++) {
                     setTimeout(function () {
                         createExplosion(game.rnd.integerInRange(0, _this.game.canvas.width), game.rnd.integerInRange(_this.game.canvas.height - 200, _this.game.canvas.height), 0.25);
-                    }, 100 * i_1);
+                    }, 100 * i);
                 }
             };
             phaserGroup.addMany(2, [earth]);
@@ -154,12 +155,13 @@ var PhaserGameObject = (function () {
             var timeContainer = phaserSprites.addFromAtlas({ name: "timerContainer", group: 'ui', filename: 'ui_container1.png', atlas: 'atlas_main', visible: false });
             phaserSprites.centerOnPoint('timerContainer', this.game.world.centerX, -200);
             timeContainer.reveal = function () {
+                var _this = this;
                 this.visible = true;
                 this.game.add.tween(this).to({ y: 5 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false).
                     onComplete.add(function () {
-                    var timeKeeper = phaserTexts.add({ y: 16, name: 'timeKeeper', group: 'ui_text', font: 'gem', size: 42, default: "00", visible: false });
+                    var timeKeeper = phaserTexts.add({ y: 36, x: _this.game.world.centerX, name: 'timeKeeper', group: 'ui_text', font: 'gem', size: 42, default: "00", visible: false });
+                    timeKeeper.anchor.setTo(0.5, 0.5);
                     timeKeeper.reveal = function () {
-                        this.x = this.game.world.centerX - 20;
                         this.visible = true;
                         this.alpha = 0;
                         this.game.add.tween(this).to({ alpha: 1 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false);
@@ -189,63 +191,67 @@ var PhaserGameObject = (function () {
                 this.game.add.tween(this).to({ y: -200 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 500, 0, false);
                 phaserTexts.get('timeKeeper').hide();
             };
-            var roundContainer = phaserSprites.addFromAtlas({ name: "roundContainer", group: 'ui', filename: 'ui_container2.png', atlas: 'atlas_main', visible: false });
-            roundContainer.reveal = function () {
-                this.x = this.game.world.width - this.width - 10;
+            var scoreContainer = phaserSprites.addFromAtlas({ name: "scoreContainer", group: 'ui', filename: 'ui_roundContainer.png', atlas: 'atlas_main', visible: false });
+            scoreContainer.anchor.setTo(0.5, 0.5);
+            scoreContainer.reveal = function () {
+                var _this = this;
+                this.x = this.game.world.width - this.width / 2 - 10;
                 this.y = -200;
                 this.visible = true;
-                this.game.add.tween(this).to({ y: 5 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false).
+                this.game.add.tween(this).to({ y: 20 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false).
                     onComplete.add(function () {
-                    var roundText = phaserTexts.add({ name: 'roundText', group: 'ui_text', x: game.world.width - 70, y: 10, font: 'gem', size: 12, default: "Round " + gameData.level, visible: false });
-                    roundText.reveal = function () {
-                        this.visible = true;
-                        this.alpha = 0;
+                    var scoreText = phaserTexts.add({ name: 'scoreText', group: 'ui_text', x: _this.x, y: _this.y, font: 'gem', size: 14, default: "" + gameData.score, alpha: 0 });
+                    scoreText.anchor.setTo(0.5, 0.5);
+                    scoreText.onUpdate = function () { };
+                    scoreText.updateScore = function () {
+                        this.setText("" + phaserMaster.get('gameData').score);
+                    };
+                    scoreText.reveal = function () {
                         this.game.add.tween(this).to({ alpha: 1 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false);
-                        phaserGroup.add(15, this);
                     };
-                    roundText.hide = function () {
-                        this.game.add.tween(this).to({ alpha: 0 }, Phaser.Timer.SECOND, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                    scoreText.hide = function () {
+                        this.game.add.tween(this).to({ alpha: 0 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false);
                     };
-                    roundText.reveal();
+                    scoreText.reveal();
                 });
             };
-            roundContainer.hide = function () {
+            scoreContainer.hide = function () {
                 this.game.add.tween(this).to({ y: -200 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 500, 0, false);
-                phaserTexts.get('roundText').hide();
+                phaserTexts.get('scoreText').hide();
             };
-            var healthContainer = phaserSprites.addFromAtlas({ name: "healthContainer", group: 'ui', filename: 'ui_healthbar.png', atlas: 'atlas_main', visible: false });
-            healthContainer.reveal = function () {
+            var statusContainer = phaserSprites.addFromAtlas({ name: "statusContainer", group: 'ui', filename: 'ui_statusContainer.png', atlas: 'atlas_main', visible: false });
+            statusContainer.reveal = function () {
                 this.x = -this.width;
                 this.y = this.game.world.height - this.height - 10;
                 this.visible = true;
                 this.game.add.tween(this).to({ x: 10 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false).
                     onComplete.add(function () {
-                    var healthBar = phaserSprites.addFromAtlas({ x: healthContainer.x + 84, y: healthContainer.y + 46, name: "healthBar", group: 'ui_overlay', filename: 'ui_health.png', atlas: 'atlas_main', visible: true });
+                    var healthBar = phaserSprites.addFromAtlas({ x: statusContainer.x + 7, y: statusContainer.y + 22, name: "healthBar", group: 'ui_overlay', filename: 'ui_shieldBar.png', atlas: 'atlas_main', visible: true });
                     var maskhealth = phaserMaster.let('healthBar', phaserSprites.addBasicMaskToSprite(healthBar));
-                    maskhealth.x = -healthBar.width;
-                    updateShipHealthbar(100);
-                    var specialBar = phaserSprites.addFromAtlas({ x: healthContainer.x + 84, y: healthContainer.y + 26, name: "specialBar", group: 'ui_overlay', filename: 'specialBar.png', atlas: 'atlas_main', visible: true });
+                    maskhealth.y = healthBar.height;
+                    updateShipHealthbar(gameData.player.health);
+                    var specialBar = phaserSprites.addFromAtlas({ x: statusContainer.x + 30, y: statusContainer.y + 206, name: "specialBar", group: 'ui_overlay', filename: 'ui_specialBar.png', atlas: 'atlas_main', visible: true });
                     var maskspecial = phaserMaster.let('specialBar', phaserSprites.addBasicMaskToSprite(specialBar));
-                    maskspecial.x = -specialBar.width;
+                    maskspecial.y = specialBar.height;
                     updateShipSpecial(100);
-                    var specialWeapon = phaserSprites.addFromAtlas({ x: healthContainer.x + 32, y: healthContainer.y + 32, name: "specialWeapon", group: 'ui_overlay', filename: 'clusterBomb.png', atlas: 'atlas_main', visible: true });
+                    var specialWeapon = phaserSprites.addFromAtlas({ x: statusContainer.x + 36, y: statusContainer.y + 305, name: "specialWeapon", group: 'ui_overlay', filename: 'clusterBomb.png', atlas: 'atlas_main', visible: false });
                     specialWeapon.anchor.setTo(0.5, 0.5);
-                    specialWeapon.scale.setTo(1.5, 1.5);
                     specialWeapon.onUpdate = function () {
                         this.angle += 2;
                     };
                     specialWeapon.reveal = function () {
+                        this.visible = true;
+                        specialWeapon.scale.setTo(2, 2);
+                        this.game.add.tween(this.scale).to({ x: 1.5, y: 1.5 }, Phaser.Timer.SECOND, Phaser.Easing.Bounce.Out, true, 0, 0, false);
                     };
                     specialWeapon.hide = function () {
                         this.visible = false;
-                    };
-                    specialWeapon.onPress = function (delay) {
                     };
                     specialWeapon.reveal();
                     phaserGroup.addMany(14, [healthBar, specialBar, specialWeapon]);
                 });
             };
-            healthContainer.hide = function () {
+            statusContainer.hide = function () {
                 updateShipSpecial(0);
                 updateShipHealthbar(0);
                 phaserSprites.getGroup('ui_overlay').forEach(function (obj) {
@@ -263,10 +269,12 @@ var PhaserGameObject = (function () {
                     onComplete.add(function () {
                     _this.defaultPosition.x = _this.x;
                     _this.defaultPosition.y = _this.y;
-                    var earthBar = phaserSprites.addFromAtlas({ x: earthContainer.x + 5, y: earthContainer.y + 5, name: "earthBar", group: 'ui_overlay', filename: 'earthBar.png', atlas: 'atlas_main', visible: true });
+                    var earthBar = phaserSprites.addFromAtlas({ x: earthContainer.x + 5, y: earthContainer.y + 5, name: "earthBar", group: 'ui_overlay', filename: 'ui_healthBar.png', atlas: 'atlas_main', visible: true });
                     var maskhealth = phaserMaster.let('earthBar', phaserSprites.addBasicMaskToSprite(earthBar));
                     maskhealth.x = -earthBar.width;
-                    updateEarthbar(100);
+                    var population = gameData.population;
+                    var damageTaken = 100 - ((population.killed / population.total) * 100);
+                    updateEarthbar(damageTaken);
                 });
             };
             earthContainer.hide = function () {
@@ -283,23 +291,42 @@ var PhaserGameObject = (function () {
                     });
                 });
             };
-            phaserGroup.addMany(13, [timeContainer, healthContainer, roundContainer, earthContainer]);
-            var scoreText = phaserTexts.add({ name: 'scoreText', group: 'ui', x: 10, y: 10, font: 'gem', size: 18, default: "Score: " + phaserMaster.get('score'), visible: false });
-            scoreText.onUpdate = function () { };
-            scoreText.updateScore = function () {
+            var portraitContainer = phaserSprites.addFromAtlas({ x: 10, name: "portraitContainer", group: 'ui', filename: 'ui_portraitContainer.png', atlas: 'atlas_main', visible: false });
+            portraitContainer.reveal = function () {
+                var _this = this;
+                this.y = -this.height - 10;
+                this.visible = true;
+                this.game.add.tween(this).to({ y: 10 }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 0, 0, false).
+                    onComplete.add(function () {
+                    var characterPortrait = phaserSprites.addFromAtlas({ x: _this.x + 2, y: _this.y + 2, name: "characterPortrait", group: 'ui_overlay', filename: 'ui_portrait_1.png', atlas: 'atlas_main', alpha: 0 });
+                    characterPortrait.reveal = function () {
+                        this.game.add.tween(this).to({ alpha: 1 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false);
+                    };
+                    characterPortrait.hide = function () {
+                        this.game.add.tween(this).to({ alpha: 0 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false);
+                    };
+                    characterPortrait.reveal();
+                    for (var i = 0; i < gameData.player.lives; i++) {
+                        var lifeIcon = phaserSprites.addFromAtlas({ x: _this.x + 12 + (i * 20), y: _this.y + _this.height + 10, name: "lifeIcon_" + i, group: 'ui_overlay', filename: 'ship_icon.png', atlas: 'atlas_main', alpha: 0 });
+                        lifeIcon.anchor.setTo(0.5, 0.5);
+                        lifeIcon.reveal = function () {
+                            this.game.add.tween(this).to({ alpha: 1 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false);
+                        };
+                        lifeIcon.hide = function () {
+                            this.game.add.tween(this).to({ alpha: 0 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 0, 0, false);
+                        };
+                        lifeIcon.destroyIt = function () {
+                            phaserSprites.destroy(this.name);
+                        };
+                        lifeIcon.reveal();
+                    }
+                    phaserGroup.addMany(12, [characterPortrait]);
+                });
             };
-            scoreText.reveal = function () {
+            portraitContainer.hide = function () {
+                this.game.add.tween(this).to({ y: -this.height }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 500, 0, false);
             };
-            scoreText.hide = function () {
-            };
-            var healthText = phaserTexts.add({ name: 'healthText', group: 'ui', font: 'gem', x: 15, y: game.canvas.height - 23, size: 16, default: '', visible: false });
-            healthText.onUpdate = function () {
-            };
-            healthText.reveal = function () {
-            };
-            healthText.hide = function () {
-            };
-            phaserGroup.addMany(15, [scoreText]);
+            phaserGroup.addMany(13, [timeContainer, statusContainer, scoreContainer, earthContainer, portraitContainer]);
             var overlaybmd = phaserBitmapdata.addGradient({ name: 'overlaybmd', start: '#2f2f2f', end: '#2f2f2f', width: 5, height: 5, render: false });
             var overlay = phaserSprites.add({ x: 0, y: 0, name: "overlay", reference: overlaybmd.cacheBitmapData, visible: true });
             overlay.width = game.canvas.width;
@@ -334,6 +361,7 @@ var PhaserGameObject = (function () {
                             }).autoDestroy = true;
                             phaserMaster.get('clock').start();
                             phaserMaster.changeState('READY');
+                            victoryScreenSequence(function () { });
                         });
                     });
                 });
@@ -349,7 +377,7 @@ var PhaserGameObject = (function () {
             if (tween !== null) {
                 tween.stop();
             }
-            phaserMaster.forceLet('healthBarTween', game.add.tween(mask).to({ x: -231 + (7.7 * bars) }, immediate ? 1 : duration, Phaser.Easing.Linear.Out, true, 0, 0, false));
+            phaserMaster.forceLet('healthBarTween', game.add.tween(mask).to({ y: 231 - (7.7 * bars) }, immediate ? 1 : duration, Phaser.Easing.Linear.Out, true, 0, 0, false));
         }
         function updateShipSpecial(remaining, immediate, duration) {
             if (immediate === void 0) { immediate = false; }
@@ -361,7 +389,7 @@ var PhaserGameObject = (function () {
             if (tween !== null) {
                 tween.stop();
             }
-            phaserMaster.forceLet('specialBarTween', game.add.tween(mask).to({ x: -48 + (8 * bars) }, immediate ? 1 : duration, Phaser.Easing.Linear.Out, true, 0, 0, false));
+            phaserMaster.forceLet('specialBarTween', game.add.tween(mask).to({ y: 48 - (8 * bars) }, immediate ? 1 : duration, Phaser.Easing.Linear.Out, true, 0, 0, false));
         }
         function updateEarthbar(remaining, immediate, duration) {
             if (immediate === void 0) { immediate = false; }
@@ -376,12 +404,17 @@ var PhaserGameObject = (function () {
             phaserMaster.forceLet('earthBarTween', game.add.tween(mask).to({ x: -244 + (24.4 * bars) }, immediate ? 1 : duration, Phaser.Easing.Linear.Out, true, 0, 0, false));
         }
         function earthTakeDamage(val) {
-            var population = phaserMaster.get('population');
+            var population = phaserMaster.get('gameData').population;
             population.killed += val;
             var damageTaken = 100 - ((population.killed / population.total) * 100);
-            phaserSprites.get('earthContainer').takeDamage();
-            updateEarthbar(damageTaken, true);
-            phaserMaster.forceLet('population', population);
+            if (damageTaken <= 0 && !phaserMaster.checkState('GAMEOVER')) {
+                gameOver();
+            }
+            else {
+                phaserSprites.get('earthContainer').takeDamage();
+                updateEarthbar(damageTaken, true);
+                saveData('population', { total: population.total, killed: population.killed });
+            }
         }
         function playSequence(wordString, callback) {
             var game = phaserMaster.game();
@@ -408,16 +441,31 @@ var PhaserGameObject = (function () {
             shipExhaust.animations.add('exhaust_animation', Phaser.Animation.generateFrameNames('exhaust_red_', 1, 8, '.png'), 1, true);
             shipExhaust.animations.play('exhaust_animation', 30, true);
             phaserGroup.add(8, shipExhaust);
+            shipExhaust.anchor.setTo(0.5, 0.5);
             shipExhaust.onUpdate = function () {
                 var player = phaserSprites.get('player');
-                var x = player.x, width = player.width, height = player.height, y = player.y, visible = player.visible;
+                var x = player.x, width = player.width, height = player.height, y = player.y, visible = player.visible, isDead = player.isDead;
                 this.visible = !phaserMaster.checkState('ENDLEVEL') ? visible : false;
-                this.x = x - 17;
-                this.y = y + 8;
+                this.x = x;
+                this.y = y + 40;
+                this.alpha = !phaserMaster.checkState('ENDLEVEL') && isDead ? 0 : 1;
+                this.scale.setTo(1, 1);
             };
             shipExhaust.updateCords = function (x, y) {
-                this.x = x - 17;
-                this.y = y + 8;
+                var starMomentum = phaserMaster.get('starMomentum');
+                this.x = x;
+                if (starMomentum.y == 0) {
+                    this.y = y + 40;
+                    this.scale.setTo(1, 1);
+                }
+                if (starMomentum.y > 0) {
+                    this.y = y + 50;
+                    this.scale.setTo(1, 1.5);
+                }
+                if (starMomentum.y < 0) {
+                    this.y = y + 25;
+                    this.scale.setTo(1, 0.25);
+                }
             };
             shipExhaust.destroyIt = function () {
                 phaserSprites.destroy('exhaust');
@@ -428,27 +476,85 @@ var PhaserGameObject = (function () {
             var player = phaserSprites.addFromAtlas({ name: 'player', group: 'playership', atlas: 'atlas_main', filename: 'ship_body.png', visible: false });
             player.anchor.setTo(0.5, 0.5);
             player.scale.setTo(1, 1);
-            player.isInvincible = true;
+            player.isInvincible = false;
+            player.isDead = false;
             game.physics.enable(player, Phaser.Physics.ARCADE);
             phaserGroup.add(8, player);
             createShipExhaust();
             player.onUpdate = function () {
-                if (this.visible) {
+                var _this = this;
+                if (this.visible && !player.isDead) {
                     player.createTrail();
                 }
+                if (!player.isInvincible && !phaserMaster.checkState('ENDLEVEL')) {
+                    var hasCollided_1 = false;
+                    returnAllCollidables().forEach(function (target) {
+                        target.game.physics.arcade.overlap(_this, target, function (player, target) {
+                            hasCollided_1 = true;
+                            target.damageIt(50);
+                        }, null, _this);
+                    });
+                    if (hasCollided_1) {
+                        this.isInvincible = true;
+                        player.takeDamage(10);
+                    }
+                }
+            };
+            player.takeDamage = function (val) {
+                var _this = this;
+                var gameData = phaserMaster.get('gameData');
+                var health = gameData.player.health - val;
+                updateShipHealthbar(health);
+                if (health > 0) {
+                    saveData('player', { health: health, lives: gameData.player.lives });
+                    this.tint = 1 * 0xff0000;
+                    this.alpha = 0.75;
+                    this.game.add.tween(this).to({ tint: 1 * 0xffffff, alpha: 1 }, 100, Phaser.Easing.Linear.Out, true, 100, 0, false).
+                        onComplete.add(function () {
+                        _this.isInvincible = false;
+                    });
+                }
+                else {
+                    gameData.player.lives--;
+                    phaserSprites.get("lifeIcon_" + gameData.player.lives).destroyIt();
+                    if (gameData.player.lives > 0) {
+                        saveData('player', { health: 100, lives: gameData.player.lives });
+                        phaserControls.clearAllControlIntervals();
+                        phaserControls.disableAllInput();
+                        this.isDestroyed();
+                    }
+                    else {
+                        gameOver();
+                    }
+                }
+            };
+            player.isDestroyed = function () {
+                var _this = this;
+                player.isDead = true;
+                createExplosion(this.x, this.y, 1);
+                game.add.tween(this).to({ angle: game.rnd.integerInRange(-90, 90), alpha: 0 }, 1000, Phaser.Easing.Linear.In, true, 0).
+                    onComplete.add(function () {
+                    createExplosion(_this.x, _this.y, 1);
+                    _this.visible = false;
+                    setTimeout(function () {
+                        updateShipHealthbar(100);
+                        player.moveToStart();
+                    }, 1000);
+                });
             };
             player.createTrail = function () {
                 var trailCount = phaserSprites.getGroup('trails').length;
                 if (trailCount < phaserMaster.checkState('ENDLEVEL') ? 20 : 10) {
                     var trail = phaserSprites.addFromAtlas({ name: "trail_" + game.rnd.integer(), group: 'trails', x: this.x, y: this.y, filename: 'ship_body.png', atlas: 'atlas_main', visible: true });
                     trail.anchor.setTo(0.5, 0.5);
-                    trail.scale.setTo(this.scale.x, this.scale.y);
-                    trail.alpha = 0.6;
+                    trail.scale.setTo(this.scale.x - 0.2, this.scale.y - 0.2);
+                    trail.alpha = 0.4;
+                    trail.angle = this.angle;
                     trail.tint = 1 * 0x0000ff;
                     phaserGroup.add(7, trail);
                     trail.destroySelf = function () {
                         var _this = this;
-                        this.game.add.tween(this).to({ alpha: 0 }, phaserMaster.checkState('ENDLEVEL') ? 400 : 100, Phaser.Easing.Linear.In, true, 0).
+                        this.game.add.tween(this).to({ alpha: 0 }, phaserMaster.checkState('ENDLEVEL') ? 1200 : 250, Phaser.Easing.Linear.In, true, 0).
                             onComplete.add(function () {
                             phaserSprites.destroy(_this.name);
                         }, this);
@@ -458,6 +564,7 @@ var PhaserGameObject = (function () {
             };
             player.selfDestruct = function () {
                 var _this = this;
+                this.isInvincible = true;
                 phaserSprites.get('exhaust').destroyIt();
                 game.add.tween(this.scale).to({ x: 0.25, y: 0.25 }, 3400, Phaser.Easing.Linear.In, true, 0).
                     game.add.tween(this).to({ angle: 720 }, 3400, Phaser.Easing.Linear.In, true, 0).
@@ -467,10 +574,21 @@ var PhaserGameObject = (function () {
                 }, this);
             };
             player.moveToStart = function () {
+                var _this = this;
+                player.isDead = false;
+                this.angle = 0;
+                this.alpha = 1;
                 this.visible = true;
+                this.isInvincible = true;
                 this.x = this.game.world.centerX;
                 this.y = this.game.world.centerY + 550;
-                game.add.tween(this).to({ y: game.world.centerY + 200 }, 1000, Phaser.Easing.Exponential.InOut, true, 0, 0, false);
+                game.add.tween(this).to({ y: game.world.centerY + 200 }, 1000, Phaser.Easing.Exponential.InOut, true, 0, 0, false).
+                    onComplete.add(function () {
+                    phaserControls.enableAllInput();
+                    setTimeout(function () {
+                        _this.isInvincible = false;
+                    }, 1000);
+                });
             };
             player.moveX = function (val) {
                 this.x += val;
@@ -498,6 +616,7 @@ var PhaserGameObject = (function () {
             };
             player.playEndSequence = function (callback) {
                 var _this = this;
+                this.isInvincible = true;
                 this.game.add.tween(this.scale).to({ x: 2, y: 2 }, 1500, Phaser.Easing.Exponential.InOut, true, 0, 0, false);
                 this.game.add.tween(this).to({ x: this.game.world.centerX, y: this.game.world.centerY + 50 }, 1500, Phaser.Easing.Exponential.InOut, true, 0, 0, false).
                     onComplete.add(function () {
@@ -557,8 +676,9 @@ var PhaserGameObject = (function () {
             alien.destroyIt = function (spawnMore) {
                 var _this = this;
                 if (spawnMore === void 0) { spawnMore = true; }
-                var score = phaserMaster.get('score');
-                phaserMaster.forceLet('score', score += 100);
+                var score = phaserMaster.get('gameData').score;
+                score += 100;
+                saveData('score', score);
                 var scoreText = phaserTexts.get('scoreText');
                 scoreText.updateScore();
                 var tween = {
@@ -667,8 +787,9 @@ var PhaserGameObject = (function () {
             obj.destroyIt = function (spawnMore) {
                 var _this = this;
                 if (spawnMore === void 0) { spawnMore = true; }
-                var score = phaserMaster.get('score');
-                phaserMaster.forceLet('score', score += 100);
+                var score = phaserMaster.get('gameData').score;
+                score += 1000;
+                saveData('score', score);
                 var scoreText = phaserTexts.get('scoreText');
                 scoreText.updateScore();
                 var tween = {
@@ -784,8 +905,9 @@ var PhaserGameObject = (function () {
             };
             trash.destroyIt = function () {
                 var _this = this;
-                var score = phaserMaster.get('score');
-                phaserMaster.forceLet('score', score += 25);
+                var score = phaserMaster.get('gameData').score;
+                score += 25;
+                saveData('score', score);
                 var scoreText = phaserTexts.get('scoreText');
                 scoreText.updateScore();
                 var tween = {
@@ -1159,9 +1281,11 @@ var PhaserGameObject = (function () {
         }
         function pauseGame() {
             phaserMaster.get('clock').stop();
+            phaserMaster.forceLet('pauseStatus', true);
         }
         function unpauseGame() {
             phaserMaster.get('clock').start();
+            phaserMaster.forceLet('pauseStatus', false);
         }
         function update() {
             var game = phaserMaster.game();
@@ -1211,9 +1335,9 @@ var PhaserGameObject = (function () {
                 if (elapsedTime < 15 && phaserSprites.getGroup('aliens').length < 5) {
                     createAlien({
                         x: game.rnd.integerInRange(0, game.canvas.width),
-                        y: game.rnd.integerInRange(-50, -100),
+                        y: game.rnd.integerInRange(-50, -300),
                         ix: game.rnd.integerInRange(-100, 100),
-                        iy: game.rnd.integerInRange(0, 150)
+                        iy: game.rnd.integerInRange(0, 80)
                     });
                 }
                 if (elapsedTime === 15 && phaserSprites.getGroup('boss').length === 0) {
@@ -1240,6 +1364,9 @@ var PhaserGameObject = (function () {
                     starMomentum.y = -2;
                     player.moveY(5);
                 }
+                if (!phaserControls.read('UP').active && !phaserControls.read('DOWN').active) {
+                    starMomentum.y = 0;
+                }
                 if (phaserControls.checkWithDelay({ isActive: true, key: 'A', delay: primaryWeapon.cooldown - (phaserControls.read('A').state * primaryWeapon.rapidFireSpd) })) {
                     if (primaryWeapon.wpnType === 'LASER') {
                         createLaser({ x: player.x, offset: -15, y: player.y, spread: -primaryWeapon.spread / 2, damageMod: 1 });
@@ -1263,7 +1390,6 @@ var PhaserGameObject = (function () {
                 }
                 if (phaserControls.checkWithDelay({ isActive: true, key: 'B', delay: secondaryWeapon.cooldown })) {
                     if (specialWeapon !== undefined) {
-                        specialWeapon.onPress(secondaryWeapon.cooldown);
                         updateShipSpecial(0, true);
                         game.time.events.add(50, function () {
                             updateShipSpecial(100, false, secondaryWeapon.cooldown - 50);
@@ -1293,6 +1419,67 @@ var PhaserGameObject = (function () {
                 player.onUpdate();
             }
         }
+        function victoryScreenSequence(callback) {
+            var game = phaserMaster.game();
+            var victoryScreenContainer = phaserSprites.addFromAtlas({ y: game.world.centerY - 100, name: "victoryScreenContainer", group: 'ui_clear', filename: 'ui_clear.png', atlas: 'atlas_main', visible: false });
+            victoryScreenContainer.anchor.setTo(0.5, 0.5);
+            victoryScreenContainer.reveal = function () {
+                var _this = this;
+                this.x = -this.width - 100;
+                this.visible = true;
+                this.game.add.tween(this).to({ x: this.game.world.centerX }, Phaser.Timer.SECOND * 1.5, Phaser.Easing.Bounce.Out, true, 0, 0, false).
+                    onComplete.add(function () {
+                    var population = phaserMaster.get('gameData').population;
+                    var leftText = phaserTexts.add({ name: 'popLeft', font: 'gem', x: _this.x, y: _this.y - 10, size: 24, default: "PEOPLE SAVED:", alpha: 0 });
+                    leftText.anchor.setTo(0.5, 0.5);
+                    leftText.scale.setTo(2, 2);
+                    leftText.game.add.tween(leftText.scale).to({ x: 1, y: 1 }, 100, Phaser.Easing.Linear.Out, true, 0);
+                    leftText.game.add.tween(leftText).to({ alpha: 1 }, 100, Phaser.Easing.Linear.Out, true, 0)
+                        .onComplete.add(function () {
+                        setTimeout(function () {
+                            var population = phaserMaster.get('gameData').population;
+                            var peopleCount = phaserTexts.add({ name: 'popCount', font: 'gem', x: _this.x, y: _this.y + 30, size: 45, default: "", alpha: 0 });
+                            peopleCount.anchor.setTo(0.5, 0.5);
+                            peopleCount.scale.setTo(1.5, 1.5);
+                            peopleCount.setText("" + (population.total - population.killed) * 700000);
+                            peopleCount.game.add.tween(peopleCount.scale).to({ x: 1, y: 1 }, 100, Phaser.Easing.Linear.Out, true, 0);
+                            peopleCount.game.add.tween(peopleCount).to({ alpha: 1 }, 100, Phaser.Easing.Linear.Out, true, 0);
+                            var totalCount = (population.total - population.killed) * 700000;
+                            var countBy = 100000;
+                            var medalsEarned = 0;
+                            var totalSaved = 0;
+                            var countInterval = setInterval(function () {
+                                if (!phaserMaster.get('pauseStatus')) {
+                                    if (countBy > totalCount) {
+                                        countBy = Math.round(countBy / 2);
+                                    }
+                                    if (totalCount - countBy <= 0) {
+                                        peopleCount.setText(0);
+                                        clearInterval(countInterval);
+                                        callback();
+                                        console.log(medalsEarned);
+                                    }
+                                    else {
+                                        totalSaved += countBy;
+                                        if (totalSaved > 10000000) {
+                                            medalsEarned++;
+                                            totalSaved = 0;
+                                        }
+                                        totalCount -= countBy;
+                                        peopleCount.setText(totalCount);
+                                    }
+                                }
+                            }, 1);
+                        }, Phaser.Timer.SECOND / 2);
+                    });
+                });
+            };
+            victoryScreenContainer.hide = function () {
+                this.game.add.tween(this).to({ y: -this.height }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 500, 0, false);
+            };
+            victoryScreenContainer.reveal();
+            phaserGroup.addMany(13, [victoryScreenContainer]);
+        }
         function endLevel() {
             var game = phaserMaster.game();
             var gameData = phaserMaster.get('gameData');
@@ -1310,10 +1497,6 @@ var PhaserGameObject = (function () {
                 var level = gameData.level++;
                 level++;
                 saveData('level', level);
-                var score = phaserMaster.get('score');
-                saveData('score', score);
-                var population = phaserMaster.get('population');
-                saveData('population', { total: population.total, killed: population.killed });
                 for (var i = 0; i < 20; i++) {
                     setTimeout(function () {
                         createExplosion(game.rnd.integerInRange(0, game.world.width), game.rnd.integerInRange(0, game.world.height), game.rnd.integerInRange(1, 4));
@@ -1330,29 +1513,17 @@ var PhaserGameObject = (function () {
                             trash.destroyIt(false);
                         }, game.rnd.integerInRange(0, 500));
                     });
+                    phaserSprites.getGroup('movingStarField').forEach(function (star) {
+                        star.fadeOut();
+                    });
                     setTimeout(function () {
-                        playSequence('NICE JOB STUD', function () {
-                            phaserSprites.getGroup('movingStarField').forEach(function (star) {
-                                star.fadeOut();
-                            });
-                            phaserSprites.get('earth').fadeOut();
-                            setTimeout(function () {
-                                var pop = phaserMaster.get('population');
-                                var leftText = phaserTexts.add({ name: 'popLeft', font: 'gem', y: game.world.centerY, size: 58, default: "Humans saved:", visible: true });
-                                phaserTexts.alignToCenter('popLeft');
-                                leftText.game.add.tween(leftText).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.Out, true, Phaser.Timer.SECOND)
-                                    .onComplete.add(function () {
-                                    leftText.alpha = 1;
-                                    leftText.setText("" + (pop.total - pop.killed) * 700000);
-                                    phaserTexts.alignToCenter('popLeft');
-                                    leftText.game.add.tween(leftText).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.Out, true, Phaser.Timer.SECOND * 2)
-                                        .onComplete.add(function () {
-                                        phaserSprites.get('overlay').fadeIn(Phaser.Timer.SECOND * 1.5, function () {
-                                            endGame();
-                                        });
-                                    });
+                        playSequence('NICE JOB HERO', function () {
+                            phaserSprites.get('overlay').fadeIn(Phaser.Timer.SECOND * 1.5, function () {
+                                victoryScreenSequence(function () {
+                                    endGame();
                                 });
-                            }, Phaser.Timer.SECOND);
+                                phaserSprites.get('earth').fadeOut();
+                            });
                         });
                     }, Phaser.Timer.SECOND * 1.5);
                 }, Phaser.Timer.SECOND / 3);
@@ -1362,6 +1533,15 @@ var PhaserGameObject = (function () {
             phaserMaster.changeState('GAMEOVER');
             var player = phaserSprites.get('player');
             var earth = phaserSprites.get('earth');
+            phaserTexts.getGroup('ui_text').forEach(function (text) {
+                text.hide();
+            });
+            phaserSprites.getGroup('ui').forEach(function (obj) {
+                obj.hide();
+            });
+            phaserSprites.getGroup('secondaryWpnSprite').forEach(function (obj) {
+                obj.destroyIt();
+            });
             player.selfDestruct();
             earth.selfDestruct();
             playSequence('DUDE IT WAS THE FIRST LEVEL JEEZE', function () {
@@ -2190,11 +2370,13 @@ var PHASER_SPRITE_MANAGER = (function () {
             params.y = params.y !== undefined ? params.y : 0;
             params.group = params.group !== undefined ? params.group : null;
             params.visible = params.visible !== undefined ? params.visible : true;
+            params.alpha = params.alpha !== undefined ? params.alpha : 1;
             var newSprite = this.game.add.sprite(params.x, params.y, params.reference);
             newSprite.name = params.name;
             newSprite.group = params.group;
             newSprite.defaultPosition = { x: params.x, y: params.y };
             newSprite.visible = params.visible;
+            newSprite.alpha = params.alpha;
             newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
             newSprite.getDefaultPositions = function () { return this.defaultPosition; };
             newSprite.init = function () { };
@@ -2218,11 +2400,13 @@ var PHASER_SPRITE_MANAGER = (function () {
             params.y = params.y !== undefined ? params.y : 0;
             params.group = params.group !== undefined ? params.group : null;
             params.visible = params.visible !== undefined ? params.visible : true;
+            params.alpha = params.alpha !== undefined ? params.alpha : 1;
             var newSprite = this.game.add.sprite(params.x, params.y, params.atlas, params.filename);
             newSprite.name = params.name;
             newSprite.group = params.group;
             newSprite.defaultPosition = { x: params.x, y: params.y };
             newSprite.visible = params.visible;
+            newSprite.alpha = params.alpha;
             newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
             newSprite.getDefaultPositions = function () { return this.defaultPosition; };
             newSprite.init = function () { };
@@ -2246,11 +2430,43 @@ var PHASER_SPRITE_MANAGER = (function () {
             params.y = params.y !== undefined ? params.y : 0;
             params.group = params.group !== undefined ? params.group : null;
             params.visible = params.visible !== undefined ? params.visible : true;
+            params.alpha = params.alpha !== undefined ? params.alpha : 1;
             var newSprite = this.game.add.tileSprite(params.x, params.y, params.width, params.height, params.atlas, params.filename);
             newSprite.name = params.name;
             newSprite.group = params.group;
             newSprite.defaultPosition = { x: params.x, y: params.y };
             newSprite.visible = params.visible;
+            newSprite.alpha = params.alpha;
+            newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
+            newSprite.getDefaultPositions = function () { return this.defaultPosition; };
+            newSprite.init = function () { };
+            newSprite.onUpdate = function () { };
+            newSprite.reveal = function () { };
+            newSprite.hide = function () { };
+            this.sprites.array.push(newSprite);
+            this.sprites.object[params.name] = newSprite;
+            return newSprite;
+        }
+        else {
+            console.log("Duplicate key name not allowed: " + params.name);
+        }
+    };
+    PHASER_SPRITE_MANAGER.prototype.addEmptySprite = function (params) {
+        var duplicateCheck = this.sprites.array.filter(function (obj) {
+            return obj.name === params.name;
+        });
+        if (duplicateCheck.length === 0) {
+            params.x = params.x !== undefined ? params.x : 0;
+            params.y = params.y !== undefined ? params.y : 0;
+            params.group = params.group !== undefined ? params.group : null;
+            params.visible = params.visible !== undefined ? params.visible : true;
+            params.alpha = params.alpha !== undefined ? params.alpha : 1;
+            var newSprite = this.game.add.sprite(params.x, params.y);
+            newSprite.name = params.name;
+            newSprite.group = params.group;
+            newSprite.defaultPosition = { x: params.x, y: params.y };
+            newSprite.visible = params.visible;
+            newSprite.alpha = params.alpha;
             newSprite.setDefaultPositions = function (x, y) { this.defaultPosition.x = x, this.defaultPosition.y = y; };
             newSprite.getDefaultPositions = function () { return this.defaultPosition; };
             newSprite.init = function () { };
@@ -2374,11 +2590,13 @@ var PHASER_TEXT_MANAGER = (function () {
         params.size = params.size !== undefined ? params.size : 12;
         params.default = params.default !== undefined ? params.default : '';
         params.visible = params.visible !== undefined ? params.visible : true;
+        params.alpha = params.alpha !== undefined ? params.alpha : 1;
         if (duplicateCheck.length === 0) {
             var newText = this.game.add.bitmapText(params.x, params.y, params.font, params.default, params.size);
             newText.name = params.name;
             newText.group = params.group;
             newText.visible = params.visible;
+            newText.alpha = params.alpha;
             this.texts.array.push(newText);
             this.texts.object[params.name] = newText;
             return newText;

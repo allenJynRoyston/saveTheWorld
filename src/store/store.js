@@ -32,6 +32,10 @@ function createNewLocalData(){
       population: {
         total: 100,
         killed: 0
+      },
+      player:{
+        health: 100,
+        lives: 3
       }
     }
   };
