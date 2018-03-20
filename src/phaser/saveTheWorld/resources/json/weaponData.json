@@ -108,6 +108,61 @@
       "spriteIcon": "bombIcon",
       "limit": 3
     }
+  },
+  "perks":{
+    "CLUSTERBOMB": {
+      "id": 50,
+      "type": "secondaryWeapon",
+      "wpnType": "CLUSTERBOMB",
+      "name": "Cluster Bombs",
+      "damage": 100,
+      "velocity": -400,
+      "cooldown": 4000,
+      "description":"Description cluster 1",
+      "sprite": "bomblet",
+      "spriteIcon": "bombIcon",
+      "bomblets": 25
+    },
+    "TRIPLEBOMB": {
+      "id": 50,
+      "type": "secondaryWeapon",
+      "wpnType": "TRIPLEBOMB",
+      "name": "Super Beam",
+      "damage": 200,
+      "initialVelocity": -200,
+      "velocity": 10,
+      "cooldown": 2500,
+      "description":"Description cluster 1",
+      "sprite": "bomblet",
+      "spriteIcon": "bombIcon"
+    },
+    "TURRET": {
+      "id": 50,
+      "type": "secondaryWeapon",
+      "wpnType": "TURRET",
+      "name": "Auto Turret",
+      "damage": 5,
+      "initialVelocity": null,
+      "velocity": null,
+      "cooldown": 10000,
+      "description":"Description cluster 1",
+      "sprite": "bomblet",
+      "spriteIcon": "bombIcon",
+      "lifespan": 9000
+    },
+    "MINES": {
+      "id": 50,
+      "type": "secondaryWeapon",
+      "wpnType": "MINES",
+      "name": "Mines",
+      "damage": 5,
+      "initialVelocity": null,
+      "velocity": null,
+      "cooldown": 1500,
+      "description":"Description cluster 1",
+      "sprite": "bomblet",
+      "spriteIcon": "bombIcon",
+      "limit": 3
+    }
   }
-
 }

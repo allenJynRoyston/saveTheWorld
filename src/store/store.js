@@ -35,7 +35,7 @@ function createNewLocalData(){
       },
       player:{
         health: 100,
-        lives: 3
+        lives: 1
       }
     }
   };

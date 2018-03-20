@@ -1,7 +1,6 @@
 <template lang="pug">
   .game-container
     #phaser-example
-    p {{gameData.level}}
 </template>
 
 <script>
@@ -26,8 +25,8 @@ export default {
   },
   methods: {
     init(){
-      this.loadGame('level1.js')
-      //this.loadGame('powerUpMenu.js')
+      //this.loadGame('level1.js')
+      this.loadGame('heroSelect.js')
     },
     loadGame(fileName){
       // remove old game first
@@ -46,11 +45,16 @@ export default {
     test(){
       this.loadGame('level1.js')
     },
-    loadShop(){
-      this.loadGame('powerUpMenu.js')
+    returnToTitle(){
+      alert("return to title")
     },
-    gameOver(){
-      alert("GAME OVER")
+    loadNextLevel(){
+      alert('load next level')
+      this.test();
+    },
+    retry(){
+      alert("retry level")
+      this.test();
     },
     loadFile(file, index){
       this.active = index;

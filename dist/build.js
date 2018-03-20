@@ -25986,7 +25986,6 @@ Object.defineProperty(exports, "__esModule", {
 //
 //
 //
-//
 
 
 exports.default = {
@@ -26016,6 +26015,7 @@ exports.default = {
       // remove old game first
       if (this.game !== null) {
         this.game.destroy();
+        console.log('destroy old game');
       }
       // load new one
       var js = document.createElement("script");
@@ -26029,11 +26029,16 @@ exports.default = {
     test: function test() {
       this.loadGame('level1.js');
     },
-    loadShop: function loadShop() {
-      this.loadGame('powerUpMenu.js');
+    returnToTitle: function returnToTitle() {
+      alert("return to title");
     },
-    gameOver: function gameOver() {
-      alert("GAME OVER");
+    loadNextLevel: function loadNextLevel() {
+      alert('load next level');
+      this.test();
+    },
+    retry: function retry() {
+      alert("retry level");
+      this.test();
     },
     loadFile: function loadFile(file, index) {
       this.active = index;
@@ -26050,14 +26055,16 @@ exports.default = {
 /***/ (function(module, exports) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _vm._m(0)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "game-container"
   }, [_c('div', {
     attrs: {
       "id": "phaser-example"
     }
-  }), _c('p', [_vm._v(_vm._s(_vm.gameData.level))])])
-},staticRenderFns: []}
+  })])
+}]}
 
 /***/ }),
 /* 48 */
@@ -26659,6 +26666,10 @@ function createNewLocalData() {
       population: {
         total: 100,
         killed: 0
+      },
+      player: {
+        health: 100,
+        lives: 1
       }
     }
   };
