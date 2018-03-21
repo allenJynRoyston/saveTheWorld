@@ -1,20 +1,20 @@
 {
   "primaryWeapons":{
-    "LASER": {
+    "BULLET": {
       "id": 0,
       "type": "primaryWeapon",
-      "wpnType": "LASER",
-      "name": "Laser",
+      "wpnType": "BULLET",
+      "name": "Bullet",
       "damage": 5,
-      "initialVelocity": -200,
+      "initialVelocity": -4000,
       "velocity": 35,
-      "cooldown": 500,
+      "cooldown": 75,
       "pierce": true,
       "spread": 0,
       "secondaryExplosion": false,
       "description":"Description laser 1",
-      "sprite": "laser1",
-      "spriteIcon": "laser1icon",
+      "spriteAnimation": ["bullet_1.png", "bullet_2.png"],
+      "spriteIcon": "pw_1.png",
       "rapidFireSpd": 75
     },
     "MISSLE": {
@@ -26,30 +26,30 @@
       "initialVelocity": 150,
       "velocity": 10,
       "number": 3,
-      "cooldown": 900,
+      "cooldown": 500,
       "pierce": false,
       "spread": 2,
       "secondaryExplosion": true,
       "description":"Description missle 3",
-      "sprite": "missle1",
-      "spriteIcon": "missle3icon",
+      "spriteAnimation": ["missle1.png"],
+      "spriteIcon": "pw_2.png",
       "rapidFireSpd": 75
     },
-    "BULLET": {
+    "LASER": {
       "id": 0,
       "type": "primaryWeapon",
-      "wpnType": "BULLET",
+      "wpnType": "LASER",
       "name": "PewPew Beam",
       "damage": 10,
-      "initialVelocity": 200,
+      "initialVelocity": -2000,
       "velocity": 100,
-      "cooldown": 50,
+      "cooldown": 250,
       "pierce": false,
       "spread": 0,
       "secondaryExplosion": false,
       "description":"Description laser 1",
-      "sprite": "laser1",
-      "spriteIcon": "laser1icon",
+      "spriteAnimation": ["beam_frame_1.png", "beam_frame_2.png", "beam_frame_3.png", "beam_frame_4.png"],
+      "spriteIcon": "pw_3.png",
       "rapidFireSpd": 0
     }
   },
@@ -60,11 +60,12 @@
       "wpnType": "CLUSTERBOMB",
       "name": "Cluster Bombs",
       "damage": 100,
-      "velocity": -400,
+      "initialVelocity": -300,
+      "velocity": 10,
       "cooldown": 4000,
       "description":"Description cluster 1",
-      "sprite": "bomblet",
-      "spriteIcon": "bombIcon",
+      "spriteAnimation": ["sw_1.png"],
+      "spriteIcon": "sw_1.png",
       "bomblets": 25
     },
     "TRIPLEBOMB": {
@@ -73,12 +74,12 @@
       "wpnType": "TRIPLEBOMB",
       "name": "Super Beam",
       "damage": 200,
-      "initialVelocity": -200,
+      "initialVelocity": -500,
       "velocity": 10,
       "cooldown": 2500,
       "description":"Description cluster 1",
-      "sprite": "bomblet",
-      "spriteIcon": "bombIcon"
+      "spriteAnimation": ["sw_2.png"],
+      "spriteIcon": "sw_2.png"
     },
     "TURRET": {
       "id": 50,
@@ -90,22 +91,22 @@
       "velocity": null,
       "cooldown": 10000,
       "description":"Description cluster 1",
-      "sprite": "bomblet",
-      "spriteIcon": "bombIcon",
+      "spriteAnimation": ["sw_2.png"],
+      "spriteIcon": "sw_4.png",
       "lifespan": 9000
     },
-    "MINES": {
+    "BLASTRADIUS": {
       "id": 50,
       "type": "secondaryWeapon",
-      "wpnType": "MINES",
-      "name": "Mines",
+      "wpnType": "BLASTRADIUS",
+      "name": "Blastradius",
       "damage": 5,
       "initialVelocity": null,
       "velocity": null,
       "cooldown": 1500,
-      "description":"Description cluster 1",
-      "sprite": "bomblet",
-      "spriteIcon": "bombIcon",
+      "description":"Blast radius",
+      "spriteAnimation": ["explosions_Layer_1.png", "explosions_Layer_2.png", "explosions_Layer_3.png", "explosions_Layer_4.png", "explosions_Layer_5.png", "explosions_Layer_6.png", "explosions_Layer_7.png", "explosions_Layer_8.png", "explosions_Layer_9.png", "explosions_Layer_10.png", "explosions_Layer_11.png", "explosions_Layer_12.png", "explosions_Layer_13.png", "explosions_Layer_14.png", "explosions_Layer_15.png", "explosions_Layer_16.png"],
+      "spriteIcon": "sw_3.png",
       "limit": 3
     }
   },
@@ -120,7 +121,7 @@
       "cooldown": 4000,
       "description":"Description cluster 1",
       "sprite": "bomblet",
-      "spriteIcon": "bombIcon",
+      "spriteIcon": "perk_1.png",
       "bomblets": 25
     },
     "TRIPLEBOMB": {
@@ -134,7 +135,7 @@
       "cooldown": 2500,
       "description":"Description cluster 1",
       "sprite": "bomblet",
-      "spriteIcon": "bombIcon"
+      "spriteIcon": "perk_2.png"
     },
     "TURRET": {
       "id": 50,
@@ -147,22 +148,8 @@
       "cooldown": 10000,
       "description":"Description cluster 1",
       "sprite": "bomblet",
-      "spriteIcon": "bombIcon",
-      "lifespan": 9000
-    },
-    "MINES": {
-      "id": 50,
-      "type": "secondaryWeapon",
-      "wpnType": "MINES",
-      "name": "Mines",
-      "damage": 5,
-      "initialVelocity": null,
-      "velocity": null,
-      "cooldown": 1500,
-      "description":"Description cluster 1",
-      "sprite": "bomblet",
-      "spriteIcon": "bombIcon",
-      "limit": 3
+      "spriteIcon": "perk_3.png",
+      "lifespan": 4000
     }
   }
 }
