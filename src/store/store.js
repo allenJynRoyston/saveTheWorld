@@ -27,8 +27,10 @@ function createNewLocalData(){
     gameData: {
       score: 0,
       level: 1,
-      primaryWeapon: 'LASER',
+      pilot: 0,
+      primaryWeapon: 'BULLET',
       secondaryWeapon: 'CLUSTERBOMB',
+      perk: 'FIREPOWER',
       population: {
         total: 100,
         killed: 0

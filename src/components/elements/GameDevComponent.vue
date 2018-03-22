@@ -25,8 +25,8 @@ export default {
   },
   methods: {
     init(){
-      //this.loadGame('level1.js')
-      this.loadGame('heroSelect.js')
+      this.loadGame('level1.js')
+      //this.loadGame('heroSelect.js')
     },
     loadGame(fileName){
       // remove old game first
@@ -41,6 +41,9 @@ export default {
           js.onload = (() => {
             __phaser.init(this.$el, this, {width: 640, height: 640, store: this.$store});
           })
+    },
+    startGame(){
+      this.loadGame('level1.js')
     },
     test(){
       this.loadGame('level1.js')

@@ -1,0 +1,33 @@
+{
+  "pilots":[
+    {
+      "image": "portrait_1.png",
+      "age": 36,
+      "name": "PILOT 1",
+      "firerate": "FAST",
+      "subweaponRecharge": "AVERAGE",
+      "health": "AVERAGE",
+      "movement": "AVERAGE"
+    },
+    {
+      "image": "portrait_2.png",
+      "age": 29,
+      "name": "PILOT 2",
+      "description": "LOREM IPSUM SOMETHING LOREM IPSUM SOMETHING LOREM IPSUM SOMETHING",
+      "firerate": "AVERAGE",
+      "subweaponRecharge": "FAST",
+      "health": "AVERAGE",
+      "movement": "AVERAGE"
+    },
+    {
+      "image": "portrait_3.png",
+      "age": 62,
+      "name": "PILOT 3",
+      "description": "LOREM IPSUM SOMETHING LOREM IPSUM SOMETHING LOREM IPSUM SOMETHING",
+      "firerate": "AVERAGE",
+      "subweaponRecharge": "FAST",
+      "health": "LOW",
+      "movement": "FAST"
+    }
+  ]
+}
