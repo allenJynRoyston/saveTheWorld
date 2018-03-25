@@ -26007,7 +26007,7 @@ exports.default = {
   methods: {
     init: function init() {
       this.loadGame('level1.js');
-      //this.loadGame('powerUpMenu.js')
+      //this.loadGame('heroSelect.js')
     },
     loadGame: function loadGame(fileName) {
       var _this = this;
@@ -26015,7 +26015,6 @@ exports.default = {
       // remove old game first
       if (this.game !== null) {
         this.game.destroy();
-        console.log('destroy old game');
       }
       // load new one
       var js = document.createElement("script");
@@ -26025,6 +26024,9 @@ exports.default = {
       js.onload = function () {
         __phaser.init(_this.$el, _this, { width: 640, height: 640, store: _this.$store });
       };
+    },
+    startGame: function startGame() {
+      this.loadGame('level1.js');
     },
     test: function test() {
       this.loadGame('level1.js');
@@ -26661,8 +26663,10 @@ function createNewLocalData() {
     gameData: {
       score: 0,
       level: 1,
-      primaryWeapon: 'LASER',
+      pilot: 0,
+      primaryWeapon: 'BULLET',
       secondaryWeapon: 'CLUSTERBOMB',
+      perk: 'FIREPOWER',
       population: {
         total: 100,
         killed: 0
@@ -27681,7 +27685,7 @@ var index_esm = {
 /* 71 */
 /***/ (function(module, exports) {
 
-module.exports = {"primaryWeapons":{"LASER":{"id":0,"type":"primaryWeapon","wpnType":"LASER","name":"Laser","damage":5,"initialVelocity":-200,"velocity":35,"cooldown":500,"pierce":true,"spread":0,"secondaryExplosion":false,"description":"Description laser 1","sprite":"laser1","spriteIcon":"laser1icon","rapidFireSpd":75},"MISSLE":{"id":23,"type":"primaryWeapon","wpnType":"MISSLES","name":"Spread Missles","damage":100,"initialVelocity":150,"velocity":10,"number":3,"cooldown":900,"pierce":false,"spread":2,"secondaryExplosion":true,"description":"Description missle 3","sprite":"missle1","spriteIcon":"missle3icon","rapidFireSpd":75},"BULLET":{"id":0,"type":"primaryWeapon","wpnType":"BULLET","name":"PewPew Beam","damage":10,"initialVelocity":200,"velocity":100,"cooldown":50,"pierce":false,"spread":0,"secondaryExplosion":false,"description":"Description laser 1","sprite":"laser1","spriteIcon":"laser1icon","rapidFireSpd":0}},"secondaryWeapons":{"CLUSTERBOMB":{"id":50,"type":"secondaryWeapon","wpnType":"CLUSTERBOMB","name":"Cluster Bombs","damage":100,"velocity":-400,"cooldown":4000,"description":"Description cluster 1","sprite":"bomblet","spriteIcon":"bombIcon","bomblets":25},"TRIPLEBOMB":{"id":50,"type":"secondaryWeapon","wpnType":"TRIPLEBOMB","name":"Super Beam","damage":200,"initialVelocity":-200,"velocity":10,"cooldown":2500,"description":"Description cluster 1","sprite":"bomblet","spriteIcon":"bombIcon"},"TURRET":{"id":50,"type":"secondaryWeapon","wpnType":"TURRET","name":"Auto Turret","damage":5,"initialVelocity":null,"velocity":null,"cooldown":10000,"description":"Description cluster 1","sprite":"bomblet","spriteIcon":"bombIcon","lifespan":9000},"MINES":{"id":50,"type":"secondaryWeapon","wpnType":"MINES","name":"Mines","damage":5,"initialVelocity":null,"velocity":null,"cooldown":1500,"description":"Description cluster 1","sprite":"bomblet","spriteIcon":"bombIcon","limit":3}}}
+module.exports = {"primaryWeapons":{"BULLET":{"id":0,"type":"primaryWeapon","reference":"BULLET","name":"X22 ROUNDS","damage":25,"initialVelocity":-3000,"velocity":35,"cooldown":75,"pierce":false,"spread":0,"secondaryExplosion":false,"description":"Rapid fire, low damage ballistic bullets.","spriteAnimation":["bullet_1.png","bullet_2.png"],"spriteIcon":"icon_pw_1.png","rapidFireSpd":0},"MISSLE":{"id":23,"type":"primaryWeapon","reference":"MISSLES","name":"EXPLOSIVE MISSLES","damage":100,"initialVelocity":150,"velocity":10,"number":3,"cooldown":500,"pierce":false,"spread":2,"secondaryExplosion":true,"description":"Missles that explode upon impact.  High damage.","spriteAnimation":["orange_ring_explosion_layer_1.png","orange_ring_explosion_layer_2.png","orange_ring_explosion_layer_3.png","orange_ring_explosion_layer_4.png","orange_ring_explosion_layer_5.png","orange_ring_explosion_layer_6.png","orange_ring_explosion_layer_7.png"],"spriteIcon":"icon_pw_2.png","rapidFireSpd":75},"LASER":{"id":0,"type":"primaryWeapon","reference":"LASER","name":"PHASER BEAM","damage":10,"initialVelocity":-2000,"velocity":100,"cooldown":250,"pierce":true,"spread":0,"secondaryExplosion":false,"description":"Phase shifting laser beams that can pass through and damage multiple targets.  Medium damage.","spriteAnimation":["beam_anim_1.png","beam_anim_2.png","beam_anim_3.png","beam_anim_4.png"],"spriteIcon":"icon_pw_3.png","rapidFireSpd":0}},"secondaryWeapons":{"CLUSTERBOMB":{"id":50,"type":"secondaryWeapon","reference":"CLUSTERBOMB","name":"CLUSTER BOMBS","damage":100,"initialVelocity":-300,"velocity":10,"cooldown":4000,"description":"Upon impact, several dozen bomblets are created which can also explode upon contact.","spriteAnimation":["icon_sw_1.png"],"spriteIcon":"icon_sw_1.png","bomblets":25},"TRIPLEBOMB":{"id":50,"type":"secondaryWeapon","reference":"TRIPLEBOMB","name":"BOALA BOMBS","damage":200,"initialVelocity":-500,"velocity":10,"cooldown":2500,"description":"Release three sets of boala bombs that cause high damage on impact.  Disrupts the momentum of incoming objects.","spriteAnimation":["icon_sw_2.png"],"spriteIcon":"icon_sw_2.png"},"TURRET":{"id":50,"type":"secondaryWeapon","reference":"TURRET","name":"AUTO TURRET","damage":5,"initialVelocity":null,"velocity":null,"cooldown":10000,"description":"Stationary self deployed turret which automatically shoots at targets in front of it.","spriteAnimation":["icon_sw_2.png"],"spriteIcon":"icon_sw_4.png","lifespan":9000},"BLASTRADIUS":{"id":50,"type":"secondaryWeapon","reference":"BLASTRADIUS","name":"HEAT DISPERATION BLAST","damage":5,"initialVelocity":null,"velocity":null,"cooldown":1500,"description":"Creates a strong heatwave directly around the ship, dealing heavy damage to anything caught in the radius.","spriteAnimation":["blue_explosion_layer_1.png","blue_explosion_layer_2.png","blue_explosion_layer_3.png","blue_explosion_layer_4.png","blue_explosion_layer_5.png","blue_explosion_layer_6.png","blue_explosion_layer_7.png"],"spriteIcon":"icon_sw_3.png","limit":3}},"perks":{"FIREPOWER":{"id":50,"type":"secondaryWeapon","reference":"FIREPOWER","name":"EXTRA FIREPOWER","damage":100,"velocity":-400,"cooldown":4000,"description":"Weapons start fully powered up.","sprite":"bomblet","spriteIcon":"icon_perk_1.png","bomblets":25},"REGEN":{"id":50,"type":"secondaryWeapon","reference":"REGEN","name":"AMALORATIVE PLATING","damage":200,"initialVelocity":-200,"velocity":10,"cooldown":2500,"description":"Health regenerates over time.","sprite":"bomblet","spriteIcon":"icon_perk_2.png"},"ARMORPLATING":{"id":50,"type":"secondaryWeapon","reference":"ARMORPLATING","name":"AUTO TURRET","damage":5,"initialVelocity":null,"velocity":null,"cooldown":10000,"description":"Pilot begins missions with 150% more health, and takes 25% less damage.","sprite":"bomblet","spriteIcon":"icon_perk_3.png","lifespan":4000}}}
 
 /***/ })
 /******/ ]);
