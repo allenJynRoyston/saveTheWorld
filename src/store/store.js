@@ -38,7 +38,8 @@ function createNewLocalData(){
       player:{
         health: 100,
         lives: 3
-      }
+      },
+      snapshot: null
     }
   };
   localStorage.setItem('checksum', getChecksumValue(JSON.stringify(localData)) )

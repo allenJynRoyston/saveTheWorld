@@ -6,7 +6,9 @@ var PhaserGameObject = (function () {
         };
     }
     PhaserGameObject.prototype.init = function (el, parent, options) {
-        var phaserMaster = new PHASER_MASTER({ game: new Phaser.Game(options.width, options.height, Phaser.WEBGL, el, { preload: preload, create: create, update: update }), resolution: { width: options.width, height: options.height } }), phaserControls = new PHASER_CONTROLS(), phaserMouse = new PHASER_MOUSE({ showDebugger: false }), phaserSprites = new PHASER_SPRITE_MANAGER(), phaserBmd = new PHASER_BITMAPDATA_MANAGER(), phaserTexts = new PHASER_TEXT_MANAGER(), phaserButtons = new PHASER_BUTTON_MANAGER(), phaserGroup = new PHASER_GROUP_MANAGER(), phaserBitmapdata = new PHASER_BITMAPDATA_MANAGER(), weaponManager = new WEAPON_MANAGER(), enemyManager = new ENEMY_MANAGER(), playerManager = new PLAYER_MANAGER();
+        var game = new Phaser.Game(options.width, options.height, Phaser.WEBGL, el, { preload: preload, create: create, update: update });
+        game.preserveDrawingBuffer = true;
+        var phaserMaster = new PHASER_MASTER({ game: game, resolution: { width: options.width, height: options.height } }), phaserControls = new PHASER_CONTROLS(), phaserMouse = new PHASER_MOUSE({ showDebugger: false }), phaserSprites = new PHASER_SPRITE_MANAGER(), phaserBmd = new PHASER_BITMAPDATA_MANAGER(), phaserTexts = new PHASER_TEXT_MANAGER(), phaserButtons = new PHASER_BUTTON_MANAGER(), phaserGroup = new PHASER_GROUP_MANAGER(), phaserBitmapdata = new PHASER_BITMAPDATA_MANAGER(), weaponManager = new WEAPON_MANAGER(), enemyManager = new ENEMY_MANAGER(), playerManager = new PLAYER_MANAGER(), utilityManager = new UTILITY_MANAGER();
         var store = options.store;
         var gameDataCopy = JSON.stringify(store.getters._gameData());
         phaserMaster.let('gameData', JSON.parse(gameDataCopy));
@@ -43,7 +45,6 @@ var PhaserGameObject = (function () {
             colorTween.start();
         }
         function create() {
-            var _this = this;
             var game = phaserMaster.game();
             var gameData = phaserMaster.get('gameData');
             game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -58,6 +59,7 @@ var PhaserGameObject = (function () {
             weaponManager.assign(game, phaserMaster, phaserSprites, phaserGroup, 'atlas_weapons');
             enemyManager.assign(game, phaserMaster, phaserSprites, phaserTexts, phaserGroup, weaponManager, 'atlas_main');
             playerManager.assign(game, phaserMaster, phaserSprites, phaserTexts, phaserGroup, phaserControls, weaponManager, 'atlas_main');
+            utilityManager.assign(game, phaserSprites, phaserBitmapdata, phaserGroup, 'atlas_main');
             phaserMaster.let('roundTime', 2);
             phaserMaster.let('clock', game.time.create(false));
             phaserMaster.let('elapsedTime', 0);
@@ -73,27 +75,8 @@ var PhaserGameObject = (function () {
             game.onResume.add(function () {
                 unpauseGame();
             }, this);
-            var squareSize = 80;
-            var count = 0;
-            for (var c = 0; c < Math.ceil(game.world.height / squareSize); c++) {
-                var _loop_1 = function (r) {
-                    var gridSquare = phaserSprites.addFromAtlas({ x: c * squareSize, y: r * squareSize, name: "grid" + count, group: 'grids', width: squareSize, height: squareSize, atlas: 'atlas_main', filename: 'landmine.png', visible: true });
-                    gridSquare.anchor.setTo(0.5, 0.5);
-                    gridSquare.x = gridSquare.x += gridSquare.width / 2;
-                    gridSquare.y = gridSquare.y += gridSquare.height / 2;
-                    gridSquare.fadeOut = function (speed) {
-                        _this.game.add.tween(gridSquare).to({ height: 0 }, speed, Phaser.Easing.Linear.Out, true, 0, 0, false);
-                    };
-                    gridSquare.fadeIn = function (speed) {
-                        _this.game.add.tween(gridSquare).to({ height: squareSize }, speed, Phaser.Easing.Linear.In, true, 0, 0, false);
-                    };
-                    count++;
-                    phaserGroup.add(20, gridSquare);
-                };
-                for (var r = 0; r < Math.ceil(game.world.width / squareSize); r++) {
-                    _loop_1(r);
-                }
-            }
+            utilityManager.buildOverlayBackground('#ffffff', '#ffffff', 19, true);
+            utilityManager.buildOverlayGrid(80, 20, 'landmine.png');
             var boundryObj = phaserBitmapdata.addGradient({ name: 'boundryObj', start: '#ffffff', end: '#ffffff', width: 5, height: 5, render: false });
             var leftBoundry = phaserSprites.add({ x: -9, y: -game.world.height / 2, name: "leftBoundry", group: 'boundries', width: 10, height: game.world.height * 2, reference: boundryObj.cacheBitmapData, alpha: 0 });
             var rightBoundry = phaserSprites.add({ x: game.world.width - 1, y: -game.world.height / 2, name: "rightBoundry", group: 'boundries', width: 10, height: game.world.height * 2, reference: boundryObj.cacheBitmapData, alpha: 0 });
@@ -111,7 +94,7 @@ var PhaserGameObject = (function () {
             emitter.makeParticles('atlas_main', 'particle.png');
             emitter.gravity = 0;
             phaserGroup.layer(1).add(emitter);
-            var _loop_2 = function (i) {
+            var _loop_1 = function (i) {
                 var star = phaserSprites.addFromAtlas({ x: game.rnd.integerInRange(0, game.world.width), y: game.rnd.integerInRange(0, game.world.height), name: "star_" + i, group: 'movingStarField', filename: "stars_layer_" + game.rnd.integerInRange(1, 3) + ".png", atlas: 'atlas_main', visible: true });
                 star.starType = game.rnd.integerInRange(1, 3);
                 star.scale.setTo(star.starType / 2, star.starType / 2);
@@ -149,7 +132,7 @@ var PhaserGameObject = (function () {
                 phaserGroup.layer(4 - star.starType).add(star);
             };
             for (var i = 0; i < 25; i++) {
-                _loop_2(i);
+                _loop_1(i);
             }
             var nebula1 = phaserSprites.addTilespriteFromAtlas({ name: 'nebula1', group: 'spaceGroup', x: 0, y: 0, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_large', filename: 'Nebula1.png' });
             nebula1.count = 0;
@@ -358,6 +341,7 @@ var PhaserGameObject = (function () {
                 });
             };
             bossContainer.hide = function () {
+                updateBossBar(0);
                 this.game.add.tween(this).to({ y: -this.height }, Phaser.Timer.SECOND, Phaser.Easing.Back.InOut, true, 500, 0, false);
             };
             var portraitContainer = phaserSprites.addFromAtlas({ x: 10, name: "portraitContainer", group: 'ui', filename: 'ui_portraitContainer.png', atlas: 'atlas_main', visible: false });
@@ -443,20 +427,22 @@ var PhaserGameObject = (function () {
             var isDevMode = phaserMaster.get('devMode');
             var overlay = phaserSprites.getOnly(['overlay']).overlay;
             var _a = phaserMaster.getOnly(['clock', 'roundTime']), clock = _a.clock, roundTime = _a.roundTime;
-            overlayControls('FADEOUT', function () {
-                var player = createPlayer();
-                overlay.fadeOut(isDevMode ? 0 : Phaser.Timer.SECOND / 2, function () {
-                    playSequence('SAVE THE WORLD', function () {
-                        player.moveToStart();
-                        game.time.events.add(isDevMode ? Phaser.Timer.SECOND * 0 : Phaser.Timer.SECOND * 1, function () {
-                            playSequence(roundTime + " SECONDS GO", function () {
-                                game.time.events.add(isDevMode ? Phaser.Timer.SECOND * 0 : Phaser.Timer.SECOND / 2, function () {
-                                    phaserSprites.getGroup('ui').map(function (sprite) {
-                                        sprite.reveal();
-                                        phaserMaster.changeState('READY');
-                                    });
-                                }).autoDestroy = true;
-                                clock.start();
+            overlayControls('WIPEOUT', function () {
+                utilityManager.overlayBGControls({ transition: 'FADEOUT', delay: 0, speed: 250 }, function () {
+                    var player = createPlayer();
+                    overlay.fadeOut(isDevMode ? 0 : Phaser.Timer.SECOND / 2, function () {
+                        playSequence('SAVE THE WORLD', function () {
+                            player.moveToStart();
+                            game.time.events.add(isDevMode ? Phaser.Timer.SECOND * 0 : Phaser.Timer.SECOND * 1, function () {
+                                playSequence(roundTime + " SECONDS GO", function () {
+                                    game.time.events.add(isDevMode ? Phaser.Timer.SECOND * 0 : Phaser.Timer.SECOND / 2, function () {
+                                        phaserSprites.getGroup('ui').map(function (sprite) {
+                                            sprite.reveal();
+                                            phaserMaster.changeState('READY');
+                                        });
+                                    }).autoDestroy = true;
+                                    clock.start();
+                                });
                             });
                         });
                     });
@@ -465,31 +451,7 @@ var PhaserGameObject = (function () {
         }
         function overlayControls(transition, callback) {
             if (callback === void 0) { callback = function () { }; }
-            var delay = 500;
-            var speed = 500;
-            var tileDelay = 10;
-            setTimeout(function () {
-                if (transition === 'FADEOUT') {
-                    phaserSprites.getGroup('grids').map(function (obj, index) {
-                        setTimeout(function () {
-                            obj.fadeOut(speed);
-                        }, tileDelay * index);
-                    });
-                    setTimeout(function () {
-                        callback();
-                    }, phaserSprites.getGroup('grids').length * tileDelay + speed);
-                }
-                if (transition === 'FADEIN') {
-                    phaserSprites.getGroup('grids').map(function (obj, index) {
-                        setTimeout(function () {
-                            obj.fadeIn(speed);
-                        }, tileDelay * index);
-                    });
-                    setTimeout(function () {
-                        callback();
-                    }, phaserSprites.getGroup('grids').length * tileDelay + speed);
-                }
-            }, delay);
+            utilityManager.overlayControls({ transition: transition, delay: 500, speed: 500, tileDelay: 15 }, callback);
         }
         function updateShipHealthbar(remaining, immediate, duration) {
             if (immediate === void 0) { immediate = false; }
@@ -605,7 +567,7 @@ var PhaserGameObject = (function () {
                     gameOver();
                 }
             };
-            var player = playerManager.createShip1(updateHealth, loseLife, onUpdate);
+            var player = playerManager.createShip1({ name: 'player', group: 'playership', layer: 8 }, updateHealth, loseLife, onUpdate);
             return player;
         }
         function createEnemy(options) {
@@ -648,12 +610,12 @@ var PhaserGameObject = (function () {
             var game = phaserMaster.game();
             var bossContainer = phaserSprites.getOnly(['bossContainer']).bossContainer;
             var onDestroy = function (enemy) {
+                bossContainer.hide();
                 var gameData = phaserMaster.getOnly(['gameData']).gameData;
                 gameData.score += 10000;
                 saveData('score', gameData.score);
                 var scoreText = phaserTexts.getOnly(['scoreText']).scoreText;
                 scoreText.updateScore();
-                bossContainer.hide();
                 endLevel();
             };
             var onDamage = function (boss) {
@@ -662,7 +624,6 @@ var PhaserGameObject = (function () {
             };
             var onFail = function () {
                 phaserMaster.changeState('ENDLEVEL');
-                updateBossBar(0);
                 bossContainer.hide();
                 earthTakeDamage(50);
                 setTimeout(function () {
@@ -691,7 +652,7 @@ var PhaserGameObject = (function () {
             var player = phaserSprites.getOnly(['player']).player;
             var _a = { gap: 10, shots: 2 }, gap = _a.gap, shots = _a.shots;
             var centerShots = (gap * (shots - 1)) / 2;
-            var _loop_3 = function (i) {
+            var _loop_2 = function (i) {
                 setTimeout(function () {
                     var onUpdate = function (obj) { targetCheck(obj); };
                     var onDestroy = function () { };
@@ -699,7 +660,7 @@ var PhaserGameObject = (function () {
                 }, 25);
             };
             for (var i = 0; i < shots; i++) {
-                _loop_3(i);
+                _loop_2(i);
             }
         }
         function fireLasers() {
@@ -724,7 +685,7 @@ var PhaserGameObject = (function () {
                 weaponManager.createMissle({ name: "missle_" + game.rnd.integer(), group: 'ship_weapons', x: player.x + (i * gap) - centerShots, y: player.y - player.height / 2, spread: (i % 2 === 0 ? -0.50 : 0.50), layer: 2 }, onDestroy, onUpdate);
             }
         }
-        function createClusterbomb(options) {
+        function createClusterbomb() {
             var game = phaserMaster.game();
             var player = phaserSprites.getOnly(['player']).player;
             var onUpdate = function (obj) { targetCheck(obj); };
@@ -743,7 +704,7 @@ var PhaserGameObject = (function () {
             };
             weaponManager.createClusterbomb({ name: "clusterbomb_" + game.rnd.integer(), group: 'ship_secondary_weapons', x: player.x, y: player.y, layer: 2 }, onDestroy, onUpdate);
         }
-        function createTriplebomb(options) {
+        function createTriplebomb() {
             var game = phaserMaster.game();
             var player = phaserSprites.getOnly(['player']).player;
             var onUpdate = function (obj) { targetCheck(obj); };
@@ -754,7 +715,7 @@ var PhaserGameObject = (function () {
                 }, i * 300);
             }
         }
-        function createTurret(options) {
+        function createTurret() {
             var game = phaserMaster.game();
             var player = phaserSprites.getOnly(['player']).player;
             var onInit = function (obj) {
@@ -857,7 +818,7 @@ var PhaserGameObject = (function () {
                         case 'LASER':
                             fireLasers();
                             break;
-                        case 'MISSLES':
+                        case 'MISSLE':
                             fireMissles();
                             break;
                         case 'BULLET':
@@ -871,20 +832,18 @@ var PhaserGameObject = (function () {
                             updateShipSpecial(100, false, secondaryWeapon.cooldown - 50);
                         }).autoDestroy = true;
                     }
-                    if (secondaryWeapon.reference === 'CLUSTERBOMB') {
-                        var x = player.x, y = player.y;
-                        createClusterbomb({ x: x, y: y, velocity: secondaryWeapon.velocity, damage: secondaryWeapon.damage, bomblets: secondaryWeapon.bomblets });
-                    }
-                    if (secondaryWeapon.reference === 'TRIPLEBOMB') {
-                        var x = player.x, y = player.y;
-                        createTriplebomb({ x: x, y: y, initialVelocity: secondaryWeapon.initialVelocity, velocity: secondaryWeapon.velocity, damage: secondaryWeapon.damage });
-                    }
-                    if (secondaryWeapon.reference === 'TURRET') {
-                        var x = player.x, y = player.y;
-                        createTurret({ x: x, y: y, damage: secondaryWeapon.damage, lifespan: secondaryWeapon.lifespan });
-                    }
-                    if (secondaryWeapon.reference === 'MINES') {
-                        var x = player.x, y = player.y;
+                    switch (secondaryWeapon.reference) {
+                        case 'CLUSTERBOMB':
+                            createClusterbomb();
+                            break;
+                        case 'TRIPLEBOMB':
+                            createTriplebomb();
+                            break;
+                        case 'TURRET':
+                            createTurret();
+                            break;
+                        case 'BLASTRADIUS':
+                            break;
                     }
                 }
             }
@@ -898,13 +857,15 @@ var PhaserGameObject = (function () {
                 if (START.active) {
                     phaserMaster.changeState('LOCKED');
                     phaserControls.disableAllInput();
-                    if (menuButtonSelection === 1) {
-                        updateStore();
-                        nextLevel();
-                    }
-                    if (menuButtonSelection === 2) {
-                        updateStore();
-                        saveAndQuit();
+                    switch (menuButtonSelection) {
+                        case 1:
+                            updateStore();
+                            nextLevel();
+                            break;
+                        case 2:
+                            updateStore();
+                            saveAndQuit();
+                            break;
                     }
                 }
             }
@@ -919,11 +880,13 @@ var PhaserGameObject = (function () {
                     clearInterval(phaserMaster.get('endExplosion'));
                     phaserMaster.changeState('LOCKED');
                     phaserControls.disableAllInput();
-                    if (menuButtonSelection === 1) {
-                        retryLevel();
-                    }
-                    if (menuButtonSelection === 2) {
-                        resetGame();
+                    switch (menuButtonSelection) {
+                        case 1:
+                            retryLevel();
+                            break;
+                        case 2:
+                            resetGame();
+                            break;
                     }
                 }
             }
@@ -1047,7 +1010,7 @@ var PhaserGameObject = (function () {
                                         setTimeout(function () {
                                             leftText.setText('MEDALS EARNED');
                                             phaserTexts.destroy('popCount');
-                                            var _loop_4 = function (i) {
+                                            var _loop_3 = function (i) {
                                                 var medal = phaserSprites.addFromAtlas({ name: "medal_" + i, group: 'medals', x: victoryScreenContainer.x + (i * 20) - 80, y: victoryScreenContainer.y + 20, width: game.canvas.width, height: game.canvas.height, atlas: 'atlas_main', filename: 'medal_gold.png', alpha: 0 });
                                                 medal.reveal = function () {
                                                     this.scale.setTo(2, 2);
@@ -1060,7 +1023,7 @@ var PhaserGameObject = (function () {
                                                 }, i * 50);
                                             };
                                             for (var i = 0; i < medalsEarned; i++) {
-                                                _loop_4(i);
+                                                _loop_3(i);
                                             }
                                             setTimeout(function () {
                                                 var _a = phaserTexts.getOnly(['menuButton1Text', 'menuButton2Text']), menuButton1Text = _a.menuButton1Text, menuButton2Text = _a.menuButton2Text;
@@ -1123,19 +1086,14 @@ var PhaserGameObject = (function () {
             });
         }
         function finalFadeOut(callback) {
-            var game = phaserMaster.game();
-            var overlaybmd = phaserBitmapdata.addGradient({ name: 'overlayFadeout', start: '#ffffff', end: '#ffffff', width: 5, height: 5, render: false });
-            var overlay = phaserSprites.add({ x: 0, y: 0, name: "overlayFinal", width: game.world.width, height: game.world.height, reference: overlaybmd.cacheBitmapData, alpha: 0 });
-            phaserGroup.add(19, overlay);
-            game.add.tween(overlay).to({ alpha: 1 }, Phaser.Timer.SECOND, Phaser.Easing.Linear.In, true, 0, 0, false).
-                onComplete.add(function () {
+            utilityManager.overlayBGControls({ transition: 'FADEIN', delay: 0, speed: 250 }, function () {
                 phaserTexts.getManyGroups(['ui', 'ui_text', 'ui_buttons']).map(function (text) {
                     phaserTexts.destroy(text.name);
                 });
                 phaserSprites.getManyGroups(['ui', 'ui_buttons']).map(function (obj) {
                     phaserSprites.destroy(obj.name);
                 });
-                overlayControls('FADEIN', function () {
+                overlayControls('WIPEIN', function () {
                     setTimeout(function () {
                         callback();
                     }, 500);
@@ -1309,6 +1267,9 @@ var PHASER_BITMAPDATA_MANAGER = (function () {
         }
         return { object: this.bmd.object, array: this.bmd.array };
     };
+    PHASER_BITMAPDATA_MANAGER.prototype.takeSnapshot = function () {
+        return this.game.canvas.toDataURL();
+    };
     return PHASER_BITMAPDATA_MANAGER;
 }());
 var PHASER_BUTTON_MANAGER = (function () {
@@ -1472,7 +1433,7 @@ var PHASER_CONTROLS = (function () {
             sensitivityBuffer: {},
             state: {}
         };
-        var _loop_5 = function (btn) {
+        var _loop_4 = function (btn) {
             IO.buttons[btn] = game.input.keyboard.addKey(Phaser.Keyboard[this_1.buttonMap[btn].name]);
             IO.sensitivityPress[btn] = null;
             IO.sensitivityBuffer[btn] = 0;
@@ -1483,9 +1444,9 @@ var PHASER_CONTROLS = (function () {
         var this_1 = this;
         for (var _i = 0, _a = this.buttonArray; _i < _a.length; _i++) {
             var btn = _a[_i];
-            _loop_5(btn);
+            _loop_4(btn);
         }
-        var _loop_6 = function (btn) {
+        var _loop_5 = function (btn) {
             IO.buttons[btn].onDown.add(function (e) {
                 clearInterval(IO.sensitivityPress[btn]);
                 var btnType, btnName;
@@ -1526,7 +1487,7 @@ var PHASER_CONTROLS = (function () {
         var this_2 = this;
         for (var _b = 0, _c = this.buttonArray; _b < _c.length; _b++) {
             var btn = _c[_b];
-            _loop_6(btn);
+            _loop_5(btn);
         }
         game.input.keyboard.onUpCallback = function (e) {
             for (var _i = 0, _a = _this.buttonArray; _i < _a.length; _i++) {
@@ -1671,7 +1632,7 @@ var PHASER_CONTROLS = (function () {
     PHASER_CONTROLS.prototype.getOnly = function (names) {
         var _this = this;
         var _return = {};
-        var _loop_7 = function (key) {
+        var _loop_6 = function (key) {
             names.map(function (name) {
                 if (key === name) {
                     _return[key] = { id: _this.buttonMapId[key.toUpperCase()], active: _this.IO.state[key.toUpperCase()]().val > 0 ? true : false, duration: _this.IO.state[key.toUpperCase()]().val, state: _this.IO.state[key.toUpperCase()]().state, type: _this.IO.state[key.toUpperCase()]().type, disabled: _this.disabledButtons[key.toUpperCase()] };
@@ -1680,7 +1641,7 @@ var PHASER_CONTROLS = (function () {
         };
         for (var _i = 0, _a = this.buttonArray; _i < _a.length; _i++) {
             var key = _a[_i];
-            _loop_7(key);
+            _loop_6(key);
         }
         return _return;
     };
@@ -1793,7 +1754,7 @@ var PHASER_MASTER = (function () {
         for (var key in this.variables) {
             toArray.push({ key: key, data: this.variables[key] });
         }
-        var _loop_8 = function (i) {
+        var _loop_7 = function (i) {
             var _r = toArray.filter(function (obj) {
                 return obj.key === names[i];
             });
@@ -1802,7 +1763,7 @@ var PHASER_MASTER = (function () {
             });
         };
         for (var i = 0; i < names.length; i++) {
-            _loop_8(i);
+            _loop_7(i);
         }
         return _return;
     };
@@ -1870,7 +1831,7 @@ var PHASER_MOUSE = (function () {
     PHASER_MOUSE.prototype.assign = function (game) {
         var _this = this;
         this.game = game;
-        var _loop_9 = function (key) {
+        var _loop_8 = function (key) {
             this_3.metrics.sensitivityPress[key] = null;
             this_3.metrics.sensitivityBuffer[key] = 0;
             this_3.metrics.location[key] = { x: null, y: null };
@@ -1881,7 +1842,7 @@ var PHASER_MOUSE = (function () {
         var this_3 = this;
         for (var _i = 0, _a = this.mouseMapping; _i < _a.length; _i++) {
             var key = _a[_i];
-            _loop_9(key);
+            _loop_8(key);
         }
         this.game.input.onDown.add(function (e) {
             var mouseKey = _this.checkMouseClick();
@@ -2253,7 +2214,7 @@ var PHASER_SPRITE_MANAGER = (function () {
     };
     PHASER_SPRITE_MANAGER.prototype.getManyGroups = function (names) {
         var _return = [];
-        var _loop_10 = function (i) {
+        var _loop_9 = function (i) {
             var _r = this_4.sprites.array.filter(function (obj) {
                 return obj.group === names[i];
             });
@@ -2261,13 +2222,13 @@ var PHASER_SPRITE_MANAGER = (function () {
         };
         var this_4 = this;
         for (var i = 0; i < names.length; i++) {
-            _loop_10(i);
+            _loop_9(i);
         }
         return _return;
     };
     PHASER_SPRITE_MANAGER.prototype.getOnly = function (names) {
         var _return = {};
-        var _loop_11 = function (i) {
+        var _loop_10 = function (i) {
             var _r = this_5.sprites.array.filter(function (obj) {
                 return obj.group === names[i] || obj.name === names[i];
             });
@@ -2277,7 +2238,7 @@ var PHASER_SPRITE_MANAGER = (function () {
         };
         var this_5 = this;
         for (var i = 0; i < names.length; i++) {
-            _loop_11(i);
+            _loop_10(i);
         }
         return _return;
     };
@@ -2400,7 +2361,7 @@ var PHASER_TEXT_MANAGER = (function () {
     };
     PHASER_TEXT_MANAGER.prototype.getManyGroups = function (names) {
         var _return = [];
-        var _loop_12 = function (i) {
+        var _loop_11 = function (i) {
             var _r = this_6.texts.array.filter(function (obj) {
                 return obj.group === names[i];
             });
@@ -2408,7 +2369,7 @@ var PHASER_TEXT_MANAGER = (function () {
         };
         var this_6 = this;
         for (var i = 0; i < names.length; i++) {
-            _loop_12(i);
+            _loop_11(i);
         }
         return _return;
     };
@@ -2424,7 +2385,7 @@ var PHASER_TEXT_MANAGER = (function () {
     };
     PHASER_TEXT_MANAGER.prototype.getOnly = function (names) {
         var _return = {};
-        var _loop_13 = function (i) {
+        var _loop_12 = function (i) {
             var _r = this_7.texts.array.filter(function (obj) {
                 return obj.group === names[i] || obj.name === names[i];
             });
@@ -2434,7 +2395,7 @@ var PHASER_TEXT_MANAGER = (function () {
         };
         var this_7 = this;
         for (var i = 0; i < names.length; i++) {
-            _loop_13(i);
+            _loop_12(i);
         }
         return _return;
     };
@@ -2893,13 +2854,13 @@ var PLAYER_MANAGER = (function () {
         this.weaponManager = weaponManager;
         this.atlas = atlas;
     };
-    PLAYER_MANAGER.prototype.createShip1 = function (updateHealth, loseLife, onUpdate) {
+    PLAYER_MANAGER.prototype.createShip1 = function (params, updateHealth, loseLife, onUpdate) {
         var _this = this;
         if (updateHealth === void 0) { updateHealth = function () { }; }
         if (loseLife === void 0) { loseLife = function () { }; }
         if (onUpdate === void 0) { onUpdate = function () { }; }
         var game = this.game;
-        var player = this.phaserSprites.addFromAtlas({ name: 'player', group: 'playership', atlas: 'atlas_main', filename: 'ship_body.png', visible: false });
+        var player = this.phaserSprites.addFromAtlas({ name: params.name, group: params.group, atlas: this.atlas, filename: 'ship_body.png', visible: false });
         player.anchor.setTo(0.5, 0.5);
         player.scale.setTo(1, 1);
         player.isInvincible = false;
@@ -2910,8 +2871,8 @@ var PLAYER_MANAGER = (function () {
             bottom: 50
         };
         game.physics.enable(player, Phaser.Physics.ARCADE);
-        this.phaserGroup.add(8, player);
-        this.createShipExhaust(player);
+        this.phaserGroup.add(params.layer, player);
+        this.createShipExhaust(player, params);
         player.onUpdate = function () {
             onUpdate(player);
             if (player.visible && !player.isDead) {
@@ -2951,15 +2912,15 @@ var PLAYER_MANAGER = (function () {
         };
         player.createTrail = function () {
             var currentState = _this.phaserMaster.getState().currentState;
-            var trailCount = _this.phaserSprites.getGroup('trails').length;
+            var trailCount = _this.phaserSprites.getGroup(params.name + "_trails").length;
             if (trailCount < (currentState === 'ENDLEVEL') ? 20 : 10) {
-                var trail_1 = _this.phaserSprites.addFromAtlas({ name: "trail_" + game.rnd.integer(), group: 'trails', x: player.x, y: player.y, filename: 'ship_body.png', atlas: 'atlas_main', visible: true });
+                var trail_1 = _this.phaserSprites.addFromAtlas({ name: params.name + "_trail_" + game.rnd.integer(), group: params.name + "_trails", x: player.x, y: player.y, filename: 'ship_body.png', atlas: 'atlas_main', visible: true });
                 trail_1.anchor.setTo(0.5, 0.5);
                 trail_1.scale.setTo(player.scale.x - 0.2, player.scale.y - 0.2);
                 trail_1.alpha = 0.4;
                 trail_1.angle = player.angle;
                 trail_1.tint = 1 * 0x0000ff;
-                _this.phaserGroup.add(7, trail_1);
+                _this.phaserGroup.add(params.layer - 1, trail_1);
                 trail_1.destroySelf = function () {
                     trail_1.game.add.tween(trail_1).to({ alpha: 0 }, (currentState === 'ENDLEVEL') ? 600 : 250, Phaser.Easing.Linear.In, true, 0).
                         onComplete.add(function () {
@@ -2995,7 +2956,8 @@ var PLAYER_MANAGER = (function () {
             });
         };
         player.syncExhaust = function () {
-            var _a = _this.phaserSprites.getOnly(['player', 'exhaust']), player = _a.player, exhaust = _a.exhaust;
+            var player = _this.phaserSprites.get(params.name);
+            var exhaust = _this.phaserSprites.get(params.name + "_exhaust");
             if (exhaust !== undefined && player !== undefined) {
                 exhaust.updateCords(player.x, player.y);
             }
@@ -3040,12 +3002,12 @@ var PLAYER_MANAGER = (function () {
         };
         return player;
     };
-    PLAYER_MANAGER.prototype.createShipExhaust = function (player) {
+    PLAYER_MANAGER.prototype.createShipExhaust = function (player, params) {
         var _this = this;
-        var shipExhaust = this.phaserSprites.addFromAtlas({ name: 'exhaust', group: 'playership', atlas: 'atlas_main', filename: 'exhaust_red_1.png', visible: false });
+        var shipExhaust = this.phaserSprites.addFromAtlas({ name: params.name + "_exhaust", group: params.group, atlas: this.atlas, filename: 'exhaust_red_1.png', visible: false });
         shipExhaust.animations.add('exhaust_animation', Phaser.Animation.generateFrameNames('exhaust_red_', 1, 8, '.png'), 1, true);
         shipExhaust.animations.play('exhaust_animation', 30, true);
-        this.phaserGroup.add(8, shipExhaust);
+        this.phaserGroup.add(params.layer, shipExhaust);
         shipExhaust.anchor.setTo(0.5, 0.5);
         shipExhaust.onUpdate = function () {
             var currentState = _this.phaserMaster.getState().currentState;
@@ -3076,7 +3038,186 @@ var PLAYER_MANAGER = (function () {
             _this.phaserSprites.destroy(shipExhaust.name);
         };
     };
+    PLAYER_MANAGER.prototype.destroyShip = function (name) {
+        this.phaserSprites.destroy(name);
+        this.phaserSprites.destroy(name + "_exhaust");
+        this.phaserSprites.getGroup(name + "_trails").map(function (obj) {
+            obj.destroySelf();
+        });
+    };
     return PLAYER_MANAGER;
+}());
+var UTILITY_MANAGER = (function () {
+    function UTILITY_MANAGER() {
+    }
+    UTILITY_MANAGER.prototype.assign = function (game, phaserSprites, phaserBitmapdata, phaserGroup, atlas) {
+        this.game = game;
+        this.phaserSprites = phaserSprites;
+        this.phaserBitmapdata = phaserBitmapdata;
+        this.phaserGroup = phaserGroup;
+        this.atlas = atlas;
+    };
+    UTILITY_MANAGER.prototype.buildOverlayBackground = function (start, end, layer, visibleOnStart) {
+        if (visibleOnStart === void 0) { visibleOnStart = false; }
+        var game = this.game;
+        var overlaybmd = this.phaserBitmapdata.addGradient({ name: 'um_overlay__bmd', start: start, end: end, width: 5, height: 5, render: false });
+        var overlay = this.phaserSprites.add({ x: 0, y: 0, name: "um_overlay__bg", width: game.world.width, height: game.world.height, reference: overlaybmd.cacheBitmapData, visible: visibleOnStart });
+        overlay.fadeIn = function (speed, callback) {
+            if (speed === void 0) { speed = 500; }
+            if (callback === void 0) { callback = function () { }; }
+            overlay.visible = true;
+            overlay.alpha = 0;
+            game.add.tween(overlay).to({ alpha: 1 }, speed, Phaser.Easing.Linear.In, true, 0, 0, false).
+                onComplete.add(function () {
+                callback();
+            });
+        };
+        overlay.fadeOut = function (speed, callback) {
+            if (speed === void 0) { speed = 500; }
+            if (callback === void 0) { callback = function () { }; }
+            overlay.visible = true;
+            overlay.alpha = 1;
+            game.add.tween(overlay).to({ alpha: 0 }, speed, Phaser.Easing.Linear.In, true, 0, 0, false).
+                onComplete.add(function () {
+                callback();
+            });
+        };
+        this.phaserGroup.add(layer, overlay);
+    };
+    UTILITY_MANAGER.prototype.buildOverlayGrid = function (squareSize, layer, image) {
+        if (squareSize === void 0) { squareSize = 80; }
+        var game = this.game;
+        var count = 0;
+        for (var c = 0; c < Math.ceil(game.world.height / squareSize) + 1; c++) {
+            var _loop_13 = function (r) {
+                var gridSquare = this_8.phaserSprites.addFromAtlas({ x: c * squareSize, y: r * squareSize, name: "grid" + count, group: 'um_grid__bg', width: squareSize, height: squareSize, atlas: this_8.atlas, filename: image, visible: true });
+                gridSquare.anchor.setTo(0.5, 0.5);
+                gridSquare.x = gridSquare.x += gridSquare.width / 2 - gridSquare.width / 2;
+                gridSquare.y = gridSquare.y += gridSquare.height / 2 - gridSquare.height / 2;
+                gridSquare.fadeOut = function (speed) {
+                    gridSquare.scale.setTo(1, 1);
+                    game.add.tween(gridSquare).to({ height: 0 }, speed, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                };
+                gridSquare.scaleOut = function (speed) {
+                    gridSquare.scale.setTo(1, 1);
+                    game.add.tween(gridSquare.scale).to({ x: 0, y: 0 }, speed, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                };
+                gridSquare.fadeIn = function (speed) {
+                    gridSquare.height = squareSize;
+                    gridSquare.width = squareSize;
+                    game.add.tween(gridSquare).to({ height: squareSize }, speed, Phaser.Easing.Linear.In, true, 0, 0, false);
+                };
+                gridSquare.scaleIn = function (speed) {
+                    gridSquare.height = squareSize;
+                    gridSquare.width = squareSize;
+                    game.add.tween(gridSquare.scale).to({ x: 1, y: 1 }, speed, Phaser.Easing.Linear.In, true, 0, 0, false);
+                };
+                count++;
+                this_8.phaserGroup.add(20, gridSquare);
+            };
+            var this_8 = this;
+            for (var r = 0; r < Math.ceil(game.world.width / squareSize + 1); r++) {
+                _loop_13(r);
+            }
+        }
+    };
+    UTILITY_MANAGER.prototype.overlayBGControls = function (options, callback) {
+        var transition = options.transition, delay = options.delay, speed = options.speed;
+        var um_overlay__bg = this.phaserSprites.getOnly(['um_overlay__bg']).um_overlay__bg;
+        setTimeout(function () {
+            switch (transition) {
+                case 'FADEIN':
+                    um_overlay__bg.fadeIn(speed, callback);
+                    break;
+                case 'FADEOUT':
+                    um_overlay__bg.fadeOut(speed, callback);
+                    break;
+            }
+        }, delay);
+    };
+    UTILITY_MANAGER.prototype.overlayControls = function (options, callback) {
+        var transition = options.transition, delay = options.delay, speed = options.speed, tileDelay = options.tileDelay;
+        var grid = this.phaserSprites.getGroup('um_grid__bg');
+        var odd = [];
+        var even = [];
+        var rowDelay = (tileDelay * grid.length) * 0.75;
+        var returnDelay = rowDelay + (tileDelay * grid.length);
+        setTimeout(function () {
+            switch (transition) {
+                case 'WIPEIN':
+                    grid.map(function (obj, index) {
+                        if (index % 2 === 0) {
+                            even.push(obj);
+                        }
+                        else {
+                            odd.push(obj);
+                        }
+                    });
+                    even.map(function (obj, index) {
+                        setTimeout(function () {
+                            obj.scaleIn(speed);
+                        }, tileDelay * index);
+                    });
+                    setTimeout(function () {
+                        odd.slice(0).reverse().map(function (obj, index) {
+                            setTimeout(function () {
+                                obj.scaleIn(speed);
+                            }, tileDelay * index);
+                        });
+                    }, rowDelay);
+                    setTimeout(function () {
+                        callback();
+                    }, returnDelay);
+                    break;
+                case 'WIPEOUT':
+                    grid.map(function (obj, index) {
+                        if (index % 2 === 0) {
+                            even.push(obj);
+                        }
+                        else {
+                            odd.push(obj);
+                        }
+                    });
+                    even.map(function (obj, index) {
+                        setTimeout(function () {
+                            obj.scaleOut(speed);
+                        }, tileDelay * index);
+                    });
+                    setTimeout(function () {
+                        odd.slice(0).reverse().map(function (obj, index) {
+                            setTimeout(function () {
+                                obj.scaleOut(speed);
+                            }, tileDelay * index);
+                        });
+                    }, rowDelay);
+                    setTimeout(function () {
+                        callback();
+                    }, returnDelay);
+                    break;
+                case 'FADEOUT':
+                    grid.map(function (obj, index) {
+                        setTimeout(function () {
+                            obj.fadeOut(speed);
+                        }, tileDelay * index);
+                    });
+                    setTimeout(function () {
+                        callback();
+                    }, grid.length * tileDelay + speed);
+                    break;
+                case 'FADEIN':
+                    grid.map(function (obj, index) {
+                        setTimeout(function () {
+                            obj.fadeIn(speed);
+                        }, tileDelay * index);
+                    });
+                    setTimeout(function () {
+                        callback();
+                    }, grid.length * tileDelay + speed);
+                    break;
+            }
+        }, delay);
+    };
+    return UTILITY_MANAGER;
 }());
 var WEAPON_MANAGER = (function () {
     function WEAPON_MANAGER() {

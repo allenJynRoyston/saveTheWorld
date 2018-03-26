@@ -1,6 +1,7 @@
 <template lang="pug">
   .game-container
     #phaser-example
+    a(v-bind:href='gameData.snapshot' download) Link
 </template>
 
 <script>
@@ -17,7 +18,7 @@ export default {
     }
   },
   mounted(){
-
+          console.log(this.gameData)
     this.store.watch(this.store.getters._gameData, val => {
 
     })
@@ -25,8 +26,8 @@ export default {
   },
   methods: {
     init(){
-      this.loadGame('level1.js')
-      //this.loadGame('heroSelect.js')
+      //this.loadGame('level1.js')
+      this.loadGame('heroSelect.js')
     },
     loadGame(fileName){
       // remove old game first
@@ -49,7 +50,7 @@ export default {
       this.loadGame('level1.js')
     },
     returnToTitle(){
-      alert("return to title")
+      this.loadGame('heroSelect.js')
     },
     loadNextLevel(){
       alert('load next level')
