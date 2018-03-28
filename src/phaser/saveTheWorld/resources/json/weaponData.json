@@ -13,7 +13,7 @@
       "spread": 0,
       "secondaryExplosion": false,
       "description":"Rapid fire, low damage ballistic bullets.",
-      "spriteAnimation": ["bullet_1.png", "bullet_2.png"],
+      "spriteAnimation": ["bullet_1.png"],
       "spriteIcon": "icon_pw_1.png",
       "rapidFireSpd": 0
     },
@@ -23,15 +23,15 @@
       "reference": "MISSLE",
       "name": "EXPLOSIVE MISSLES",
       "damage": 50,
-      "initialVelocity": 150,
+      "initialVelocity": 50,
       "velocity": 10,
       "number": 1,
-      "cooldown": 500,
+      "cooldown": 650,
       "pierceStrength": 1,
       "spread": 2,
       "secondaryExplosion": true,
       "description":"Missles that explode upon impact.  High damage.",
-      "spriteAnimation": ["orange_ring_explosion_layer_1.png", "orange_ring_explosion_layer_2.png", "orange_ring_explosion_layer_3.png", "orange_ring_explosion_layer_4.png", "orange_ring_explosion_layer_5.png", "orange_ring_explosion_layer_6.png", "orange_ring_explosion_layer_7.png"],
+      "spriteAnimation": ["missle_1.png", "missle_2.png", "missle_3.png", "missle_4.png"],
       "spriteIcon": "icon_pw_2.png",
       "rapidFireSpd": 75
     },
@@ -74,7 +74,7 @@
       "type": "secondaryWeapon",
       "reference": "TRIPLEBOMB",
       "name": "BOALA BOMBS",
-      "damage": 100,
+      "damage": 500,
       "initialVelocity": -500,
       "velocity": 10,
       "cooldown": 2500,
@@ -93,7 +93,7 @@
       "velocity": null,
       "cooldown": 20000,
       "description":"Stationary self deployed turret which automatically shoots at targets in front of it.",
-      "spriteAnimation": ["icon_sw_2.png"],
+      "spriteAnimation": ["turret_1.png", "turret_2.png"],
       "spriteIcon": "icon_sw_4.png",
       "lifespan": 15000
     },
@@ -113,24 +113,38 @@
     }
   },
   "perks":{
+    "ARMORPLATING": {
+      "id": 50,
+      "type": "perks",
+      "reference": "ARMORPLATING",
+      "name": "ARMOR UP",
+      "damage": 5,
+      "initialVelocity": null,
+      "velocity": null,
+      "cooldown": 10000,
+      "description":"Ship takes 50% less damage than usual.",
+      "sprite": "bomblet",
+      "spriteIcon": "icon_perk_3.png",
+      "lifespan": 4000
+    },
     "FIREPOWER": {
       "id": 50,
-      "type": "secondaryWeapon",
+      "type": "perks",
       "reference": "FIREPOWER",
-      "name": "EXTRA FIREPOWER",
+      "name": "BLACKBOX",
       "damage": 100,
       "velocity": -400,
       "cooldown": 4000,
-      "description":"Weapons start fully powered up.",
+      "description":"Powerups are retained even when you lose a life.",
       "sprite": "bomblet",
       "spriteIcon": "icon_perk_1.png",
       "bomblets": 25
     },
     "REGEN": {
       "id": 50,
-      "type": "secondaryWeapon",
+      "type": "perks",
       "reference": "REGEN",
-      "name": "AMALORATIVE PLATING",
+      "name": "SMART METALS",
       "damage": 200,
       "initialVelocity": -200,
       "velocity": 10,
@@ -138,20 +152,6 @@
       "description":"Health regenerates over time.",
       "sprite": "bomblet",
       "spriteIcon": "icon_perk_2.png"
-    },
-    "ARMORPLATING": {
-      "id": 50,
-      "type": "secondaryWeapon",
-      "reference": "ARMORPLATING",
-      "name": "AUTO TURRET",
-      "damage": 5,
-      "initialVelocity": null,
-      "velocity": null,
-      "cooldown": 10000,
-      "description":"Pilot begins missions with 150% more health, and takes 25% less damage.",
-      "sprite": "bomblet",
-      "spriteIcon": "icon_perk_3.png",
-      "lifespan": 4000
     }
   }
 }

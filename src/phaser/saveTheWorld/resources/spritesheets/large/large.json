@@ -2,7 +2,7 @@
 
 {
 	"filename": "motionBlur.jpg",
-	"frame": {"x":1,"y":892,"w":480,"h":852},
+	"frame": {"x":794,"y":1,"w":480,"h":852},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":480,"h":852},
@@ -10,7 +10,7 @@
 },
 {
 	"filename": "Nebula1.png",
-	"frame": {"x":1285,"y":1,"w":751,"h":564},
+	"frame": {"x":1276,"y":1,"w":751,"h":564},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":751,"h":564},
@@ -18,7 +18,7 @@
 },
 {
 	"filename": "Nebula2.png",
-	"frame": {"x":483,"y":892,"w":800,"h":719},
+	"frame": {"x":803,"y":1209,"w":800,"h":719},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":800,"h":719},
@@ -34,15 +34,15 @@
 },
 {
 	"filename": "spacebg.png",
-	"frame": {"x":1285,"y":1209,"w":640,"h":700},
+	"frame": {"x":1,"y":892,"w":800,"h":875},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":700},
-	"sourceSize": {"w":640,"h":700}
+	"spriteSourceSize": {"x":0,"y":0,"w":800,"h":875},
+	"sourceSize": {"w":800,"h":875}
 },
 {
 	"filename": "victory_bg.png",
-	"frame": {"x":1285,"y":567,"w":688,"h":640},
+	"frame": {"x":1276,"y":567,"w":688,"h":640},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":688,"h":640},
@@ -53,8 +53,8 @@
 	"version": "1.0",
 	"image": "large.png",
 	"format": "RGBA8888",
-	"size": {"w":2037,"h":1910},
+	"size": {"w":2028,"h":1929},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:44d1d2b847b19f961357f50c5c38dc81:4e1b56309d72e47548ea5c7c9446cef8:5d956d0ea7e6e514e126b746967ecfb6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:1f4f0303ccf24144cedf3a7aeab04d03:b2096e6e107361335434fe9274778ade:5d956d0ea7e6e514e126b746967ecfb6$"
 }
 }

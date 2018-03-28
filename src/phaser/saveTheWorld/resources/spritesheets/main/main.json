@@ -1,78 +1,6 @@
 {"frames": [
 
 {
-	"filename": "asteroid_large_layer_1.png",
-	"frame": {"x":683,"y":159,"w":137,"h":150},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":137,"h":150},
-	"sourceSize": {"w":137,"h":150}
-},
-{
-	"filename": "asteroid_large_layer_2.png",
-	"frame": {"x":683,"y":311,"w":137,"h":150},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":137,"h":150},
-	"sourceSize": {"w":137,"h":150}
-},
-{
-	"filename": "asteroid_large_layer_3.png",
-	"frame": {"x":837,"y":159,"w":137,"h":150},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":137,"h":150},
-	"sourceSize": {"w":137,"h":150}
-},
-{
-	"filename": "asteroid_mid_layer_1.png",
-	"frame": {"x":907,"y":99,"w":51,"h":57},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
-	"sourceSize": {"w":51,"h":57}
-},
-{
-	"filename": "asteroid_mid_layer_2.png",
-	"frame": {"x":872,"y":377,"w":51,"h":57},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
-	"sourceSize": {"w":51,"h":57}
-},
-{
-	"filename": "asteroid_mid_layer_3.png",
-	"frame": {"x":925,"y":377,"w":51,"h":57},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
-	"sourceSize": {"w":51,"h":57}
-},
-{
-	"filename": "asteroid_small_layer_1.png",
-	"frame": {"x":976,"y":133,"w":32,"h":30},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
-	"sourceSize": {"w":32,"h":30}
-},
-{
-	"filename": "asteroid_small_layer_2.png",
-	"frame": {"x":976,"y":165,"w":32,"h":30},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
-	"sourceSize": {"w":32,"h":30}
-},
-{
-	"filename": "asteroid_small_layer_3.png",
-	"frame": {"x":976,"y":197,"w":32,"h":30},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
-	"sourceSize": {"w":32,"h":30}
-},
-{
 	"filename": "earth.png",
 	"frame": {"x":1,"y":1,"w":607,"h":605},
 	"rotated": false,
@@ -82,87 +10,31 @@
 },
 {
 	"filename": "earthBar.png",
-	"frame": {"x":683,"y":490,"w":244,"h":14},
+	"frame": {"x":610,"y":524,"w":244,"h":14},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":14},
 	"sourceSize": {"w":244,"h":14}
 },
 {
-	"filename": "exhaust_red_1.png",
-	"frame": {"x":926,"y":506,"w":34,"h":61},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
-	"sourceSize": {"w":34,"h":64}
-},
-{
-	"filename": "exhaust_red_2.png",
-	"frame": {"x":929,"y":436,"w":34,"h":61},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
-	"sourceSize": {"w":34,"h":64}
-},
-{
-	"filename": "exhaust_red_3.png",
-	"frame": {"x":965,"y":436,"w":34,"h":61},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
-	"sourceSize": {"w":34,"h":64}
-},
-{
-	"filename": "exhaust_red_4.png",
-	"frame": {"x":974,"y":1,"w":34,"h":64},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":34,"h":64},
-	"sourceSize": {"w":34,"h":64}
-},
-{
-	"filename": "exhaust_red_5.png",
-	"frame": {"x":974,"y":67,"w":34,"h":64},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":34,"h":64},
-	"sourceSize": {"w":34,"h":64}
-},
-{
-	"filename": "exhaust_red_6.png",
-	"frame": {"x":974,"y":1,"w":34,"h":64},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":34,"h":64},
-	"sourceSize": {"w":34,"h":64}
-},
-{
-	"filename": "exhaust_red_7.png",
-	"frame": {"x":965,"y":436,"w":34,"h":61},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
-	"sourceSize": {"w":34,"h":64}
-},
-{
-	"filename": "exhaust_red_8.png",
-	"frame": {"x":929,"y":436,"w":34,"h":61},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":3,"w":34,"h":61},
-	"sourceSize": {"w":34,"h":64}
-},
-{
 	"filename": "landmine.png",
-	"frame": {"x":934,"y":311,"w":62,"h":64},
+	"frame": {"x":818,"y":259,"w":62,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":62,"h":64},
 	"sourceSize": {"w":62,"h":64}
 },
 {
+	"filename": "logo_small.png",
+	"frame": {"x":683,"y":1,"w":238,"h":130},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":238,"h":130},
+	"sourceSize": {"w":238,"h":130}
+},
+{
 	"filename": "medal_bronze.png",
-	"frame": {"x":960,"y":99,"w":12,"h":18},
+	"frame": {"x":793,"y":572,"w":12,"h":18},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":12,"h":18},
@@ -170,7 +42,7 @@
 },
 {
 	"filename": "medal_gold.png",
-	"frame": {"x":960,"y":119,"w":12,"h":18},
+	"frame": {"x":807,"y":572,"w":12,"h":18},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":12,"h":18},
@@ -178,7 +50,7 @@
 },
 {
 	"filename": "medal_silver.png",
-	"frame": {"x":960,"y":139,"w":12,"h":18},
+	"frame": {"x":821,"y":572,"w":12,"h":18},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":12,"h":18},
@@ -186,7 +58,7 @@
 },
 {
 	"filename": "particle.png",
-	"frame": {"x":976,"y":229,"w":18,"h":18},
+	"frame": {"x":882,"y":564,"w":18,"h":18},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":18,"h":18},
@@ -194,7 +66,7 @@
 },
 {
 	"filename": "ship_body.png",
-	"frame": {"x":822,"y":392,"w":48,"h":64},
+	"frame": {"x":865,"y":498,"w":48,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":64},
@@ -202,7 +74,7 @@
 },
 {
 	"filename": "ship_icon.png",
-	"frame": {"x":730,"y":590,"w":16,"h":16},
+	"frame": {"x":882,"y":584,"w":16,"h":16},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
@@ -210,7 +82,7 @@
 },
 {
 	"filename": "stars_layer_1.png",
-	"frame": {"x":856,"y":532,"w":7,"h":7},
+	"frame": {"x":856,"y":524,"w":7,"h":7},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":7,"h":7},
@@ -218,7 +90,7 @@
 },
 {
 	"filename": "stars_layer_2.png",
-	"frame": {"x":856,"y":541,"w":7,"h":7},
+	"frame": {"x":856,"y":533,"w":7,"h":7},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":7,"h":7},
@@ -226,7 +98,7 @@
 },
 {
 	"filename": "stars_layer_3.png",
-	"frame": {"x":856,"y":550,"w":7,"h":7},
+	"frame": {"x":856,"y":542,"w":7,"h":7},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":7,"h":7},
@@ -234,7 +106,7 @@
 },
 {
 	"filename": "sw_1.png",
-	"frame": {"x":748,"y":590,"w":16,"h":16},
+	"frame": {"x":900,"y":584,"w":16,"h":16},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
@@ -242,7 +114,7 @@
 },
 {
 	"filename": "sw_2.png",
-	"frame": {"x":804,"y":564,"w":24,"h":24},
+	"frame": {"x":856,"y":564,"w":24,"h":24},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":24,"h":24},
@@ -250,7 +122,7 @@
 },
 {
 	"filename": "ui_BossHealthBar.png",
-	"frame": {"x":610,"y":532,"w":244,"h":14},
+	"frame": {"x":610,"y":540,"w":244,"h":14},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":14},
@@ -258,7 +130,7 @@
 },
 {
 	"filename": "ui_button.png",
-	"frame": {"x":683,"y":463,"w":181,"h":25},
+	"frame": {"x":610,"y":572,"w":181,"h":25},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":181,"h":25},
@@ -266,7 +138,7 @@
 },
 {
 	"filename": "ui_clear.png",
-	"frame": {"x":610,"y":1,"w":295,"h":156},
+	"frame": {"x":610,"y":340,"w":295,"h":156},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":295,"h":156},
@@ -274,7 +146,7 @@
 },
 {
 	"filename": "ui_container1.png",
-	"frame": {"x":837,"y":311,"w":95,"h":64},
+	"frame": {"x":683,"y":133,"w":95,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":95,"h":64},
@@ -282,7 +154,7 @@
 },
 {
 	"filename": "ui_container2.png",
-	"frame": {"x":730,"y":564,"w":72,"h":24},
+	"frame": {"x":744,"y":259,"w":72,"h":24},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":24},
@@ -290,7 +162,7 @@
 },
 {
 	"filename": "ui_cursor.png",
-	"frame": {"x":837,"y":377,"w":16,"h":13},
+	"frame": {"x":902,"y":564,"w":16,"h":13},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":13},
@@ -298,7 +170,7 @@
 },
 {
 	"filename": "ui_healthBar.png",
-	"frame": {"x":610,"y":548,"w":244,"h":14},
+	"frame": {"x":610,"y":556,"w":244,"h":14},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":14},
@@ -306,7 +178,7 @@
 },
 {
 	"filename": "ui_portrait_1.png",
-	"frame": {"x":865,"y":506,"w":59,"h":93},
+	"frame": {"x":683,"y":199,"w":59,"h":93},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":59,"h":93},
@@ -314,7 +186,7 @@
 },
 {
 	"filename": "ui_portraitContainer.png",
-	"frame": {"x":907,"y":1,"w":65,"h":96},
+	"frame": {"x":780,"y":133,"w":65,"h":96},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":96},
@@ -322,7 +194,7 @@
 },
 {
 	"filename": "ui_roundContainer.png",
-	"frame": {"x":610,"y":564,"w":118,"h":26},
+	"frame": {"x":744,"y":231,"w":118,"h":26},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":118,"h":26},
@@ -330,7 +202,7 @@
 },
 {
 	"filename": "ui_shield.png",
-	"frame": {"x":610,"y":506,"w":253,"h":24},
+	"frame": {"x":610,"y":498,"w":253,"h":24},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":253,"h":24},
@@ -338,7 +210,7 @@
 },
 {
 	"filename": "ui_shieldBar.png",
-	"frame": {"x":822,"y":159,"w":13,"h":231},
+	"frame": {"x":907,"y":133,"w":13,"h":231},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":13,"h":231},
@@ -346,7 +218,7 @@
 },
 {
 	"filename": "ui_specialBar.png",
-	"frame": {"x":978,"y":377,"w":13,"h":47},
+	"frame": {"x":907,"y":366,"w":13,"h":47},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":13,"h":47},
@@ -354,7 +226,7 @@
 },
 {
 	"filename": "ui_statusContainer.png",
-	"frame": {"x":610,"y":159,"w":71,"h":337},
+	"frame": {"x":610,"y":1,"w":71,"h":337},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":71,"h":337},
@@ -365,8 +237,8 @@
 	"version": "1.0",
 	"image": "main.png",
 	"format": "RGBA8888",
-	"size": {"w":1009,"h":607},
+	"size": {"w":922,"h":607},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:3600967c43f928becf0c5bd6ee65d6e4:f249bf5dcfb1135342690dbb21e151bd:03f91ab73e0f4667800419161e658c40$"
+	"smartupdate": "$TexturePacker:SmartUpdate:b7454796114671ba09920133cfa2c715:b9c444434ecfe156c2defb637c75afb7:03f91ab73e0f4667800419161e658c40$"
 }
 }

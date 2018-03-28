@@ -26,8 +26,8 @@ export default {
   },
   methods: {
     init(){
-      //this.loadGame('level1.js')
-      this.loadGame('heroSelect.js')
+      this.loadGame('level1.js')
+      // this.loadGame('heroSelect.js')
     },
     loadGame(fileName){
       // remove old game first
@@ -40,7 +40,7 @@ export default {
           js.src = `src/phaser/saveTheWorld/${fileName}`;
           document.body.appendChild(js);
           js.onload = (() => {
-            __phaser.init(this.$el, this, {width: 640, height: 640, store: this.$store});
+            __phaser.init(this.$el, this, {width: 1080, height: 720, store: this.$store});
           })
     },
     startGame(){

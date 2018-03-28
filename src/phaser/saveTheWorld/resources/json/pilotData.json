@@ -7,7 +7,10 @@
       "firerate": "FAST",
       "subweaponRecharge": "AVERAGE",
       "health": "AVERAGE",
-      "movement": "AVERAGE"
+      "movement": "AVERAGE",
+      "weapons": ["BULLET", "LASER"],
+      "subweapons": ["CLUSTERBOMB", "TRIPLEBOMB"],
+      "perks": ["ARMORPLATING", "FIREPOWER", "REGEN"]
     },
     {
       "image": "portrait_2.png",
@@ -17,7 +20,10 @@
       "firerate": "AVERAGE",
       "subweaponRecharge": "FAST",
       "health": "AVERAGE",
-      "movement": "AVERAGE"
+      "movement": "AVERAGE",
+      "weapons": ["BULLET", "MISSLE"],
+      "subweapons": ["TURRET", "TRIPLEBOMB"],
+      "perks": ["ARMORPLATING", "FIREPOWER", "REGEN"]
     },
     {
       "image": "portrait_3.png",
@@ -27,7 +33,10 @@
       "firerate": "AVERAGE",
       "subweaponRecharge": "FAST",
       "health": "LOW",
-      "movement": "FAST"
+      "movement": "FAST",
+      "weapons": ["LASER", "MISSLE"],
+      "subweapons": ["CLUSTERBOMB", "TURRET"],
+      "perks": ["ARMORPLATING", "FIREPOWER", "REGEN"]
     }
   ]
 }
