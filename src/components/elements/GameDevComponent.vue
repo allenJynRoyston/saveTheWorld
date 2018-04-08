@@ -18,7 +18,6 @@ export default {
     }
   },
   mounted(){
-          console.log(this.gameData)
     this.store.watch(this.store.getters._gameData, val => {
 
     })
@@ -40,7 +39,7 @@ export default {
           js.src = `src/phaser/saveTheWorld/${fileName}`;
           document.body.appendChild(js);
           js.onload = (() => {
-            __phaser.init(this.$el, this, {width: 1080, height: 720, store: this.$store});
+            __phaser.init(this.$el, this, {width: 775, height: 740, store: this.$store});
           })
     },
     startGame(){
@@ -56,8 +55,7 @@ export default {
       alert('load next level')
       this.test();
     },
-    retry(){
-      alert("retry level")
+    retry(){      
       this.test();
     },
     loadFile(file, index){

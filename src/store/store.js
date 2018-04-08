@@ -29,7 +29,7 @@ function createNewLocalData(){
       level: 1,
       pilot: 0,
       primaryWeapon: 'LASER',
-      secondaryWeapon: 'TURRET',
+      secondaryWeapon: 'CLUSTERBOMB',
       perk: 'FIREPOWER',
       population: {
         total: 100,
@@ -37,7 +37,9 @@ function createNewLocalData(){
       },
       player:{
         health: 100,
-        lives: 3
+        lives: 3,
+        powerup: 1,
+        special: 3
       },
       snapshot: null
     }

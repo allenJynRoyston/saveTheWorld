@@ -1,0 +1,44 @@
+{"frames": [
+
+{
+	"filename": "Nebula1",
+	"frame": {"x":1,"y":892,"w":751,"h":564},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":751,"h":564},
+	"sourceSize": {"w":751,"h":564}
+},
+{
+	"filename": "Nebula2",
+	"frame": {"x":794,"y":1,"w":800,"h":719},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":800,"h":719},
+	"sourceSize": {"w":800,"h":719}
+},
+{
+	"filename": "Nebula3",
+	"frame": {"x":1,"y":1,"w":791,"h":889},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":791,"h":889},
+	"sourceSize": {"w":791,"h":889}
+},
+{
+	"filename": "planetBG",
+	"frame": {"x":794,"y":722,"w":800,"h":719},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":800,"h":719},
+	"sourceSize": {"w":800,"h":719}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "large.png",
+	"format": "RGBA8888",
+	"size": {"w":1595,"h":1457},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:8b81c01c057aa58521ba43f11e35d112:067a3c031dd9cdedf3b5bab6c5176bd3:5d956d0ea7e6e514e126b746967ecfb6$"
+}
+}

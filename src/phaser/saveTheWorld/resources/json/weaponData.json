@@ -5,16 +5,58 @@
       "type": "primaryWeapon",
       "reference": "BULLET",
       "name": "X22 ROUNDS",
-      "damage": 25,
-      "initialVelocity": -1500,
-      "velocity": 35,
+      "damage": 35,
       "cooldown": 75,
-      "pierceStrength": 1,
-      "spread": 0,
-      "secondaryExplosion": false,
+      "bulletSpeed": 1700,
+      "pierce": false,
       "description":"Rapid fire, low damage ballistic bullets.",
-      "spriteAnimation": ["bullet_1.png"],
-      "spriteIcon": "icon_pw_1.png",
+      "spriteAnimation": ["bullet_1"],
+      "spriteIcon": "icon_pw_1",
+      "rapidFireSpd": 5
+    },
+    "GATLING": {
+      "id": 23,
+      "type": "primaryWeapon",
+      "reference": "GATLING",
+      "name": "GATLING",
+      "damage": 50,
+      "pierce": false,
+      "ignoreDamageState": false,
+      "bulletSpeed": 1800,
+      "cooldown": 750,
+      "descriptiona":"A beam weapon that has lots of power but short range.",
+      "spriteAnimation": ["shot_beam_3", "shot_beam_4", "shot_beam_5", "shot_beam_6", "shot_beam_7", "shot_beam_8", "shot_beam_9", "shot_beam_10"],
+      "spriteIcon": "icon_pw_2",
+      "rapidFireSpd": 125
+    },
+    "SHOTGUN": {
+      "id": 23,
+      "type": "primaryWeapon",
+      "reference": "SHOTGUN",
+      "name": "SHOTGUN",
+      "damage": 5,
+      "pierce": true,
+      "ignoreDamageState": true,
+      "bulletSpeed": 2500,
+      "cooldown": 500,
+      "descriptiona":"A beam weapon that has lots of power but short range.",
+      "spriteAnimation": ["shotgun_pellet_1"],
+      "spriteIcon": "icon_pw_2",
+      "rapidFireSpd": 25
+    },
+    "SPREAD": {
+      "id": 0,
+      "type": "primaryWeapon",
+      "reference": "SPREAD",
+      "name": "X22 ROUNDS",
+      "damage": 35,
+      "pierce": false,
+      "ignoreDamageState": false,
+      "cooldown": 75,
+      "bulletSpeed": 1600,
+      "description":"Rapid fire, low damage bullets that cover an increasing area",
+      "spriteAnimation": ["ammo_spread_1", "ammo_spread_2"],
+      "spriteIcon": "icon_pw_1",
       "rapidFireSpd": 0
     },
     "MISSLE": {
@@ -22,34 +64,29 @@
       "type": "primaryWeapon",
       "reference": "MISSLE",
       "name": "EXPLOSIVE MISSLES",
-      "damage": 50,
-      "initialVelocity": 50,
-      "velocity": 10,
-      "number": 1,
-      "cooldown": 650,
-      "pierceStrength": 1,
-      "spread": 2,
-      "secondaryExplosion": true,
-      "description":"Missles that explode upon impact.  High damage.",
-      "spriteAnimation": ["missle_1.png", "missle_2.png", "missle_3.png", "missle_4.png"],
-      "spriteIcon": "icon_pw_2.png",
-      "rapidFireSpd": 75
+      "damage": 75,
+      "pierce": false,
+      "ignoreDamageState": false,
+      "bulletSpeed": 1000,
+      "cooldown": 350,
+      "descriptiona":"Missles that explode upon impact.  High damage.",
+      "spriteAnimation": ["missle_1", "missle_2", "missle_3", "missle_4"],
+      "spriteIcon": "icon_pw_2",
+      "rapidFireSpd": 25
     },
     "LASER": {
       "id": 0,
       "type": "primaryWeapon",
       "reference": "LASER",
       "name": "PHASER BEAM",
-      "damage": 20,
-      "initialVelocity": -1200,
-      "velocity": 100,
-      "cooldown": 250,
-      "pierceStrength": 30,
-      "spread": 0,
-      "secondaryExplosion": false,
+      "damage": 35,
+      "pierce": true,
+      "ignoreDamageState": false,
+      "bulletSpeed": 1600,
+      "cooldown": 200,
       "description":"Phase shifting laser beams that can pass through and damage multiple targets.  Medium damage.",
-      "spriteAnimation": ["beam_anim_1.png", "beam_anim_2.png", "beam_anim_3.png", "beam_anim_4.png"],
-      "spriteIcon": "icon_pw_3.png",
+      "spriteAnimation": ["beam_anim_1", "beam_anim_2", "beam_anim_3", "beam_anim_4"],
+      "spriteIcon": "icon_pw_3",
       "rapidFireSpd": 0
     }
   },
@@ -59,15 +96,15 @@
       "type": "secondaryWeapon",
       "reference": "CLUSTERBOMB",
       "name": "CLUSTER BOMBS",
-      "damage": 25,
-      "initialVelocity": -300,
-      "velocity": 10,
+      "damage": 100,
+      "pierce": false,
+      "ignoreDamageState": false,
+      "bulletSpeed": 400,
       "cooldown": 4000,
-      "pierceStrength": 1,
       "description":"Upon impact, several dozen bomblets are created which can also explode upon contact.",
-      "spriteAnimation": ["icon_sw_1.png"],
-      "spriteIcon": "icon_sw_1.png",
-      "bomblets": 25
+      "spriteAnimation": ["icon_sw_1"],
+      "spriteIcon": "icon_sw_1",
+      "rapidFireSpd": 0
     },
     "TRIPLEBOMB": {
       "id": 50,
@@ -80,8 +117,8 @@
       "cooldown": 2500,
       "pierceStrength": 1,
       "description":"Release three sets of boala bombs that cause high damage on impact.  Disrupts the momentum of incoming objects.",
-      "spriteAnimation": ["icon_sw_2.png"],
-      "spriteIcon": "icon_sw_2.png"
+      "spriteAnimation": ["icon_sw_2"],
+      "spriteIcon": "icon_sw_2"
     },
     "TURRET": {
       "id": 50,
@@ -93,8 +130,8 @@
       "velocity": null,
       "cooldown": 20000,
       "description":"Stationary self deployed turret which automatically shoots at targets in front of it.",
-      "spriteAnimation": ["turret_1.png", "turret_2.png"],
-      "spriteIcon": "icon_sw_4.png",
+      "spriteAnimation": ["turret_1", "turret_2"],
+      "spriteIcon": "icon_sw_4",
       "lifespan": 15000
     },
     "BLASTRADIUS": {
@@ -107,8 +144,8 @@
       "velocity": null,
       "cooldown": 1500,
       "description":"Creates a strong heatwave directly around the ship, dealing heavy damage to anything caught in the radius.",
-      "spriteAnimation": ["blue_explosion_layer_1.png", "blue_explosion_layer_2.png", "blue_explosion_layer_3.png", "blue_explosion_layer_4.png", "blue_explosion_layer_5.png", "blue_explosion_layer_6.png", "blue_explosion_layer_7.png"],
-      "spriteIcon": "icon_sw_3.png",
+      "spriteAnimation": ["blue_explosion_layer_1", "blue_explosion_layer_2", "blue_explosion_layer_3", "blue_explosion_layer_4", "blue_explosion_layer_5", "blue_explosion_layer_6", "blue_explosion_layer_7"],
+      "spriteIcon": "icon_sw_3",
       "limit": 3
     }
   },
@@ -124,7 +161,7 @@
       "cooldown": 10000,
       "description":"Ship takes 50% less damage than usual.",
       "sprite": "bomblet",
-      "spriteIcon": "icon_perk_3.png",
+      "spriteIcon": "icon_perk_3",
       "lifespan": 4000
     },
     "FIREPOWER": {
@@ -137,7 +174,7 @@
       "cooldown": 4000,
       "description":"Powerups are retained even when you lose a life.",
       "sprite": "bomblet",
-      "spriteIcon": "icon_perk_1.png",
+      "spriteIcon": "icon_perk_1",
       "bomblets": 25
     },
     "REGEN": {
@@ -151,7 +188,7 @@
       "cooldown": 2500,
       "description":"Health regenerates over time.",
       "sprite": "bomblet",
-      "spriteIcon": "icon_perk_2.png"
+      "spriteIcon": "icon_perk_2"
     }
   }
 }
