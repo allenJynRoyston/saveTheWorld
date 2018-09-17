@@ -26,11 +26,11 @@
 },
 {
 	"filename": "planetBG",
-	"frame": {"x":794,"y":722,"w":800,"h":719},
+	"frame": {"x":794,"y":722,"w":767,"h":674},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":800,"h":719},
-	"sourceSize": {"w":800,"h":719}
+	"spriteSourceSize": {"x":0,"y":0,"w":767,"h":674},
+	"sourceSize": {"w":767,"h":674}
 }],
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
@@ -39,6 +39,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1595,"h":1457},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:8b81c01c057aa58521ba43f11e35d112:067a3c031dd9cdedf3b5bab6c5176bd3:5d956d0ea7e6e514e126b746967ecfb6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:05d727c8f7c12502acfe9b101439b781:f996c9c4fedff8baba6db4fd1a7208f2:5d956d0ea7e6e514e126b746967ecfb6$"
 }
 }

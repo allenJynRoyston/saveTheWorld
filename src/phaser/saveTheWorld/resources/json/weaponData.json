@@ -109,7 +109,7 @@
       "bulletSpeed": 400,
       "cooldown": 4000,
       "description":"Upon impact, several dozen bomblets are created which can also explode upon contact.",
-      "spriteAnimation": ["icon_sw_1"],
+      "spriteAnimation": ["clusterbomb_0", "clusterbomb_1", "clusterbomb_2", "clusterbomb_3", "clusterbomb_4"],
       "spriteIcon": "icon_sw_1",
       "rapidFireSpd": 0
     }

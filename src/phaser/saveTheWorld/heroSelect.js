@@ -1,3 +1,30 @@
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var PhaserGameObject = (function () {
     function PhaserGameObject() {
         this.game = null;
@@ -1358,6 +1385,7 @@ var PHASER_MASTER = (function () {
     function PHASER_MASTER(params) {
         var _this = this;
         this._game = params.game;
+        this.element = params.element;
         this.resolution = params.resolution;
         this.states = {
             BOOT: 'BOOT',
@@ -1436,6 +1464,9 @@ var PHASER_MASTER = (function () {
     };
     PHASER_MASTER.prototype.getCurrentState = function () {
         return this.currentState;
+    };
+    PHASER_MASTER.prototype.getElement = function () {
+        return this.element;
     };
     PHASER_MASTER.prototype.getStates = function () {
         return this.states;
@@ -2177,85 +2208,496 @@ var PHASER_TEXT_MANAGER = (function () {
     };
     return PHASER_TEXT_MANAGER;
 }());
+var DIALOG_MANAGER = (function () {
+    function DIALOG_MANAGER() {
+    }
+    DIALOG_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserGroup, phaserTexts, phaserControls, atlas) {
+        this.game = game;
+        this.phaserSprites = phaserSprites;
+        this.phaserMaster = phaserMaster;
+        this.phaserGroup = phaserGroup;
+        this.phaserTexts = phaserTexts;
+        this.phaserControls = phaserControls;
+        this.atlas = atlas;
+        this.dialogGenerator;
+        this.dialogbox;
+    };
+    DIALOG_MANAGER.prototype.create = function () {
+        var _a = this, game = _a.game, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, phaserTexts = _a.phaserTexts, atlas = _a.atlas;
+        var _b = phaserMaster.getResolution(), w = _b.w, h = _b.h;
+        var dialogbox = phaserSprites.addEmptySprite({ x: 0, y: h + 300, name: 'dialogbox', visible: false });
+        dialogbox.reveal = function (callback) {
+            var y = dialogbox.getDefaultPositions().y;
+            dialogbox.visible = true;
+            dialogbox.setDefaultPositions();
+            dialogbox.children.map(function (child) {
+                if (child.onStart !== undefined) {
+                    child.onStart();
+                }
+            });
+            game.add.tween(dialogbox).to({ y: h - 110 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Circular.InOut, true, 1, 0, false).
+                onComplete.add(function () {
+                callback();
+            });
+        };
+        dialogbox.hide = function () {
+            dialogbox.text.replaceText('');
+            game.add.tween(dialogbox).to({ y: dialogbox.getDefaultPositions().y }, Phaser.Timer.SECOND / 2, Phaser.Easing.Circular.InOut, true, 1, 0, false).
+                onComplete.add(function () {
+                dialogbox.children.map(function (child) {
+                    if (child.onStop !== undefined) {
+                        child.onStop();
+                    }
+                });
+            });
+        };
+        var dialogboxGraphic = phaserSprites.addFromAtlas({ x: 0, y: 0, width: w, height: 110, name: "dialogboxGraphic", filename: 'dialogbox', atlas: 'atlas_main', alpha: 0.8 });
+        dialogbox.addChild(dialogboxGraphic);
+        var dialogPortraitFrame = phaserSprites.addFromAtlas({ x: 10, y: 8, name: "dialogPortraitFrame", filename: 'ui_portraitContainer', atlas: 'atlas_main', visible: true });
+        dialogbox.addChild(dialogPortraitFrame);
+        var dialogPortraitMask = phaserSprites.createBasicMask(13, 11, dialogPortraitFrame.width - 3, dialogPortraitFrame.height - 3);
+        dialogbox.addChild(dialogPortraitMask);
+        dialogPortraitFrame.replaceImage = function (image) {
+            if (phaserSprites.get('dialogPortraitImage') !== undefined) {
+                phaserSprites.destroy('dialogPortraitImage');
+            }
+            var dialogPortraitImage = phaserSprites.addFromAtlas({ name: "dialogPortraitImage", filename: image, atlas: 'atlas_main' });
+            dialogPortraitImage.mask = dialogPortraitMask;
+            dialogPortraitFrame.addChild(dialogPortraitImage);
+        };
+        dialogPortraitFrame.onStart = function () {
+            var staticAnimation = Phaser.Animation.generateFrameNames('portrait_static_', 1, 4).concat(Phaser.Animation.generateFrameNames('portrait_static_', 3, 1));
+            var dialogboxStatic = phaserSprites.addFromAtlas({ x: 10, y: 8, name: "dialogboxStatic", filename: staticAnimation[0], atlas: 'atlas_main', visible: true, alpha: 0.35 });
+            dialogboxStatic.animations.add('static', staticAnimation, 1, true);
+            dialogboxStatic.mask = dialogPortraitMask;
+            dialogbox.addChild(dialogboxStatic);
+            dialogboxStatic.animations.play('static', 30, true);
+        };
+        dialogPortraitFrame.onStop = function () {
+            phaserSprites.destroy('dialogboxStatic');
+            if (phaserSprites.get('dialogPortraitImage') !== undefined) {
+                phaserSprites.destroy('dialogPortraitImage');
+            }
+        };
+        var animation = Phaser.Animation.generateFrameNames('a_button_', 1, 9).slice();
+        var dialogboxButton = phaserSprites.addFromAtlas({ x: dialogboxGraphic.width - 40, y: dialogboxGraphic.height - 40, name: "dialogboxButton", filename: animation[0], atlas: 'atlas_main', visible: false });
+        dialogboxButton.animations.add('animate', animation);
+        dialogboxButton.onStop = function () {
+            dialogboxButton.animations.stop(null, true);
+        };
+        dialogbox.addChild(dialogboxButton);
+        var dialogText = phaserTexts.add({ x: 100, y: 10, name: "dialogtext", font: 'gem', size: 16 });
+        dialogText.maxWidth = w - 100 - 15;
+        dialogbox.addChild(dialogText);
+        dialogText.replaceText = function (newText, callback) {
+            if (callback === void 0) { callback = function () { }; }
+            dialogText.alpha = 0;
+            dialogboxButton.visible = false;
+            dialogText.setText(newText);
+            game.add.tween(dialogText).to({ alpha: 1 }, Phaser.Timer.SECOND / 2, Phaser.Easing.Linear.In, true, 1, 0, false).
+                onComplete.add(function () {
+                dialogboxButton.visible = true;
+                callback();
+            });
+        };
+        dialogText.onStart = function () { };
+        dialogText.onStop = function () {
+            dialogText.replaceText('');
+        };
+        var skipallText = phaserTexts.add({ y: -20, name: "skipallText", font: 'gem', default: 'PRESS START TO SKIP', size: 15, visible: false });
+        skipallText.x = w - skipallText.width - 10;
+        dialogbox.addChild(skipallText);
+        dialogbox.portrait = dialogPortraitFrame;
+        dialogbox.text = dialogText;
+        dialogbox.skipallText = skipallText;
+        dialogbox.dialogboxButton = dialogboxButton;
+        this.dialogbox = dialogbox;
+        phaserGroup.addMany(phaserMaster.get('layers').DIALOGBOX, [dialogbox]);
+    };
+    DIALOG_MANAGER.prototype.dialog = function (data) {
+        var i;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    i = 0;
+                    _a.label = 1;
+                case 1:
+                    if (!(i < data.length)) return [3, 4];
+                    return [4, data[i]];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3:
+                    i++;
+                    return [3, 1];
+                case 4: return [4, null];
+                case 5:
+                    _a.sent();
+                    return [2];
+            }
+        });
+    };
+    DIALOG_MANAGER.prototype.start = function (script, callback) {
+        var _a = this, game = _a.game, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, phaserTexts = _a.phaserTexts, phaserControls = _a.phaserControls, atlas = _a.atlas;
+        var currentState = phaserMaster.getState().currentState;
+        var gen = this.dialog(script);
+        this.canSkip = false;
+        this.onTimer = false;
+        this.autoplay = false;
+        gen.complete = callback;
+        gen.revertToState = currentState;
+        gen.isReady = false;
+        phaserControls.enableAllActionButtons();
+        this.createDialogbox(gen);
+        gen.nextItem = function (data) {
+            var txtMsg = data.text;
+            var portrait = data.portrait;
+            gen.dialogbox.portrait.replaceImage(portrait);
+            gen.dialogbox.text.replaceText(txtMsg, function () { });
+        };
+        gen.finished = function () {
+            phaserSprites.getGroup('player_healthbar').concat(phaserSprites.getGroup('player_pow')).map(function (obj) {
+                obj.fadeIn();
+            });
+            phaserMaster.changeState(gen.revertToState);
+            gen.dialogbox.hide();
+            callback();
+        };
+        phaserMaster.changeState('DIALOG');
+        this.dialogGenerator = gen;
+    };
+    DIALOG_MANAGER.prototype.createDialogbox = function (gen) {
+        var _this = this;
+        var _a = this, game = _a.game, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, phaserTexts = _a.phaserTexts, phaserControls = _a.phaserControls, atlas = _a.atlas;
+        var dialogbox = this.dialogbox;
+        phaserSprites.getGroup('player_healthbar').concat(phaserSprites.getGroup('player_pow')).map(function (obj) {
+            obj.fadeOut();
+        });
+        dialogbox.reveal(function () {
+            gen.dialogbox = dialogbox;
+            gen.dialogbox.text.replaceText('', function () {
+                gen.isReady = true;
+                _this.next();
+            });
+        });
+    };
+    DIALOG_MANAGER.prototype.next = function (force) {
+        var _this = this;
+        if (force === void 0) { force = false; }
+        var dialogbox = this.dialogbox;
+        if ((this.dialogGenerator.isReady && !this.onTimer) || force) {
+            var line_1 = this.dialogGenerator.next().value;
+            if (line_1 === null) {
+                this.dialogGenerator.finished();
+            }
+            else {
+                if (!!line_1.autoplay) {
+                    this.autoplay = line_1.autoplay;
+                    if (this.autoplay) {
+                        dialogbox.dialogboxButton.animations.play('animate', 6, true);
+                    }
+                    else {
+                        dialogbox.dialogboxButton.animations.stop('animate');
+                    }
+                }
+                if (this.autoplay) {
+                    line_1.timer = (line_1.text.length * 50 > 2500) ? (line_1.text.length * 50) : 2500;
+                }
+                if (!!line_1.canSkip) {
+                    this.canSkip = line_1.canSkip;
+                }
+                dialogbox.skipallText.visible = this.canSkip;
+                if (!!line_1.timer) {
+                    this.onTimer = true;
+                    this.execute(line_1);
+                    this.game.time.events.add(line_1.timer, function () {
+                        _this.execute(line_1, function () {
+                            _this.next(true);
+                        });
+                    }, this).autoDestroy = true;
+                }
+                else {
+                    this.onTimer = false;
+                    this.execute(line_1);
+                }
+            }
+        }
+    };
+    DIALOG_MANAGER.prototype.execute = function (line, callback) {
+        if (callback === void 0) { callback = function () { }; }
+        if (line !== null) {
+            this.dialogGenerator.nextItem(line);
+            callback();
+        }
+        if (line === null) {
+            this.dialogGenerator.finished();
+        }
+    };
+    DIALOG_MANAGER.prototype.skipAll = function () {
+        if (this.dialogGenerator.isReady) {
+            if (this.canSkip) {
+                this.dialogGenerator.finished();
+            }
+        }
+    };
+    return DIALOG_MANAGER;
+}());
+var EFFECTS_MANAGER = (function () {
+    function EFFECTS_MANAGER() {
+    }
+    EFFECTS_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserGroup, atlas) {
+        this.game = game;
+        this.phaserSprites = phaserSprites;
+        this.phaserMaster = phaserMaster;
+        this.phaserGroup = phaserGroup;
+        this.atlas = atlas;
+        this.currentExplosionCount = 0;
+        this.maxExplosions = 5;
+        this.currentAmmoCount = 0;
+        this.maxAmmo = 3;
+    };
+    EFFECTS_MANAGER.prototype.debris = function (onscreenCap) {
+        var game = this.game;
+        var phaserMaster = this.phaserMaster;
+        var onscreenDebrisCount = phaserMaster.getOnly(['onscreenDebrisCount']).onscreenDebrisCount;
+        var animationSprites = Phaser.Animation.generateFrameNames('debrs__', 1, 9);
+        var weapon = game.add.weapon(onscreenCap, this.atlas, animationSprites[0]);
+        weapon.bulletKillType = Phaser.Weapon.KILL_CAMERA_BOUNDS;
+        weapon.bulletSpeed = 200;
+        weapon.bulletSpeedVariance = 500;
+        weapon.multiFire = true;
+        weapon.bulletPoolTotal = onscreenCap;
+        this.phaserGroup.add(this.phaserMaster.get('layers').DEBRIS, weapon.bullets);
+        weapon.bullets.children.map(function (bullet) {
+            var anim = bullet.animations.add('explosion', animationSprites, 30, true);
+        });
+        weapon.customFire = function (target, amountOfDebri) {
+            for (var i = 0; i < amountOfDebri; i++) {
+                weapon.fire(target, target.x + game.rnd.integerInRange(-360, 360), target.y + game.rnd.integerInRange(-360, 360));
+            }
+            weapon.bullets.children.map(function (bullet, index) {
+                game.time.events.add(index * 15, function () {
+                    bullet.animations.play('explosion', 30, true);
+                    game.add.tween(bullet).to({ alpha: 0 }, 500, Phaser.Easing.Linear.In, true, 500).
+                        onComplete.add(function () {
+                        bullet.alpha = 1;
+                        bullet.kill();
+                    });
+                }).autoDestroy = true;
+            });
+        };
+        return weapon;
+    };
+    EFFECTS_MANAGER.prototype.createExplosion = function (x, y, scale, layer, onDestroy, onUpdate) {
+        var _this = this;
+        if (onDestroy === void 0) { onDestroy = function () { }; }
+        if (onUpdate === void 0) { onUpdate = function () { }; }
+        if (this.currentExplosionCount < this.maxExplosions) {
+            this.currentExplosionCount++;
+            var game = this.game;
+            var _a = this, phaserSprites_1 = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+            var data = {
+                spriteAnimation: Phaser.Animation.generateFrameNames('explosion2_layer_', 1, 12)
+            };
+            var explosion_1 = phaserSprites_1.addFromAtlas({ name: "explosion_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
+            explosion_1.scale.setTo(scale, scale);
+            explosion_1.anchor.setTo(0.5, 0.5);
+            explosion_1.animations.add('explosion', data.spriteAnimation, 1, true);
+            explosion_1.animations.play('explosion', 30, false).onComplete.add(function () {
+                explosion_1.destroyIt();
+            }, explosion_1);
+            explosion_1.destroyIt = function () {
+                _this.currentExplosionCount--;
+                phaserSprites_1.destroy(explosion_1.name);
+            };
+            phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').VISUALS : layer, explosion_1);
+            return explosion_1;
+        }
+    };
+    EFFECTS_MANAGER.prototype.pelletImpact = function (x, y, scale, layer) {
+        var _this = this;
+        if (this.currentAmmoCount < this.maxAmmo) {
+            this.currentAmmoCount++;
+            var game = this.game;
+            var _a = this, phaserSprites_2 = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+            var data = {
+                spriteAnimation: Phaser.Animation.generateFrameNames('sparks_', 1, 5)
+            };
+            var explosion_2 = phaserSprites_2.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
+            explosion_2.scale.setTo(scale, scale);
+            explosion_2.anchor.setTo(0.5, 0.5);
+            explosion_2.animations.add('explosion', data.spriteAnimation, 1, true);
+            explosion_2.animations.play('explosion', 30, false).onComplete.add(function () {
+                explosion_2.destroyIt();
+            }, explosion_2);
+            explosion_2.destroyIt = function () {
+                _this.currentAmmoCount--;
+                phaserSprites_2.destroy(explosion_2.name);
+            };
+            phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').BULLET_IMPACT : layer, explosion_2);
+            game.physics.enable(explosion_2, Phaser.Physics.ARCADE);
+            return explosion_2;
+        }
+    };
+    EFFECTS_MANAGER.prototype.blueImpact = function (x, y, scale, layer) {
+        var _this = this;
+        if (this.currentAmmoCount < this.maxAmmo) {
+            this.currentAmmoCount++;
+            var game = this.game;
+            var _a = this, phaserSprites_3 = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+            var data = {
+                spriteAnimation: Phaser.Animation.generateFrameNames('blue_explosion_small_layer_', 1, 7)
+            };
+            var frames_1 = Phaser.Animation.generateFrameNames('blue_explosion_small_layer_', 1, 7);
+            var explosion_3 = phaserSprites_3.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
+            explosion_3.scale.setTo(scale, scale);
+            explosion_3.anchor.setTo(0.5, 0.5);
+            game.physics.enable(explosion_3, Phaser.Physics.ARCADE);
+            explosion_3.animations.add('explosion', data.spriteAnimation, 1, true);
+            explosion_3.animations.play('explosion', 30, false).onComplete.add(function () {
+                explosion_3.destroyIt();
+            }, explosion_3);
+            explosion_3.destroyIt = function () {
+                _this.currentAmmoCount--;
+                phaserSprites_3.destroy(explosion_3.name);
+            };
+            phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').BULLET_IMPACT : layer, explosion_3);
+            return explosion_3;
+        }
+    };
+    EFFECTS_MANAGER.prototype.orangeImpact = function (x, y, scale, layer) {
+        var _this = this;
+        if (this.currentAmmoCount < this.maxAmmo) {
+            this.currentAmmoCount++;
+            var game = this.game;
+            var _a = this, phaserSprites_4 = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+            var data = {
+                spriteAnimation: Phaser.Animation.generateFrameNames('orange_ring_explosion_layer_', 1, 7)
+            };
+            var frames_2 = Phaser.Animation.generateFrameNames('orange_ring_explosion_layer_', 1, 7);
+            var explosion_4 = phaserSprites_4.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
+            explosion_4.scale.setTo(scale, scale);
+            explosion_4.anchor.setTo(0.5, 0.5);
+            game.physics.enable(explosion_4, Phaser.Physics.ARCADE);
+            explosion_4.animations.add('explosion', data.spriteAnimation, 1, true);
+            explosion_4.animations.play('explosion', 30, false).onComplete.add(function () {
+                explosion_4.destroyIt();
+            }, explosion_4);
+            explosion_4.destroyIt = function () {
+                _this.currentAmmoCount--;
+                phaserSprites_4.destroy(explosion_4.name);
+            };
+            phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').BULLET_IMPACT : layer, explosion_4);
+            return explosion_4;
+        }
+    };
+    EFFECTS_MANAGER.prototype.electricDischarge = function (x, y, scale, layer) {
+        var _this = this;
+        if (this.currentAmmoCount < this.maxAmmo) {
+            this.currentAmmoCount++;
+            var game = this.game;
+            var _a = this, phaserSprites_5 = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+            var data = {
+                spriteAnimation: Phaser.Animation.generateFrameNames('disintegrate', 1, 10)
+            };
+            var explosion_5 = phaserSprites_5.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
+            explosion_5.scale.setTo(scale, scale);
+            explosion_5.anchor.setTo(0.5, 0.5);
+            game.physics.enable(explosion_5, Phaser.Physics.ARCADE);
+            explosion_5.animations.add('explosion', data.spriteAnimation, 1, true);
+            explosion_5.animations.play('explosion', game.rnd.integerInRange(20, 30), false).onComplete.add(function () {
+                explosion_5.destroyIt();
+            }, explosion_5);
+            explosion_5.destroyIt = function () {
+                _this.currentAmmoCount--;
+                phaserSprites_5.destroy(explosion_5.name);
+            };
+            phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').BULLET_IMPACT : layer, explosion_5);
+            return explosion_5;
+        }
+    };
+    return EFFECTS_MANAGER;
+}());
 var ENEMY_MANAGER = (function () {
     function ENEMY_MANAGER(params) {
         this.showHitbox = params.showHitbox;
     }
-    ENEMY_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserTexts, phaserGroup, weaponManager, atlas, atlas_weapons) {
+    ENEMY_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserTexts, phaserGroup, weaponManager, effectsManager, atlas, atlas_weapons) {
         this.game = game;
         this.phaserSprites = phaserSprites;
         this.phaserMaster = phaserMaster;
         this.phaserTexts = phaserTexts;
         this.phaserGroup = phaserGroup;
         this.weaponManager = weaponManager;
+        this.effectsManager = effectsManager;
         this.atlas = atlas;
         this.atlas_weapons = atlas_weapons;
-    };
-    ENEMY_MANAGER.prototype.collisionCheck = function (obj, damage) {
-        this.phaserSprites.getManyGroups(['player_hitboxes']).map(function (target) {
-            target.game.physics.arcade.overlap(obj, target, function (obj, target) {
-                target.parent.takeDamage(damage);
-                obj.destroyIt();
-            }, null, obj);
-        });
+        this.enemyLayer;
     };
     ENEMY_MANAGER.prototype.facePlayer = function (obj) {
         var game = this.game;
         var player = this.phaserSprites.getOnly(['player']).player;
         return Math.ceil((360 / (2 * Math.PI)) * game.math.angleBetween(obj.x, obj.y, player.x, player.y) - 90);
     };
+    ENEMY_MANAGER.prototype.generateWaveData = function (duration, range) {
+        return this.game.math.sinCosGenerator(duration, range, 0, 1).cos.map(function (value) {
+            return Math.abs(value);
+        });
+    };
     ENEMY_MANAGER.prototype.bulletCollisionWithPlayer = function (enemy) {
         var targets = this.phaserSprites.getGroup('player_hitboxes').slice();
         var collidables = enemy.collidables.primaryWeapon.slice();
         this.game.physics.arcade.overlap(targets, collidables, function (target, collidable) {
-            if (!target.isInvincible && !target.isDead && !target.isDamaged) {
-                target.parent.takeDamage(collidable.damgeOnImpact);
+            var player = target.parent;
+            if (!player.isInvincible && !player.isDead && !player.isDamaged && !player.isForceMoved) {
+                player.takeDamage(collidable.damgeOnImpact);
                 collidable.destroyIt();
             }
         });
     };
-    ENEMY_MANAGER.prototype.createSmallEnemy1 = function (options, onDamage, onDestroy, onUpdate) {
+    ENEMY_MANAGER.prototype.addSharedBehavior = function (enemy) {
         var _this = this;
-        if (onDamage === void 0) { onDamage = function () { }; }
-        if (onDestroy === void 0) { onDestroy = function () { }; }
-        if (onUpdate === void 0) { onUpdate = function () { }; }
-        var game = this.game;
-        var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var enemy = phaserSprites.addFromAtlas({ name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: "small_1", visible: true });
+        var _a = this, game = _a.game, phaserSprites = _a.phaserSprites, phaserMaster = _a.phaserMaster, phaserGroup = _a.phaserGroup;
+        enemy.onLayer = phaserMaster.get('layers').ENEMIES;
         enemy.anchor.setTo(0.5, 0.5);
-        enemy.scale.setTo(1, 1);
-        enemy.maxHealth = 100;
         enemy.health = enemy.maxHealth;
-        enemy.pierceResistence = 1;
-        enemy.fallThreshold = game.rnd.integerInRange(0, 75);
-        enemy.cosWave = { data: game.math.sinCosGenerator(200, game.world.height * .50, 0, 1).cos, count: 0 };
-        enemy.sinWave = { data: game.math.sinCosGenerator(game.rnd.integerInRange(200, 300), game.rnd.integerInRange(0, 1) === 1 ? -50 : 50, 1, 3).sin, count: 0 };
-        enemy.fireDelay = 0;
-        enemy.fireTimer = 1000;
         enemy.isInvincible = false;
         enemy.isDamaged = false;
         enemy.isDestroyed = false;
-        enemy.onLayer = options.layer;
+        enemy.belowBlinkTimer = game.time.returnTrueTime();
+        enemy.isBelow50 = false;
+        enemy.isBelow75 = false;
         enemy.weaponSystems = [];
         enemy.collidables = {
             primaryWeapon: [],
             secondaryWeapon: []
         };
-        phaserGroup.add(options.layer, enemy);
-        var hitboxes = ["small_1_hitbox_1"];
+        enemy.removeIt = function () {
+            if (!enemy.isDestroyed) {
+                enemy.weaponSystems.map(function (weaponSystem) {
+                    weaponSystem.destroyIt();
+                });
+                enemy.children.map(function (obj) {
+                    _this.phaserSprites.destroy(obj.name);
+                });
+                phaserSprites.destroy(enemy.name);
+            }
+        };
+        phaserGroup.add(enemy.onLayer, enemy);
+    };
+    ENEMY_MANAGER.prototype.attachHitbox = function (enemy, hitboxes) {
+        var _this = this;
+        var _a = this, game = _a.game, phaserSprites = _a.phaserSprites, atlas = _a.atlas;
         hitboxes.map(function (obj) {
             var e_hitbox = phaserSprites.addFromAtlas({ name: "enemy_hitbox_" + game.rnd.integer(), group: 'enemy_hitboxes', atlas: atlas, filename: obj, alpha: _this.showHitbox ? 0.75 : 0 });
             e_hitbox.anchor.setTo(0.5, 0.5);
             game.physics.enable(e_hitbox, Phaser.Physics.ARCADE);
             enemy.addChild(e_hitbox);
         });
-        var ammo = this.weaponManager.enemyBullet(3);
-        ammo.bulletSpeedVariance = 100;
-        ammo.bulletAngleVariance = 20;
-        ammo.bullets.children.map(function (bullet) {
-            bullet.damgeOnImpact = 10;
-        });
-        var animationSprites = Phaser.Animation.generateFrameNames('bullet_fire_', 1, 4).slice();
+    };
+    ENEMY_MANAGER.prototype.attachWeaponSystem = function (enemy, ammo, animationSprites) {
+        var _this = this;
+        var _a = this, game = _a.game, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
         var weaponSystem = this.phaserSprites.addFromAtlas({ name: "enemy_weapons_" + this.game.rnd.integer(), group: 'enemy_weapons', atlas: this.atlas_weapons, filename: animationSprites[0], visible: true });
         weaponSystem.anchor.setTo(0.5, 0.5);
         weaponSystem.angle = 180;
@@ -2267,7 +2709,7 @@ var ENEMY_MANAGER = (function () {
         };
         weaponSystem.destroyIt = function () {
             var x = weaponSystem.x, y = weaponSystem.y;
-            _this.weaponManager.blueImpact(x, y, 1, enemy.onLayer);
+            _this.effectsManager.blueImpact(x, y, 1, enemy.onLayer);
             _this.phaserSprites.destroy(weaponSystem.name);
             game.time.events.add(Phaser.Timer.SECOND * 4, function () {
                 weaponSystem.ammo.destroy();
@@ -2287,45 +2729,244 @@ var ENEMY_MANAGER = (function () {
             }
             weaponSystem.animations.play('fireWeapon', 24, false);
         };
-        phaserGroup.add(options.layer + 1, weaponSystem);
+        phaserGroup.add(enemy.onLayer + 1, weaponSystem);
         weaponSystem.ammo = ammo;
         enemy.weaponSystems.push(weaponSystem);
         enemy.collidables.primaryWeapon = [];
         enemy.collidables.primaryWeapon.push(ammo.bullets);
+        return weaponSystem;
+    };
+    ENEMY_MANAGER.prototype.createAsteroid1 = function (options, onDamage, onDestroy, onUpdate) {
+        var _this = this;
+        if (onDamage === void 0) { onDamage = function () { }; }
+        if (onDestroy === void 0) { onDestroy = function () { }; }
+        if (onUpdate === void 0) { onUpdate = function () { }; }
+        var game = this.game;
+        var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+        var folder = 'asteroid1';
+        var enemySprites = Phaser.Animation.generateFrameNames(folder + "/asteroid_", 1, 28).slice();
+        var enemy = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: enemySprites[0], visible: true });
+        enemy.maxHealth = 50;
+        this.addSharedBehavior(enemy);
+        enemy.animations.add('idol', enemySprites);
+        enemy.animations.play('idol', 16, true);
+        this.attachHitbox(enemy, [folder + "/hitbox"]);
+        var ammo = this.weaponManager.enemyBullet(0);
+        ammo.bullets.children.map(function (bullet) { });
+        var animationSprites = Phaser.Animation.generateFrameNames('bullet_fire_', 1, 4).slice();
+        this.attachWeaponSystem(enemy, ammo, animationSprites);
         enemy.onUpdate = function () {
-            var player = phaserSprites.get('player');
+            enemy.y += 2;
+            if (enemy.isBelow50) {
+                if (game.time.returnTrueTime() > enemy.belowBlinkTimer) {
+                    enemy.belowBlinkTimer += 500;
+                    enemy.tint = 1 * 0xff0000;
+                    enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                }
+            }
+            if (enemy.isBelow75) {
+                if (game.time.returnTrueTime() > enemy.belowBlinkTimer) {
+                    enemy.belowBlinkTimer += 250;
+                    enemy.tint = 1 * 0xff0000;
+                    enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                }
+            }
             onUpdate(enemy);
+            if (enemy.y > (_this.game.world.height + enemy.height)) {
+                enemy.removeIt();
+            }
+            _this.bulletCollisionWithPlayer(enemy);
+        };
+        enemy.destroyIt = function () {
+            enemy.isDestroyed = true;
+            enemy.isBelow50 = false;
+            enemy.isBelow75 = false;
+            enemy.tint = 1 * 0xff0000;
+            enemy.weaponSystems.map(function (weaponSystem) {
+                weaponSystem.destroyIt();
+            });
+            enemy.game.add.tween(enemy).to({ alpha: 0.75 }, 150, Phaser.Easing.Linear.Out, true, 1, 0, false).
+                onComplete.add(function () {
+                onDestroy(enemy);
+                _this.weaponManager.createExplosionBasic(enemy.x, enemy.y, 1, enemy.onLayer + 1, 0);
+                game.time.events.remove(enemy.explodeInterval);
+                enemy.children.map(function (obj) {
+                    _this.phaserSprites.destroy(obj.name);
+                });
+                phaserSprites.destroy(enemy.name);
+            });
+        };
+        enemy.damageIt = function (val) {
+            onDamage(enemy);
+            enemy.isDamaged = true;
+            game.time.events.add(10, function () {
+                enemy.isDamaged = false;
+            }, _this).autoDestroy = true;
+            if (enemy.y > 0) {
+                enemy.health -= val;
+            }
+            enemy.tint = 1 * 0xff0000;
+            enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+            if (enemy.health / enemy.maxHealth < 0.5) {
+                enemy.isBelow50 = true;
+            }
+            if (enemy.health / enemy.maxHealth < 0.25) {
+                enemy.isBelow75 = true;
+            }
+            if (enemy.health <= 0) {
+                enemy.destroyIt();
+            }
+        };
+        return enemy;
+    };
+    ENEMY_MANAGER.prototype.createAsteroid2 = function (options, onDamage, onDestroy, onUpdate) {
+        var _this = this;
+        if (onDamage === void 0) { onDamage = function () { }; }
+        if (onDestroy === void 0) { onDestroy = function () { }; }
+        if (onUpdate === void 0) { onUpdate = function () { }; }
+        var game = this.game;
+        var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+        var folder = 'asteroid2';
+        var enemySprites = Phaser.Animation.generateFrameNames(folder + "/asteroid_", 1, 19).slice();
+        var enemy = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: enemySprites[0], visible: true });
+        enemy.maxHealth = 150;
+        this.addSharedBehavior(enemy);
+        enemy.animations.add('idol', enemySprites);
+        enemy.animations.play('idol', 12, true);
+        this.attachHitbox(enemy, [folder + "/hitbox"]);
+        var ammo = this.weaponManager.enemyBullet(0);
+        ammo.bullets.children.map(function (bullet) { });
+        var animationSprites = Phaser.Animation.generateFrameNames('bullet_fire_', 1, 4).slice();
+        this.attachWeaponSystem(enemy, ammo, animationSprites);
+        enemy.onUpdate = function () {
+            enemy.y += 0.5;
+            if (enemy.isBelow50) {
+                if (game.time.returnTrueTime() > enemy.belowBlinkTimer) {
+                    enemy.belowBlinkTimer += 500;
+                    enemy.tint = 1 * 0xff0000;
+                    enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                }
+            }
+            if (enemy.isBelow75) {
+                if (game.time.returnTrueTime() > enemy.belowBlinkTimer) {
+                    enemy.belowBlinkTimer += 250;
+                    enemy.tint = 1 * 0xff0000;
+                    enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                }
+            }
+            onUpdate(enemy);
+            if (enemy.y > (_this.game.world.height + enemy.height)) {
+                enemy.removeIt();
+            }
+            _this.bulletCollisionWithPlayer(enemy);
+        };
+        enemy.destroyIt = function () {
+            enemy.isDestroyed = true;
+            enemy.isBelow50 = false;
+            enemy.isBelow75 = false;
+            enemy.tint = 1 * 0xff0000;
+            enemy.weaponSystems.map(function (weaponSystem) {
+                weaponSystem.destroyIt();
+            });
+            enemy.game.add.tween(enemy).to({ alpha: 0.5 }, 10, Phaser.Easing.Linear.Out, true, 1, 0, false).
+                onComplete.add(function () {
+                onDestroy(enemy);
+                var debris = _this.phaserMaster.get('sharedDebris');
+                debris.customFire(enemy, 25);
+                game.time.events.remove(enemy.explodeInterval);
+                enemy.children.map(function (obj) {
+                    _this.phaserSprites.destroy(obj.name);
+                });
+                phaserSprites.destroy(enemy.name);
+            });
+        };
+        enemy.damageIt = function (val) {
+            onDamage(enemy);
+            enemy.isDamaged = true;
+            game.time.events.add(10, function () {
+                enemy.isDamaged = false;
+            }, _this).autoDestroy = true;
+            enemy.health -= val;
+            enemy.tint = 1 * 0xff0000;
+            enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+            if (enemy.health / enemy.maxHealth < 0.5) {
+                enemy.isBelow50 = true;
+            }
+            if (enemy.health / enemy.maxHealth < 0.25) {
+                enemy.isBelow75 = true;
+            }
+            if (enemy.health <= 0) {
+                enemy.destroyIt();
+            }
+        };
+        return enemy;
+    };
+    ENEMY_MANAGER.prototype.createSmallEnemy1 = function (options, onDamage, onDestroy, onUpdate) {
+        var _this = this;
+        if (onDamage === void 0) { onDamage = function () { }; }
+        if (onDestroy === void 0) { onDestroy = function () { }; }
+        if (onUpdate === void 0) { onUpdate = function () { }; }
+        var game = this.game;
+        var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
+        var folder = 'smallShip';
+        var enemySprites = Phaser.Animation.generateFrameNames(folder + "/small_", 1, 1).slice();
+        var enemy = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: enemySprites[0], visible: true });
+        enemy.maxHealth = 50;
+        this.addSharedBehavior(enemy);
+        enemy.yWave = { data: this.generateWaveData(200, game.world.height * .60), count: 0 };
+        enemy.fireDelay = 0;
+        enemy.fireTimer = 1000;
+        phaserGroup.add(enemy.onLayer, enemy);
+        this.attachHitbox(enemy, [folder + "/hitbox"]);
+        var ammo = this.weaponManager.enemyBullet(3);
+        ammo.bullets.children.map(function (bullet) { });
+        var animationSprites = Phaser.Animation.generateFrameNames('bullet_fire_', 1, 4).slice();
+        var weaponSystem = this.attachWeaponSystem(enemy, ammo, animationSprites);
+        enemy.onUpdate = function () {
             enemy.angle = _this.facePlayer(enemy);
             enemy.weaponSystems.map(function (weaponsSystem) {
                 weaponsSystem.angle = _this.facePlayer(enemy) - 180;
             });
-            if (game.time.returnTrueTime() > enemy.fireDelay && !enemy.isDestroyed && (enemy.y > enemy.game.canvas.height * .3)) {
+            if (game.time.returnTrueTime() > enemy.fireDelay && !enemy.isDestroyed && (enemy.y > enemy.game.canvas.height * .4)) {
                 enemy.fireDelay = game.time.returnTrueTime() + enemy.fireTimer;
                 enemy.weaponSystems.map(function (weaponsSystem) {
                     weaponSystem.fire();
                 });
             }
             if (!enemy.isDestroyed) {
-                enemy.y = -(enemy.cosWave.data[enemy.cosWave.count]) - enemy.height;
-                enemy.x = enemy.sinWave.data[enemy.sinWave.count] + options.x;
-                enemy.cosWave.count++;
-                enemy.sinWave.count++;
-                if (enemy.cosWave.count >= enemy.cosWave.data.length) {
+                enemy.y = enemy.yWave.data[enemy.yWave.count] - enemy.height;
+                enemy.yWave.count++;
+                if (enemy.yWave.count >= enemy.yWave.data.length) {
                     enemy.removeIt();
                 }
                 enemy.weaponSystems.map(function (obj) {
                     obj.sync(enemy);
                 });
             }
-            else {
-                enemy.inPlace = true;
+            if (enemy.isBelow50) {
+                if (game.time.returnTrueTime() > enemy.belowBlinkTimer) {
+                    enemy.belowBlinkTimer += 500;
+                    enemy.tint = 1 * 0xff0000;
+                    enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                }
+            }
+            if (enemy.isBelow75) {
+                if (game.time.returnTrueTime() > enemy.belowBlinkTimer) {
+                    enemy.belowBlinkTimer += 250;
+                    enemy.tint = 1 * 0xff0000;
+                    enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                }
+            }
+            onUpdate(enemy);
+            if (enemy.y > (_this.game.world.height + enemy.height)) {
+                enemy.removeIt();
             }
             _this.bulletCollisionWithPlayer(enemy);
         };
         enemy.damageIt = function (val) {
             onDamage(enemy);
             enemy.isDamaged = true;
-            game.time.events.add(150, function () {
+            game.time.events.add(10, function () {
                 enemy.isDamaged = false;
             }, _this).autoDestroy = true;
             enemy.health -= val;
@@ -2351,10 +2992,12 @@ var ENEMY_MANAGER = (function () {
                 weaponSystem.destroyIt();
             });
             enemy.explodeInterval = game.time.events.loop(250, function () {
-                _this.weaponManager.createExplosion(enemy.x + game.rnd.integerInRange(-enemy.width / 2, enemy.width / 2), enemy.y + game.rnd.integerInRange(-enemy.height / 2, enemy.height / 2), 1, enemy.onLayer + 1);
+                _this.effectsManager.createExplosion(enemy.x + game.rnd.integerInRange(-enemy.width / 2, enemy.width / 2), enemy.y + game.rnd.integerInRange(-enemy.height / 2, enemy.height / 2), 1, enemy.onLayer + 1);
             });
-            enemy.game.add.tween(enemy).to({ y: enemy.y + 100, alpha: 0.5 }, 750, Phaser.Easing.Linear.Out, true, 100, 0, false).
+            enemy.game.add.tween(enemy).to({ y: enemy.y + 50, alpha: 0.5 }, 500, Phaser.Easing.Linear.Out, true, 250, 0, false).
                 onComplete.add(function () {
+                var debris = _this.phaserMaster.get('sharedDebris');
+                debris.customFire(enemy, 25);
                 onDestroy(enemy);
                 game.time.events.remove(enemy.explodeInterval);
                 enemy.children.map(function (obj) {
@@ -2365,31 +3008,39 @@ var ENEMY_MANAGER = (function () {
         };
         return enemy;
     };
-    ENEMY_MANAGER.prototype.createBigEnemy1 = function (options, onDamage, onDestroy, onFail, onUpdate) {
+    ENEMY_MANAGER.prototype.createSmallEnemy2 = function (options, onDamage, onDestroy, onUpdate) {
         var _this = this;
         if (onDamage === void 0) { onDamage = function () { }; }
         if (onDestroy === void 0) { onDestroy = function () { }; }
-        if (onFail === void 0) { onFail = function () { }; }
         if (onUpdate === void 0) { onUpdate = function () { }; }
         var game = this.game;
         var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var enemy = phaserSprites.addFromAtlas({ x: options.x, name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: "big_1", visible: true });
+        var enemy = phaserSprites.addFromAtlas({ name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: "big_1", visible: true, x: options.x });
         enemy.anchor.setTo(0.5, 0.5);
         enemy.scale.setTo(1, 1);
-        game.physics.enable(enemy, Phaser.Physics.ARCADE);
-        enemy.atTarget = false;
-        enemy.maxHealth = 1500;
+        enemy.maxHealth = 700;
         enemy.health = enemy.maxHealth;
-        enemy.pierceResistence = 4;
+        enemy.pierceResistence = 1;
         enemy.fallThreshold = game.rnd.integerInRange(0, 75);
-        enemy.sinWave = game.math.sinCosGenerator(400 + options.y, game.world.height / 2, 1, 1);
-        enemy.count = 0;
+        enemy.cosWave = { data: game.math.sinCosGenerator(400, game.world.height * .50, 0, 1).cos, count: 0 };
         enemy.fireDelay = 0;
-        enemy.fireTimer = 500;
-        enemy.inPlace = false;
+        enemy.fireTimer = 200;
+        enemy.isInvincible = false;
+        enemy.isDamaged = false;
         enemy.isDestroyed = false;
-        enemy.onLayer = options.layer;
-        phaserGroup.add(options.layer, enemy);
+        enemy.onLayer = phaserMaster.get('layers').ENEMIES;
+        enemy.bulletCycle = {
+            count: 0,
+            total: 3,
+            delay: 500,
+            lock: false
+        };
+        enemy.weaponSystems = [];
+        enemy.collidables = {
+            primaryWeapon: [],
+            secondaryWeapon: []
+        };
+        phaserGroup.add(enemy.onLayer, enemy);
         var hitboxes = ["big_1_hitbox_1", "big_1_hitbox_2"];
         hitboxes.map(function (obj) {
             var e_hitbox = phaserSprites.addFromAtlas({ name: "enemy_hitbox_" + game.rnd.integer(), group: 'enemy_hitboxes', atlas: atlas, filename: obj, alpha: _this.showHitbox ? 0.75 : 0 });
@@ -2397,381 +3048,291 @@ var ENEMY_MANAGER = (function () {
             game.physics.enable(e_hitbox, Phaser.Physics.ARCADE);
             enemy.addChild(e_hitbox);
         });
+        var ammo = this.weaponManager.enemyBullet(9);
+        ammo.bullets.children.map(function (bullet) {
+            bullet.damgeOnImpact = 10;
+        });
+        var animationSprites = Phaser.Animation.generateFrameNames('bullet_fire_', 1, 4).slice();
+        var weaponSystem = this.phaserSprites.addFromAtlas({ name: "enemy_weapons_" + this.game.rnd.integer(), group: 'enemy_weapons', atlas: this.atlas_weapons, filename: animationSprites[0], visible: true });
+        weaponSystem.anchor.setTo(0.5, 0.5);
+        weaponSystem.angle = 180;
+        weaponSystem.animations.add('fireWeapon', animationSprites, 1, true);
+        weaponSystem.sync = function (enemy) {
+            var x = enemy.x, y = enemy.y;
+            weaponSystem.x = x;
+            weaponSystem.y = y;
+        };
+        weaponSystem.destroyIt = function () {
+            var x = weaponSystem.x, y = weaponSystem.y;
+            _this.effectsManager.blueImpact(x, y, 1, enemy.onLayer);
+            _this.phaserSprites.destroy(weaponSystem.name);
+            game.time.events.add(Phaser.Timer.SECOND * 4, function () {
+                weaponSystem.ammo.destroy();
+            }, _this).autoDestroy = true;
+        };
+        weaponSystem.fire = function () {
+            var player = phaserSprites.get('player');
+            ammo.fire(weaponSystem, weaponSystem.x, weaponSystem.y + 100);
+            ammo.fire(weaponSystem, weaponSystem.x + 50, weaponSystem.y + 100);
+            ammo.fire(weaponSystem, weaponSystem.x - 50, weaponSystem.y + 100);
+            weaponSystem.animations.play('fireWeapon', 24, false);
+        };
+        phaserGroup.add(enemy.onLayer + 1, weaponSystem);
+        weaponSystem.ammo = ammo;
+        enemy.weaponSystems.push(weaponSystem);
+        enemy.collidables.primaryWeapon = [];
+        enemy.collidables.primaryWeapon.push(ammo.bullets);
+        enemy.onUpdate = function () {
+            var player = phaserSprites.get('player');
+            onUpdate(enemy);
+            if (game.time.returnTrueTime() > enemy.fireDelay && !enemy.isDestroyed && (enemy.y > enemy.game.canvas.height * .3)) {
+                enemy.fireDelay = game.time.returnTrueTime() + enemy.fireTimer;
+                if (enemy.bulletCycle.count < enemy.bulletCycle.total) {
+                    enemy.weaponSystems.map(function (weaponsSystem) {
+                        weaponSystem.fire();
+                    });
+                    enemy.bulletCycle.count++;
+                }
+                else {
+                    if (!enemy.bulletCycle.lock) {
+                        enemy.bulletCycle.lock = true;
+                        game.time.events.add(Phaser.Timer.SECOND * 1.5, function () {
+                            enemy.bulletCycle.count = 0;
+                            enemy.bulletCycle.lock = false;
+                        }).autoDestroy = true;
+                    }
+                }
+            }
+            if (!enemy.isDestroyed) {
+                if (enemy.cosWave.count < enemy.cosWave.data.length / 2) {
+                    enemy.y = -(enemy.cosWave.data[enemy.cosWave.count]) - enemy.height;
+                    enemy.cosWave.count++;
+                }
+                if (enemy.cosWave.count >= enemy.cosWave.data.length) {
+                    enemy.removeIt();
+                }
+                enemy.weaponSystems.map(function (obj) {
+                    obj.sync(enemy);
+                });
+            }
+            _this.bulletCollisionWithPlayer(enemy);
+        };
         enemy.damageIt = function (val) {
             onDamage(enemy);
-            if (!enemy.atTarget) {
-                enemy.health -= val;
-                enemy.tint = 1 * 0xff0000;
-                enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
-                if (enemy.health <= 0) {
-                    enemy.destroyIt();
-                }
-            }
-        };
-        enemy.removeIt = function () {
-            phaserSprites.destroy(enemy.name);
-        };
-        enemy.destroyIt = function () {
-            enemy.children.map(function (obj) {
-                _this.phaserSprites.destroy(obj.name);
-            });
-            if (!enemy.isDestroyed) {
-                enemy.isDestroyed = true;
-                enemy.tint = 1 * 0xff0000;
-                enemy.explodeInterval = game.time.events.loop(100, function () {
-                    _this.weaponManager.createExplosion(enemy.x + game.rnd.integerInRange(-enemy.width / 2, enemy.width / 2), enemy.y + game.rnd.integerInRange(-enemy.height / 2, enemy.height / 2), 1, enemy.onLayer + 1);
-                });
-                enemy.game.add.tween(enemy).to({ y: enemy.y - 15, alpha: 0.5 }, 750, Phaser.Easing.Linear.Out, true, 100, 0, false).
-                    onComplete.add(function () {
-                    game.time.events.remove(enemy.explodeInterval);
-                    onDestroy(enemy);
-                    _this.weaponManager.createExplosion(enemy.x, enemy.y, 1, options.layer + 1);
-                    phaserSprites.destroy(enemy.name);
-                });
-            }
-        };
-        enemy.onUpdate = function () {
-            onUpdate(enemy);
-            if (game.time.returnTrueTime() > enemy.fireDelay && enemy.inPlace) {
-                enemy.fireDelay = game.time.returnTrueTime() + enemy.fireTimer;
-            }
-            if (!enemy.isDestroyed && enemy.count < enemy.sinWave.cos.length / 2) {
-                enemy.y = -(enemy.sinWave.cos[enemy.count]) - enemy.height;
-                enemy.count++;
-            }
-            else {
-                enemy.inPlace = true;
-            }
-        };
-        enemy.removeIt = function () {
-            phaserSprites.destroy(enemy.name);
-        };
-        return enemy;
-    };
-    ENEMY_MANAGER.prototype.createAsteroid = function (options, onDamage, onDestroy, onFail, onUpdate) {
-        var _this = this;
-        if (onDamage === void 0) { onDamage = function () { }; }
-        if (onDestroy === void 0) { onDestroy = function () { }; }
-        if (onFail === void 0) { onFail = function () { }; }
-        if (onUpdate === void 0) { onUpdate = function () { }; }
-        var game = this.game;
-        var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var enemy = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: "asteroid_mid_layer_" + game.rnd.integerInRange(1, 3), visible: true });
-        enemy.anchor.setTo(0.5, 0.5);
-        enemy.scale.setTo(1.5, 1.5);
-        game.physics.enable(enemy, Phaser.Physics.ARCADE);
-        enemy.body.velocity.y = options.iy;
-        enemy.body.velocity.x = options.ix;
-        enemy.angleMomentum = game.rnd.integerInRange(-5, 5);
-        enemy.body.bounce.setTo(1, 1);
-        enemy.atTarget = false;
-        enemy.maxHealth = 150;
-        enemy.health = enemy.maxHealth;
-        enemy.pierceResistence = 4;
-        enemy.fallThreshold = game.rnd.integerInRange(0, 75);
-        phaserGroup.add(options.layer, enemy);
-        var hitboxes = ["1_hitbox_1", "1_hitbox_2"];
-        hitboxes.map(function (obj) {
-            var e_hitbox = phaserSprites.addFromAtlas({ name: "enemy_hitbox_" + game.rnd.integer(), group: 'enemy_hitboxes', atlas: atlas, filename: obj, alpha: _this.showHitbox ? 0.75 : 0 });
-            e_hitbox.anchor.setTo(0.5, 0.5);
-            e_hitbox.destroyIt = function (self) {
-                self.body = null;
-                _this.phaserSprites.destroy(self.name);
-            };
-            game.physics.enable(e_hitbox, Phaser.Physics.ARCADE);
-            enemy.addChild(e_hitbox);
-        });
-        enemy.damageIt = function (val, wpnType) {
-            if (wpnType === void 0) { wpnType = null; }
-            onDamage(enemy);
-            if (!enemy.atTarget) {
-                enemy.health -= val;
-                enemy.tint = 1 * 0xff0000;
-                enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
-                if (enemy.health <= 0) {
-                    enemy.destroyIt();
-                }
-            }
-        };
-        enemy.destroyIt = function () {
-            var tween = {
-                angle: game.rnd.integerInRange(-720, 720),
-                x: enemy.x - game.rnd.integerInRange(-25, 25),
-                y: enemy.y - game.rnd.integerInRange(5, 25),
-                alpha: .5
-            };
-            enemy.game.add.tween(enemy).to(tween, game.rnd.integerInRange(150, 500), Phaser.Easing.Linear.Out, true, 0, 0, false);
-            enemy.body = null;
-            game.time.events.add(Phaser.Timer.SECOND / 2, function () {
-                onDestroy(enemy);
-                _this.weaponManager.createExplosion(enemy.x, enemy.y, 1, options.layer + 1);
-                phaserSprites.destroy(enemy.name);
-            }, enemy).autoDestroy = true;
-        };
-        enemy.fallToPlanet = function () {
-            enemy.tint = 1 * 0x000000;
-            enemy.atTarget = true;
-            enemy.body = null;
-            enemy.game.add.tween(enemy).to({ y: enemy.y + 60 }, Phaser.Timer.SECOND * 2, Phaser.Easing.Linear.In, true, 0).autoDestroy = true;
-            game.time.events.add(350, function () {
-                _this.game.add.tween(enemy.scale).to({ x: 0, y: 0 }, Phaser.Timer.SECOND * 1, Phaser.Easing.Linear.In, true, game.rnd.integerInRange(0, 500)).
-                    onComplete.add(function () {
-                    onFail(enemy);
-                    enemy.removeIt();
-                    _this.weaponManager.createExplosion(enemy.x, enemy.y, 0.25, 6);
-                }).autoDestroy = true;
-            }).autoDestroy = true;
-        };
-        enemy.checkLocation = function () {
-            enemy.angle += enemy.angleMomentum;
-            if (enemy.angleMomentum > 0) {
-                enemy.angleMomentum -= 0.002;
-            }
-            if (enemy.angleMomentum < 0) {
-                enemy.angleMomentum += 0.002;
-            }
-            if (enemy.y > enemy.height) {
-                if (enemy.body !== null) {
-                    enemy.body.collideWorldBounds = true;
-                }
-            }
-            if (enemy.y > _this.game.canvas.height - (75 + enemy.fallThreshold)) {
-                if (enemy.body !== null && !enemy.atTarget) {
-                    enemy.body.collideWorldBounds = false;
-                    enemy.fallToPlanet();
-                }
-            }
-        };
-        enemy.onUpdate = function () {
-            onUpdate(enemy);
-            game.physics.arcade.collide([phaserSprites.get('leftBoundry'), phaserSprites.get('rightBoundry')], enemy);
-            enemy.rotate += 2;
-            if (!enemy.atTarget) {
-                if (enemy.body !== null) {
-                    if (enemy.body.velocity.y + 2 < 100) {
-                        enemy.body.velocity.y += 2;
-                    }
-                    if (enemy.body.velocity.x > 0) {
-                        enemy.body.velocity.x -= 0.2;
-                    }
-                    if (enemy.body.velocity.x < 0) {
-                        enemy.body.velocity.x += 0.2;
-                    }
-                }
-                enemy.checkLocation();
-            }
-        };
-        enemy.removeIt = function () {
-            phaserSprites.destroy(enemy.name);
-        };
-        return enemy;
-    };
-    ENEMY_MANAGER.prototype.createDebris = function (options, onDamage, onDestroy, onFail, onUpdate) {
-        var _this = this;
-        if (onDamage === void 0) { onDamage = function (enemy) { }; }
-        if (onDestroy === void 0) { onDestroy = function (enemy) { }; }
-        if (onFail === void 0) { onFail = function (enemy) { }; }
-        if (onUpdate === void 0) { onUpdate = function (enemy) { }; }
-        var game = this.game;
-        var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var enemy = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: "asteroid_mid_layer_" + game.rnd.integerInRange(1, 3), visible: true });
-        enemy.anchor.setTo(0.5, 0.5);
-        enemy.scale.setTo(1, 1);
-        game.physics.enable(enemy, Phaser.Physics.ARCADE);
-        enemy.body.velocity.y = options.iy;
-        enemy.body.velocity.x = options.ix;
-        enemy.angleMomentum = game.rnd.integerInRange(-5, 5);
-        enemy.body.bounce.setTo(1, 1);
-        enemy.atTarget = false;
-        enemy.maxHealth = 50;
-        enemy.health = enemy.maxHealth;
-        enemy.pierceResistence = 1;
-        enemy.fallThrehold = game.rnd.integerInRange(0, 75);
-        phaserGroup.add(options.layer, enemy);
-        enemy.damageIt = function (val, wpnType) {
-            if (wpnType === void 0) { wpnType = null; }
+            enemy.isDamaged = true;
+            game.time.events.add(10, function () {
+                enemy.isDamaged = false;
+            }, _this).autoDestroy = true;
             enemy.health -= val;
             enemy.tint = 1 * 0xff0000;
             enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
             if (enemy.health <= 0) {
-                enemy.destroyIt(enemy);
+                enemy.destroyIt();
             }
         };
         enemy.removeIt = function () {
+            enemy.weaponSystems.map(function (weaponSystem) {
+                weaponSystem.destroyIt();
+            });
+            enemy.children.map(function (obj) {
+                _this.phaserSprites.destroy(obj.name);
+            });
             phaserSprites.destroy(enemy.name);
         };
-        enemy.fallToPlanet = function () {
-            enemy.tint = 1 * 0x000000;
-            enemy.atTarget = true;
-            enemy.body = null;
-            enemy.game.add.tween(enemy).to({ y: enemy.y + 60 }, Phaser.Timer.SECOND * 2, Phaser.Easing.Linear.In, true, 0).autoDestroy = true;
-            game.time.events.add(350, function () {
-                _this.game.add.tween(enemy.scale).to({ x: 0, y: 0 }, Phaser.Timer.SECOND * 1, Phaser.Easing.Linear.In, true, game.rnd.integerInRange(0, 500)).
-                    onComplete.add(function () {
-                    onFail(enemy);
-                    enemy.removeIt();
-                    _this.weaponManager.createExplosion(enemy.x, enemy.y, 0.25, 6);
-                }).autoDestroy = true;
-            }).autoDestroy = true;
-        };
         enemy.destroyIt = function () {
-            var tween = {
-                angle: game.rnd.integerInRange(-720, 720),
-                x: enemy.x - game.rnd.integerInRange(-25, 25),
-                y: enemy.y - game.rnd.integerInRange(5, 25),
-                alpha: .5
-            };
-            enemy.game.add.tween(enemy).to(tween, game.rnd.integerInRange(50, 200), Phaser.Easing.Linear.Out, true, 0, 0, false);
-            enemy.body = null;
-            game.time.events.add(Phaser.Timer.SECOND / 3, function () {
+            enemy.isDestroyed = true;
+            enemy.tint = 1 * 0xff0000;
+            enemy.weaponSystems.map(function (weaponSystem) {
+                weaponSystem.destroyIt();
+            });
+            enemy.explodeInterval = game.time.events.loop(500, function () {
+                _this.effectsManager.createExplosion(enemy.x + game.rnd.integerInRange(-enemy.width / 2, enemy.width / 2), enemy.y + game.rnd.integerInRange(-enemy.height / 2, enemy.height / 2), 1, enemy.onLayer + 1);
+            });
+            enemy.game.add.tween(enemy.scale).to({ x: 0.85, y: 0.85 }, 500, Phaser.Easing.Linear.Out, true, 500, 0, false).
+                onComplete.add(function () {
+                _this.weaponManager.createExplosionVacuum(enemy.x, enemy.y, 1.5, enemy.onLayer + 1, 10);
+                var debris = _this.phaserMaster.get('sharedDebris');
+                debris.customFire(enemy, 50);
+                game.time.events.remove(enemy.explodeInterval);
                 onDestroy(enemy);
-                _this.weaponManager.createExplosion(enemy.x, enemy.y, 0.5, 6);
+                enemy.children.map(function (obj) {
+                    _this.phaserSprites.destroy(obj.name);
+                });
                 phaserSprites.destroy(enemy.name);
-            }, enemy).autoDestroy = true;
+            });
         };
-        enemy.checkLocation = function () {
-            enemy.angle += enemy.angleMomentum;
-            if (enemy.angleMomentum > 0) {
-                enemy.angleMomentum -= 0.002;
-            }
-            if (enemy.angleMomentum < 0) {
-                enemy.angleMomentum += 0.002;
-            }
-            if (enemy.y > enemy.height) {
-                if (enemy.body !== null) {
-                    enemy.body.collideWorldBounds = true;
-                }
-            }
-            if (enemy.y > _this.game.canvas.height - (50 + enemy.fallThrehold)) {
-                if (enemy.body !== null && !enemy.atTarget) {
-                    enemy.body.collideWorldBounds = false;
-                    enemy.fallToPlanet();
-                }
-            }
-            if (enemy.y > _this.game.canvas.height + enemy.height) {
-                enemy.removeIt();
-            }
-        };
-        enemy.onUpdate = function () {
-            game.physics.arcade.collide([phaserSprites.get('leftBoundry'), phaserSprites.get('rightBoundry')], enemy);
-            enemy.rotate += 4;
-            if (enemy.body !== null) {
-                if (enemy.body.velocity.y + 1 < 50) {
-                    enemy.body.velocity.y += 1;
-                }
-                if (enemy.body.velocity.x > 0) {
-                    enemy.body.velocity.x -= 0.2;
-                }
-                if (enemy.body.velocity.x < 0) {
-                    enemy.body.velocity.x += 0.2;
-                }
-            }
-            enemy.checkLocation();
-        };
+        return enemy;
     };
-    ENEMY_MANAGER.prototype.createGiantAsteroid = function (options, onDamage, onDestroy, onFail, onUpdate) {
+    ENEMY_MANAGER.prototype.createBoss1 = function (options, onDamage, onDestroy, onUpdate) {
         var _this = this;
         if (onDamage === void 0) { onDamage = function () { }; }
         if (onDestroy === void 0) { onDestroy = function () { }; }
-        if (onFail === void 0) { onFail = function () { }; }
         if (onUpdate === void 0) { onUpdate = function () { }; }
         var game = this.game;
         var _a = this, phaserMaster = _a.phaserMaster, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var enemy = phaserSprites.addFromAtlas({ x: options.x, y: options.y, name: "enemy_" + game.rnd.integer(), group: 'boss', atlas: atlas, filename: "asteroid_large_layer_" + game.rnd.integerInRange(1, 3), visible: true });
+        var enemy = phaserSprites.addFromAtlas({ name: "enemy_" + game.rnd.integer(), group: 'enemies', org: 'gameobjects', atlas: atlas, filename: "big_1", visible: true, x: options.x });
         enemy.anchor.setTo(0.5, 0.5);
-        game.physics.enable(enemy, Phaser.Physics.ARCADE);
-        enemy.body.velocity.y = options.iy;
-        enemy.body.velocity.x = options.ix;
-        enemy.angleMomentum = game.rnd.integerInRange(-5, 5);
-        enemy.body.bounce.setTo(1, 1);
-        enemy.atTarget = false;
-        enemy.maxHealth = 5000;
+        enemy.scale.setTo(1, 1);
+        enemy.maxHealth = 15000;
         enemy.health = enemy.maxHealth;
-        enemy.pierceResistence = 50;
-        phaserGroup.add(options.layer, enemy);
-        enemy.damageIt = function (val, wpnType) {
-            if (wpnType === void 0) { wpnType = null; }
-            onDamage(enemy);
-            if (!enemy.atTarget) {
-                enemy.health -= val;
-                enemy.tint = 1 * 0xff0000;
-                enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
-                if (enemy.health <= 0) {
-                    enemy.destroyIt();
-                }
-            }
+        enemy.pierceResistence = 1;
+        enemy.fallThreshold = game.rnd.integerInRange(0, 75);
+        enemy.cosWave = { data: game.math.sinCosGenerator(400, game.world.height * .50, 0, 1).cos, count: 0 };
+        enemy.fireDelay = 0;
+        enemy.fireTimer = 200;
+        enemy.isInvincible = false;
+        enemy.isDamaged = false;
+        enemy.isDestroyed = false;
+        enemy.onLayer = phaserMaster.get('layers').ENEMIES;
+        enemy.bulletCycle = {
+            count: 0,
+            total: 3,
+            delay: 500,
+            lock: false
         };
-        enemy.destroyIt = function (spawnMore) {
-            if (spawnMore === void 0) { spawnMore = true; }
-            var tween = {
-                angle: 720,
-                x: enemy.x - game.rnd.integerInRange(-10, 10),
-                y: enemy.y - game.rnd.integerInRange(10, 10),
-                alpha: .15
-            };
-            enemy.game.add.tween(enemy).to(tween, Phaser.Timer.SECOND * 2, Phaser.Easing.Linear.Out, true, 0, 0, false);
-            enemy.game.add.tween(enemy.scale).to({ x: 0.5, y: 0.5 }, Phaser.Timer.SECOND * 2, Phaser.Easing.Linear.Out, true, 0, 0, false);
-            enemy.body = null;
-            game.time.events.add(Phaser.Timer.SECOND / 2, function () {
-                onDestroy(enemy);
-                phaserSprites.destroy(enemy.name);
-            }, enemy).autoDestroy = true;
+        enemy.weaponSystems = [];
+        enemy.collidables = {
+            primaryWeapon: [],
+            secondaryWeapon: []
         };
-        enemy.fallToPlanet = function () {
-            enemy.tint = 1 * 0x000000;
-            enemy.atTarget = true;
-            enemy.body = null;
-            enemy.game.add.tween(enemy).to({ y: enemy.y + 60 }, Phaser.Timer.SECOND * 2, Phaser.Easing.Linear.In, true, 0).autoDestroy = true;
-            game.time.events.add(350, function () {
-                _this.game.add.tween(enemy.scale).to({ x: 0, y: 0 }, Phaser.Timer.SECOND * 1, Phaser.Easing.Linear.In, true, game.rnd.integerInRange(0, 500)).
-                    onComplete.add(function () {
-                    onFail(enemy);
-                    enemy.removeIt();
-                    _this.weaponManager.createExplosion(enemy.x, enemy.y, 0.25, 6);
-                }).autoDestroy = true;
-            }).autoDestroy = true;
+        enemy.trackinbox = null;
+        phaserGroup.add(enemy.onLayer, enemy);
+        var hitboxes = ["big_1_hitbox_1", "big_1_hitbox_2"];
+        hitboxes.map(function (obj) {
+            var e_hitbox = phaserSprites.addFromAtlas({ name: "enemy_hitbox_" + game.rnd.integer(), group: 'enemy_hitboxes', atlas: atlas, filename: obj, alpha: _this.showHitbox ? 0.75 : 0 });
+            e_hitbox.anchor.setTo(0.5, 0.5);
+            game.physics.enable(e_hitbox, Phaser.Physics.ARCADE);
+            enemy.addChild(e_hitbox);
+        });
+        var targetingBox = phaserSprites.addFromAtlas({ name: "targetingBox_" + game.rnd.integer(), group: 'enemy_hitboxes', width: enemy.width, height: enemy.height, atlas: atlas, filename: hitboxes[0], alpha: this.showHitbox ? 0.75 : 0 });
+        targetingBox.anchor.setTo(0.5, 0.5);
+        targetingBox.sync = function () {
+            var player = phaserSprites.get('player');
+            targetingBox.x = enemy.x;
+            targetingBox.y = enemy.y;
+            targetingBox.angle = Math.ceil((360 / (2 * Math.PI)) * game.math.angleBetween(targetingBox.x, targetingBox.y, player.x, player.y) - 90);
         };
-        enemy.checkLocation = function () {
-            enemy.angle += enemy.angleMomentum;
-            if (enemy.angleMomentum > 0) {
-                enemy.angleMomentum -= 0.002;
-            }
-            if (enemy.angleMomentum < 0) {
-                enemy.angleMomentum += 0.002;
-            }
-            if (enemy.y > enemy.height) {
-                if (enemy.body !== null) {
-                    enemy.body.collideWorldBounds = true;
-                }
-            }
-            if (enemy.y > enemy.game.canvas.height - enemy.height) {
-                if (enemy.body !== null && !enemy.atTarget) {
-                    enemy.body.collideWorldBounds = false;
-                    enemy.fallToPlanet();
-                }
-            }
+        enemy.targetingBox = targetingBox;
+        var ammo = this.weaponManager.enemyBullet(9);
+        ammo.bullets.children.map(function (bullet) {
+            bullet.damgeOnImpact = 10;
+        });
+        var animationSprites = Phaser.Animation.generateFrameNames('bullet_fire_', 1, 4).slice();
+        var weaponSystem = this.phaserSprites.addFromAtlas({ name: "enemy_weapons_" + this.game.rnd.integer(), group: 'enemy_weapons', atlas: this.atlas_weapons, filename: animationSprites[0], visible: true });
+        weaponSystem.anchor.setTo(0.5, 0.5);
+        weaponSystem.angle = 180;
+        weaponSystem.animations.add('fireWeapon', animationSprites, 1, true);
+        weaponSystem.sync = function (enemy) {
+            var x = enemy.x, y = enemy.y;
+            weaponSystem.x = x;
+            weaponSystem.y = y;
         };
+        weaponSystem.destroyIt = function () {
+            var x = weaponSystem.x, y = weaponSystem.y;
+            _this.effectsManager.blueImpact(x, y, 1, enemy.onLayer);
+            _this.phaserSprites.destroy(weaponSystem.name);
+            game.time.events.add(Phaser.Timer.SECOND * 4, function () {
+                weaponSystem.ammo.destroy();
+            }, _this).autoDestroy = true;
+        };
+        weaponSystem.fire = function () {
+            var player = phaserSprites.get('player');
+            ammo.fire(weaponSystem, weaponSystem.x, weaponSystem.y + 100);
+            ammo.fire(weaponSystem, weaponSystem.x + 50, weaponSystem.y + 100);
+            ammo.fire(weaponSystem, weaponSystem.x - 50, weaponSystem.y + 100);
+            weaponSystem.animations.play('fireWeapon', 24, false);
+        };
+        phaserGroup.add(enemy.onLayer + 1, weaponSystem);
+        weaponSystem.ammo = ammo;
+        enemy.weaponSystems.push(weaponSystem);
+        enemy.collidables.primaryWeapon = [];
+        enemy.collidables.primaryWeapon.push(ammo.bullets);
         enemy.onUpdate = function () {
+            var player = phaserSprites.get('player');
             onUpdate(enemy);
-            game.physics.arcade.collide([phaserSprites.get('leftBoundry'), phaserSprites.get('rightBoundry')], enemy);
-            enemy.rotate += 2;
-            if (!enemy.atTarget) {
-                if (enemy.body !== null) {
-                    if (enemy.body.velocity.y + 1 < 25) {
-                        enemy.body.velocity.y += 1;
-                    }
-                    if (enemy.body.velocity.x > 0) {
-                        enemy.body.velocity.x -= 0.2;
-                    }
-                    if (enemy.body.velocity.x < 0) {
-                        enemy.body.velocity.x += 0.2;
+            targetingBox.sync();
+            if (game.time.returnTrueTime() > enemy.fireDelay && !enemy.isDestroyed && (enemy.y > enemy.game.canvas.height * .3)) {
+                enemy.fireDelay = game.time.returnTrueTime() + enemy.fireTimer;
+                if (enemy.bulletCycle.count < enemy.bulletCycle.total) {
+                    enemy.weaponSystems.map(function (weaponsSystem) {
+                        weaponSystem.fire();
+                    });
+                    enemy.bulletCycle.count++;
+                }
+                else {
+                    if (!enemy.bulletCycle.lock) {
+                        enemy.bulletCycle.lock = true;
+                        game.time.events.add(Phaser.Timer.SECOND * 1.5, function () {
+                            enemy.bulletCycle.count = 0;
+                            enemy.bulletCycle.lock = false;
+                        }).autoDestroy = true;
                     }
                 }
-                enemy.checkLocation();
+            }
+            if (!enemy.isDestroyed) {
+                if (enemy.cosWave.count < enemy.cosWave.data.length / 2) {
+                    enemy.y = -(enemy.cosWave.data[enemy.cosWave.count]) - enemy.height;
+                    enemy.cosWave.count++;
+                }
+                if (enemy.cosWave.count >= enemy.cosWave.data.length) {
+                    enemy.removeIt();
+                }
+                enemy.weaponSystems.map(function (obj) {
+                    obj.sync(enemy);
+                });
+            }
+            _this.bulletCollisionWithPlayer(enemy);
+        };
+        enemy.damageIt = function (val) {
+            onDamage(enemy);
+            enemy.isDamaged = true;
+            game.time.events.add(10, function () {
+                enemy.isDamaged = false;
+            }, _this).autoDestroy = true;
+            enemy.health -= val;
+            enemy.tint = 1 * 0xff0000;
+            enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 100, Phaser.Easing.Linear.Out, true, 0, 0, false);
+            if (enemy.health <= 0) {
+                enemy.destroyIt();
             }
         };
         enemy.removeIt = function () {
+            enemy.weaponSystems.map(function (weaponSystem) {
+                weaponSystem.destroyIt();
+            });
+            enemy.children.map(function (obj) {
+                _this.phaserSprites.destroy(obj.name);
+            });
             phaserSprites.destroy(enemy.name);
+        };
+        enemy.destroyIt = function () {
+            enemy.isDestroyed = true;
+            enemy.tint = 1 * 0xff0000;
+            enemy.weaponSystems.map(function (weaponSystem) {
+                weaponSystem.destroyIt();
+            });
+            phaserSprites.destroy(targetingBox.name);
+            _this.weaponManager.createExplosionVacuum(enemy.x, enemy.y, 2, enemy.onLayer + 1, 10);
+            enemy.game.add.tween(enemy).to({ y: enemy.y - 100 }, 6000, Phaser.Easing.Linear.Out, true, 0, 0, false);
+            game.time.events.add(Phaser.Timer.SECOND * 2, function () {
+                enemy.explodeInterval = game.time.events.loop(150, function () {
+                    enemy.tint = 1 * 0xff0000;
+                    enemy.game.add.tween(enemy).to({ tint: 1 * 0xffffff }, 50, Phaser.Easing.Linear.Out, true, 0, 0, false);
+                    _this.effectsManager.createExplosion(enemy.x + game.rnd.integerInRange(-enemy.width / 2, enemy.width / 2), enemy.y + game.rnd.integerInRange(-enemy.height / 2, enemy.height / 2), 1, enemy.onLayer + 1);
+                });
+                onDestroy(enemy);
+                enemy.game.add.tween(enemy.scale).to({ x: 0.75, y: 0.75 }, 4500, Phaser.Easing.Linear.Out, true, 0, 0, false).
+                    onComplete.add(function () {
+                    _this.weaponManager.createExplosionVacuum(enemy.x, enemy.y, 1.5, enemy.onLayer + 1, 10);
+                    var debris = _this.phaserMaster.get('sharedDebris');
+                    debris.customFire(enemy);
+                    game.time.events.remove(enemy.explodeInterval);
+                    enemy.children.map(function (obj) {
+                        _this.phaserSprites.destroy(obj.name);
+                    });
+                    phaserSprites.destroy(enemy.name);
+                });
+            }).autoDestroy = true;
         };
         return enemy;
     };
@@ -2786,6 +3347,15 @@ var ITEMSPAWN_MANAGER = (function () {
         this.phaserMaster = phaserMaster;
         this.phaserGroup = phaserGroup;
         this.atlas = atlas;
+    };
+    ITEMSPAWN_MANAGER.prototype.getDistanceFromPlayer = function (obj) {
+        var player = this.phaserSprites.get('player');
+        if (player.isForceMoved) {
+            return 0;
+        }
+        else {
+            return Math.round(Phaser.Math.distance(player.x, player.y, obj.x, obj.y));
+        }
     };
     ITEMSPAWN_MANAGER.prototype.spawnHealthpack = function (x, y, layer, onPickup) {
         var _this = this;
@@ -2810,6 +3380,10 @@ var ITEMSPAWN_MANAGER = (function () {
             _this.phaserSprites.destroy(item.name);
         };
         item.onUpdate = function () {
+            if (_this.getDistanceFromPlayer(item) < 200) {
+                var player = _this.phaserSprites.get('player');
+                _this.game.physics.arcade.moveToObject(item, player, 400);
+            }
             if (_this.game.time.returnTrueTime() > item.blinkLifespan) {
                 item.destroyIt();
             }
@@ -2827,7 +3401,7 @@ var ITEMSPAWN_MANAGER = (function () {
                 }, null, item);
             });
         };
-        this.phaserGroup.add(layer, item);
+        this.phaserGroup.add(this.phaserMaster.get('layers').ITEMDROPS, item);
     };
     ITEMSPAWN_MANAGER.prototype.spawnPowerup = function (x, y, layer, onPickup) {
         var _this = this;
@@ -2852,6 +3426,10 @@ var ITEMSPAWN_MANAGER = (function () {
             _this.phaserSprites.destroy(item.name);
         };
         item.onUpdate = function () {
+            if (_this.getDistanceFromPlayer(item) < 200) {
+                var player = _this.phaserSprites.get('player');
+                _this.game.physics.arcade.moveToObject(item, player, 400);
+            }
             if (_this.game.time.returnTrueTime() > item.blinkLifespan) {
                 item.destroyIt();
             }
@@ -2869,7 +3447,7 @@ var ITEMSPAWN_MANAGER = (function () {
                 }, null, item);
             });
         };
-        this.phaserGroup.add(layer, item);
+        this.phaserGroup.add(this.phaserMaster.get('layers').ITEMDROPS, item);
     };
     ITEMSPAWN_MANAGER.prototype.spawnSpecial = function (x, y, layer, onPickup) {
         var _this = this;
@@ -2894,6 +3472,10 @@ var ITEMSPAWN_MANAGER = (function () {
             _this.phaserSprites.destroy(item.name);
         };
         item.onUpdate = function () {
+            if (_this.getDistanceFromPlayer(item) < 200) {
+                var player = _this.phaserSprites.get('player');
+                _this.game.physics.arcade.moveToObject(item, player, 400);
+            }
             if (_this.game.time.returnTrueTime() > item.blinkLifespan) {
                 item.destroyIt();
             }
@@ -2911,14 +3493,62 @@ var ITEMSPAWN_MANAGER = (function () {
                 }, null, item);
             });
         };
-        this.phaserGroup.add(layer, item);
+        this.phaserGroup.add(this.phaserMaster.get('layers').ITEMDROPS, item);
+    };
+    ITEMSPAWN_MANAGER.prototype.spawnScrap = function (x, y, layer, onPickup) {
+        var _this = this;
+        if (onPickup === void 0) { onPickup = function () { }; }
+        var animation = Phaser.Animation.generateFrameNames('scrap_', 1, 1).slice();
+        var item = this.phaserSprites.addFromAtlas({ name: "healthpack_" + this.game.rnd.integer(), group: 'itemspawns', x: x, y: y, atlas: this.atlas, filename: animation[0] });
+        if (animation.length > 1) {
+            item.animations.add('animate', animation, 8, true);
+            item.animations.play('animate');
+        }
+        item.anchor.setTo(0.5, 0.5);
+        item.blinkLifespan = this.game.time.returnTrueTime() + (Phaser.Timer.SECOND * 10);
+        item.blinkLifespanInterval = this.game.time.returnTrueTime();
+        item.blinkLifespanCount = 0;
+        this.game.physics.enable(item, Phaser.Physics.ARCADE);
+        item.body.collideWorldBounds = true;
+        item.body.bounce.setTo(1, 1);
+        item.body.velocity.y = this.game.rnd.integerInRange(50, 50);
+        item.body.velocity.x = this.game.rnd.integerInRange(-200, 200);
+        item.destroyIt = function () {
+            _this.phaserSprites.destroy(item.name);
+        };
+        item.pickedUp = function () {
+            _this.phaserSprites.destroy(item.name);
+        };
+        item.onUpdate = function () {
+            if (_this.getDistanceFromPlayer(item) < 200) {
+                var player = _this.phaserSprites.get('player');
+                _this.game.physics.arcade.moveToObject(item, player, 400);
+            }
+            if (_this.game.time.returnTrueTime() > item.blinkLifespan) {
+                item.destroyIt();
+            }
+            if (_this.game.time.returnTrueTime() > (item.blinkLifespan - Phaser.Timer.SECOND * 3)) {
+                if (_this.game.time.returnTrueTime() > item.blinkLifespanInterval) {
+                    item.blinkLifespanInterval = _this.game.time.returnTrueTime() + 200 - (item.blinkLifespanCount * 5);
+                    item.alpha = item.blinkLifespanCount % 2 === 0 ? 0.25 : 1;
+                    item.blinkLifespanCount++;
+                }
+            }
+            _this.phaserSprites.getManyGroups(['playership']).map(function (target) {
+                target.game.physics.arcade.overlap(item, target, function (obj, target) {
+                    onPickup();
+                    item.pickedUp();
+                }, null, item);
+            });
+        };
+        this.phaserGroup.add(this.phaserMaster.get('layers').ITEMDROPS, item);
     };
     return ITEMSPAWN_MANAGER;
 }());
 var PLAYER_MANAGER = (function () {
     function PLAYER_MANAGER() {
     }
-    PLAYER_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserTexts, phaserGroup, phaserControls, weaponManager, atlas, weaponAtlas) {
+    PLAYER_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserTexts, phaserGroup, phaserControls, weaponManager, effectsManager, atlas, weaponAtlas) {
         this.game = game;
         this.phaserSprites = phaserSprites;
         this.phaserMaster = phaserMaster;
@@ -2926,6 +3556,7 @@ var PLAYER_MANAGER = (function () {
         this.phaserGroup = phaserGroup;
         this.phaserControls = phaserControls;
         this.weaponManager = weaponManager;
+        this.effectsManager = effectsManager;
         this.atlas = atlas;
         this.weaponAtlas = weaponAtlas;
         this.player = null;
@@ -2940,7 +3571,7 @@ var PLAYER_MANAGER = (function () {
         var shipId = params.shipId + 1;
         var gameData = this.phaserMaster.getOnly(['gameData']).gameData;
         var starMomentum = this.phaserMaster.getOnly(['starMomentum']).starMomentum;
-        var player = this.phaserSprites.addFromAtlas({ name: params.name, group: params.group, org: params.org, atlas: this.atlas, filename: "ship_base_form", visible: false });
+        var player = this.phaserSprites.addFromAtlas({ x: this.game.world.centerX, y: 2000, name: params.name, group: params.group, org: params.org, atlas: this.atlas, filename: "ship_base_form" });
         player.anchor.setTo(0.5, 0.5);
         player.scale.setTo(1, 1);
         player.isInvincible = false;
@@ -2952,16 +3583,17 @@ var PLAYER_MANAGER = (function () {
         player.primaryWeapon = params.primaryWeapon;
         player.secondaryWeapon = params.secondaryWeapon;
         player.perk = params.perk;
+        player.explodeInterval = null;
         player.weaponSystems = [];
         player.subweaponSystems = [];
         player.attachments = [];
+        player.xCapture = [];
+        player.yCapture = [];
+        player.clearEnemyBulletsInterval;
         player.collidables = {
             primaryWeapon: [],
             secondaryWeapon: []
         };
-        player.xCapture = [];
-        player.yCapture = [];
-        player.clearEnemyBulletsInterval;
         var shipStart = Phaser.Animation.generateFrameNames("ship_start_", 1, 7).slice();
         var shipDamage = ['ship_damage', 'ship_damage', 'ship_damage', 'ship_damage', 'ship_start_7'];
         var preExplode = Phaser.Animation.generateFrameNames("ship_explode_", 1, 5).slice();
@@ -2971,65 +3603,65 @@ var PLAYER_MANAGER = (function () {
         player.animations.add('preExplode', preExplode, 1, true);
         player.animations.add('preExplodeLoop', preExplodeLoop, 1, true);
         game.physics.enable(player, Phaser.Physics.ARCADE);
-        this.phaserGroup.add(params.layer, player);
+        this.phaserGroup.add(this.phaserMaster.get('layers').PLAYER, player);
         var hitboxes = ["ship_hitbox_1", "ship_hitbox_2"];
         hitboxes.map(function (obj, index) {
-            var p_hitbox = _this.phaserSprites.addFromAtlas({ y: 10, name: "player_hitbox_" + index, group: 'player_hitboxes', atlas: _this.atlas, filename: obj, alpha: 0 });
+            var p_hitbox = _this.phaserSprites.addFromAtlas({ y: 10, name: "player_hitbox_" + game.rnd.integer(), group: 'player_hitboxes', atlas: _this.atlas, filename: obj, alpha: 0 });
             p_hitbox.anchor.setTo(0.5, 0.5);
             game.physics.enable(p_hitbox, Phaser.Physics.ARCADE);
             player.addChild(p_hitbox);
         });
+        var targetingBox = this.phaserSprites.addFromAtlas({ name: "mock_trackingbox_" + game.rnd.integer(), group: 'player_trackingBox', atlas: this.atlas, filename: hitboxes[0], width: 10, height: 10, alpha: 0 });
+        targetingBox.sync = function () {
+            targetingBox.x = player.x - targetingBox.width / 2;
+            targetingBox.y = player.y - game.canvas.height / 2;
+        };
+        player.defaultTargetingBox = targetingBox;
+        player.targetBox = targetingBox;
         var fullPowerAnimation = Phaser.Animation.generateFrameNames("ship_fullpower_", 1, 7).concat(Phaser.Animation.generateFrameNames("ship_fullpower__", 1, 7).reverse());
         var fullpower = this.phaserSprites.addFromAtlas({ name: 'ship_fullpower_addon', atlas: this.atlas, filename: fullPowerAnimation[0], visible: false });
         fullpower.anchor.setTo(0.5, 0.5);
         fullpower.animations.add('fullpower', fullPowerAnimation, 1, true);
         fullpower.animations.play('fullpower', 45, true);
         player.addChild(fullpower);
-        var exhaustAnimation = Phaser.Animation.generateFrameNames('exhaust_', 1, 3);
-        var bottomExhaust = this.phaserSprites.addFromAtlas({ y: 45, name: "bottom_exhaust", atlas: this.atlas, filename: exhaustAnimation[0], alpha: 1 });
-        bottomExhaust.anchor.setTo(0.5, 0.5);
-        bottomExhaust.animations.add('animate', exhaustAnimation, 1, true);
-        bottomExhaust.animations.play('animate', 12, true);
-        bottomExhaust.sync = function (player) {
-            var x = player.x, y = player.y, alpha = player.alpha, isDead = player.isDead;
-            bottomExhaust.x = x;
-            bottomExhaust.y = y + 40;
-            bottomExhaust.alpha = !isDead ? alpha : 0;
-            bottomExhaust.visible = starMomentum.y >= 0 ? true : false;
-        };
-        player.attachments.push(bottomExhaust);
-        this.phaserGroup.add(params.layer - 1, bottomExhaust);
-        var topExhaust = this.phaserSprites.addFromAtlas({ y: 0, name: "top_exhaust", atlas: this.atlas, filename: exhaustAnimation[0], alpha: 1 });
-        topExhaust.anchor.setTo(0.5, 0.5);
-        topExhaust.angle = 180;
-        topExhaust.animations.add('animate', exhaustAnimation, 1, true);
-        topExhaust.animations.play('animate', 12, true);
-        topExhaust.sync = function (player) {
-            var x = player.x, y = player.y, alpha = player.alpha;
-            topExhaust.x = x;
-            topExhaust.y = y;
-            topExhaust.alpha = !player.isDead ? alpha : 0;
-            topExhaust.visible = starMomentum.y < 0 ? true : false;
-        };
-        player.attachments.push(topExhaust);
-        this.phaserGroup.add(params.layer - 1, topExhaust);
         player.clearAllEnemyBullets = function (duration) {
             player.clearEnemyBulletsInterval = game.time.returnTrueTime() + duration;
         };
+        player.assignTarget = function (enemy) {
+            player.targetBox = enemy;
+        };
+        player.removeTarget = function () {
+            player.isForceMoved = true;
+            player.game.add.tween(player).to({ angle: 0 }, 500, Phaser.Easing.Linear.Out, true, 100, 0, false).
+                onComplete.add(function () {
+                player.targetBox = targetingBox;
+                player.isForceMoved = false;
+            });
+        };
+        player.getDistanceFromTargetingBox = function () {
+            return Math.round(Phaser.Math.distance(player.x, player.y, player.defaultTargetingBox.x, player.defaultTargetingBox.y));
+        };
         player.onUpdate = function () {
             fullpower.visible = gameData.player.powerup >= 30 ? true : false;
-            if (player.xCapture.length > 0) {
-                player.x += player.xCapture[0];
-                player.xCapture.shift();
-            }
-            if (player.yCapture.length > 0) {
-                player.y += player.yCapture[0];
-                player.yCapture.shift();
-            }
-            if (!player.ignoreBoundaries) {
-                player.checkLimits();
+            if (!!player.targetBox && !player.isForceMoved) {
+                player.angle = Math.ceil((360 / (2 * Math.PI)) * game.math.angleBetween(player.x, player.y, player.targetBox.x, player.targetBox.y) + 90);
             }
             if (!player.isForceMoved) {
+                player.alpha = (player.isInvincible && !player.isDead) ? 0.5 : 1;
+            }
+            targetingBox.sync();
+            if (!player.isDead) {
+                if (player.xCapture.length > 0) {
+                    player.x += player.xCapture[0];
+                    player.xCapture.shift();
+                }
+                if (player.yCapture.length > 0) {
+                    player.y += player.yCapture[0];
+                    player.yCapture.shift();
+                }
+                if (!player.ignoreBoundaries) {
+                    player.checkLimits();
+                }
             }
             var collidables = [];
             var weaponSystems = player.weaponSystems.concat(player.subweaponSystems);
@@ -3075,21 +3707,32 @@ var PLAYER_MANAGER = (function () {
             }
             else {
                 player.isDestroyed();
-                loseLife(player);
+                game.time.events.add(500, function () {
+                    loseLife(player);
+                }).autoDestroy = true;
             }
         };
         player.isDestroyed = function (respawn) {
             if (respawn === void 0) { respawn = true; }
-            player.isDead = true;
-            player.isInvincible = true;
-            player.destroyWeaponSystems();
-            player.onUpdate();
-            _this.weaponManager.createExplosion(player.x, player.y, 1, 6);
-            game.add.tween(_this).to({ angle: game.rnd.integerInRange(-90, 90), alpha: 0 }, 1000, Phaser.Easing.Linear.In, true, 0).
-                onComplete.add(function () {
-                _this.weaponManager.createExplosion(player.x, player.y, 1, 6);
-                player.visible = false;
-            });
+            if (!player.isDead) {
+                player.isDead = true;
+                player.isInvincible = true;
+                player.destroyWeaponSystems();
+                player.onUpdate();
+                player.explodeInterval = game.time.events.loop(250, function () {
+                    _this.effectsManager.createExplosion(player.x + game.rnd.integerInRange(-player.width / 2, player.width / 2), player.y + game.rnd.integerInRange(-player.height / 2, player.height / 2), 1, player.onLayer + 1);
+                });
+                _this.effectsManager.createExplosion(player.x, player.y, 1, 6);
+                game.add.tween(_this).to({ angle: game.rnd.integerInRange(-90, 90), alpha: 0 }, 1000, Phaser.Easing.Linear.In, true, 0).
+                    onComplete.add(function () {
+                    _this.weaponManager.createExplosionVacuum(player.x, player.y, 1.5, player.onLayer + 1, 10);
+                    var debris = _this.effectsManager.debris(100);
+                    debris = debris;
+                    debris.customFire(player);
+                    game.time.events.remove(player.explodeInterval);
+                    player.visible = false;
+                });
+            }
         };
         player.destroyWeaponSystems = function () {
             player.weaponSystems.map(function (weaponSystem) {
@@ -3168,14 +3811,14 @@ var PLAYER_MANAGER = (function () {
             if (this.y - this.height < 0) {
                 this.y = this.height;
             }
-            if (this.y + this.height > this.game.canvas.height) {
-                this.y = this.game.canvas.height - this.height;
+            if (this.y + this.height > this.game.world.height) {
+                this.y = this.game.world.height - this.height;
             }
             if (this.x < 0) {
-                this.x = this.game.canvas.width + this.width;
-            }
-            if (this.x > (this.game.canvas.width + this.width)) {
                 this.x = 0;
+            }
+            if (this.x > (this.game.world.width + this.width)) {
+                this.x = (this.game.world.width + this.width);
             }
         };
         player.moveTo = function (x, y, duration, callback) {
@@ -3290,9 +3933,9 @@ var PLAYER_MANAGER = (function () {
     };
     PLAYER_MANAGER.prototype.attachLaser = function (player, params, weaponType) {
         var _this = this;
-        var animationSprites = Phaser.Animation.generateFrameNames('laser_fire_', 1, 6).slice();
-        var gap = 35;
-        var turrets = 5;
+        var animationSprites = Phaser.Animation.generateFrameNames('laser_fire_', 1, 1).slice();
+        var gap = 15;
+        var turrets = 7;
         var _loop_11 = function (i) {
             var weaponSystem = this_8.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_8.game.rnd.integer(), atlas: this_8.weaponAtlas, filename: animationSprites[0], alpha: 0 });
             weaponSystem.anchor.setTo(0.5, 0.5);
@@ -3301,79 +3944,49 @@ var PLAYER_MANAGER = (function () {
             }
             weaponSystem.offset = (gap * i) - ((gap / 2) * (turrets - 1));
             weaponSystem.index = i;
-            weaponSystem.onUpdate = function () {
-                ammo.onUpdate();
-            };
+            weaponSystem.onUpdate = function () { };
             weaponSystem.sync = function (player) {
-                var x = player.x, y = player.y;
-                weaponSystem.x = x + weaponSystem.offset;
-                weaponSystem.y = y;
+                var x = player.x, y = player.y, angle = player.angle;
+                var coords = _this.weaponManager.calculateRotateCoords(weaponSystem.offset, player.targetBox);
+                weaponSystem.x = x + coords.x;
+                weaponSystem.y = y + coords.y;
             };
             weaponSystem.destroyIt = function () {
-                var x = weaponSystem.x, y = weaponSystem.y;
-                _this.weaponManager.blueImpact(x, y, 1, player.onLayer);
                 _this.phaserSprites.destroy(weaponSystem.name);
             };
             weaponSystem.fire = function () {
                 var gameData = _this.phaserMaster.getOnly(['gameData']).gameData;
                 var powerupLvl = Math.floor((gameData.player.powerup - 1) / 5);
+                if (animationSprites.length > 0) {
+                    weaponSystem.animations.play('fireWeapon', 60, false);
+                }
                 ammo.fireAngle = 270 + weaponSystem.angle;
-                if (powerupLvl == 0 && (weaponSystem.index === 2)) {
-                    ammo.fireOffset(0, -32);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl === 0 && (weaponSystem.index === 3)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl == 1 && (weaponSystem.index === 1 || weaponSystem.index === 3)) {
-                    ammo.fireOffset(0, -32);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl === 1 && (weaponSystem.index === 2 || weaponSystem.index === 4)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl == 2 && (weaponSystem.index === 1 || weaponSystem.index === 2 || weaponSystem.index === 3)) {
-                    ammo.fireOffset(0, -32);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl === 2 && (weaponSystem.index === 2 || weaponSystem.index === 3 || weaponSystem.index === 4)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl == 3 && (weaponSystem.index === 0 || weaponSystem.index === 1 || weaponSystem.index === 3 || weaponSystem.index === 4)) {
-                    ammo.fireOffset(0, -32);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl === 3 && (weaponSystem.index === 1 || weaponSystem.index === 2 || weaponSystem.index === 4 || weaponSystem.index === 5)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl >= 4) {
-                    ammo.fireOffset(0, -32);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl === 4 && (weaponSystem.index === 1 || weaponSystem.index === 2 || weaponSystem.index === 3 || weaponSystem.index === 4 || weaponSystem.index === 5)) {
+                    ammo.fireOffset(0, 0);
+                }
+                if (powerupLvl === 5) {
+                    ammo.fireOffset(0, 0);
                 }
             };
-            this_8.phaserGroup.add(params.layer + 1, weaponSystem);
-            var maxBulletsOnscreen = 4;
+            this_8.phaserGroup.add(this_8.phaserMaster.get('layers').PLAYER_OVER, weaponSystem);
+            var maxBulletsOnscreen = 3;
             var ammo = this_8.weaponManager.playerBullets(maxBulletsOnscreen, weaponType);
             ammo.checkOrientation(weaponSystem.angle);
-            ammo.onUpdate = function () {
-            };
-            var stagger = void 0;
-            switch (i) {
-                case 0:
-                    stagger = 0;
-                    break;
-                case 1:
-                    stagger = -20;
-                    break;
-                case 2:
-                    stagger = -40;
-                    break;
-                case 3:
-                    stagger = -20;
-                    break;
-                case 4:
-                    stagger = 0;
-                    break;
-            }
-            ammo.trackSprite(weaponSystem, 0, stagger);
+            ammo.onUpdate = function () { };
+            ammo.trackSprite(weaponSystem, 0, 0);
+            ammo.weaponSystem = weaponSystem;
             weaponSystem.ammo = ammo;
             player.weaponSystems.push(weaponSystem);
         };
@@ -3389,7 +4002,7 @@ var PLAYER_MANAGER = (function () {
         var gap = 20;
         var turrets = 1;
         var _loop_12 = function (i) {
-            var weaponSystem = this_9.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_9.game.rnd.integer(), atlas: this_9.weaponAtlas, filename: animationSprites[0] });
+            var weaponSystem = this_9.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_9.game.rnd.integer(), atlas: this_9.weaponAtlas, filename: animationSprites[0], alpha: 0 });
             weaponSystem.anchor.setTo(0.5, 0.5);
             if (animationSprites.length > 0) {
                 weaponSystem.animations.add('fireWeapon', animationSprites, 1, true);
@@ -3401,12 +4014,11 @@ var PLAYER_MANAGER = (function () {
             };
             weaponSystem.sync = function (player) {
                 var x = player.x, y = player.y;
-                weaponSystem.x = x + weaponSystem.offset;
-                weaponSystem.y = y;
+                var coords = _this.weaponManager.calculateRotateCoords(weaponSystem.offset, player.targetBox);
+                weaponSystem.x = x + coords.x;
+                weaponSystem.y = y + coords.y;
             };
             weaponSystem.destroyIt = function () {
-                var x = weaponSystem.x, y = weaponSystem.y;
-                _this.weaponManager.blueImpact(x, y, 1, player.onLayer);
                 _this.phaserSprites.destroy(weaponSystem.name);
             };
             weaponSystem.fire = function () {
@@ -3420,13 +4032,13 @@ var PLAYER_MANAGER = (function () {
                     weaponSystem.animations.play('fireWeapon', 60, false);
                 }
             };
-            this_9.phaserGroup.add(params.layer + 1, weaponSystem);
+            this_9.phaserGroup.add(this_9.phaserMaster.get('layers').PLAYER_OVER, weaponSystem);
             var maxBulletsOnscreen = 60;
             var ammo = this_9.weaponManager.playerBullets(maxBulletsOnscreen, weaponType);
             ammo.checkOrientation(weaponSystem.angle);
             ammo.onUpdate = function () {
             };
-            ammo.trackSprite(weaponSystem, 0, -20);
+            ammo.trackSprite(weaponSystem, 0, 0);
             weaponSystem.ammo = ammo;
             player.weaponSystems.push(weaponSystem);
         };
@@ -3439,8 +4051,8 @@ var PLAYER_MANAGER = (function () {
     PLAYER_MANAGER.prototype.attachBullet = function (player, params, weaponType) {
         var _this = this;
         var animationSprites = Phaser.Animation.generateFrameNames('bullet_fire_', 1, 4).slice();
-        var gap = 25;
-        var turrets = 15;
+        var gap = 15;
+        var turrets = 12;
         var _loop_13 = function (i) {
             var weaponSystem = this_10.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_10.game.rnd.integer(), atlas: this_10.weaponAtlas, filename: animationSprites[0], alpha: 0 });
             weaponSystem.anchor.setTo(0.5, 0.5);
@@ -3449,67 +4061,48 @@ var PLAYER_MANAGER = (function () {
             }
             weaponSystem.offset = (gap * i) - ((gap / 2) * (turrets - 1));
             weaponSystem.index = i;
-            weaponSystem.onUpdate = function () {
-                ammo.onUpdate();
-            };
+            weaponSystem.onUpdate = function () { };
             weaponSystem.sync = function (player) {
                 var x = player.x, y = player.y;
-                weaponSystem.x = x + weaponSystem.offset;
-                weaponSystem.y = y;
+                var coords = _this.weaponManager.calculateRotateCoords(weaponSystem.offset, player.targetBox);
+                weaponSystem.x = x + coords.x;
+                weaponSystem.y = y + coords.y;
             };
             weaponSystem.destroyIt = function () {
                 var x = weaponSystem.x, y = weaponSystem.y;
-                _this.weaponManager.blueImpact(x, y, 1, player.onLayer);
+                _this.effectsManager.blueImpact(x, y, 1, player.onLayer);
                 _this.phaserSprites.destroy(weaponSystem.name);
             };
             weaponSystem.fire = function () {
                 var gameData = _this.phaserMaster.getOnly(['gameData']).gameData;
                 var powerupLvl = Math.floor((gameData.player.powerup - 1) / 5);
+                var coords = _this.weaponManager.calculateRotateCoords(30, player.targetBox);
                 ammo.fireAngle = 270 + weaponSystem.angle;
-                if (powerupLvl >= 0 && (weaponSystem.index === 6 || weaponSystem.index === 8)) {
-                    ammo.fireOffset(0, -35);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl >= 0 && (weaponSystem.index === 5 || weaponSystem.index === 6)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl >= 1 && (weaponSystem.index === 7)) {
-                    ammo.fireOffset(0, -25);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl >= 1 && (weaponSystem.index === 4 || weaponSystem.index === 7)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl >= 2 && (weaponSystem.index === 5 || weaponSystem.index === 9)) {
-                    ammo.fireOffset(0, -15);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl >= 2 && (weaponSystem.index === 3 || weaponSystem.index === 8)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl >= 3 && (weaponSystem.index === 4 || weaponSystem.index === 10)) {
-                    ammo.fireOffset(0, -5);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl >= 3 && (weaponSystem.index === 2 || weaponSystem.index === 9)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl >= 4 && (weaponSystem.index === 3 || weaponSystem.index === 11)) {
-                    ammo.fireOffset(0, 5);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl >= 4 && (weaponSystem.index === 1 || weaponSystem.index === 10)) {
+                    ammo.fireOffset(0, 0);
                 }
-                if (powerupLvl >= 5 && (weaponSystem.index === 2 || weaponSystem.index === 12)) {
-                    ammo.fireOffset(0, 15);
-                    if (animationSprites.length > 0) {
-                        weaponSystem.animations.play('fireWeapon', 60, false);
-                    }
+                if (powerupLvl >= 5 && (weaponSystem.index === 0 || weaponSystem.index === 11)) {
+                    ammo.fireOffset(0, 0);
                 }
             };
-            this_10.phaserGroup.add(params.layer + 1, weaponSystem);
-            var maxBulletsOnscreen = 4;
+            this_10.phaserGroup.add(this_10.phaserMaster.get('layers').PLAYER_OVER, weaponSystem);
+            var maxBulletsOnscreen = 3;
             var ammo = this_10.weaponManager.playerBullets(maxBulletsOnscreen, weaponType);
             ammo.checkOrientation(weaponSystem.angle);
-            ammo.onUpdate = function () {
-            };
-            ammo.trackSprite(weaponSystem, 0, -20);
+            ammo.onUpdate = function () { };
+            ammo.trackSprite(weaponSystem);
             weaponSystem.ammo = ammo;
             player.weaponSystems.push(weaponSystem);
         };
@@ -3527,7 +4120,7 @@ var PLAYER_MANAGER = (function () {
         var turrets = powerupLvl === 5 ? 2 : 1;
         var gap = 20;
         var _loop_14 = function (i) {
-            var weaponSystem = this_11.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_11.game.rnd.integer(), atlas: this_11.weaponAtlas, filename: animationSprites[0] });
+            var weaponSystem = this_11.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_11.game.rnd.integer(), atlas: this_11.weaponAtlas, filename: animationSprites[0], alpha: 0 });
             weaponSystem.anchor.setTo(0.5, 0.5);
             if (animationSprites.length > 0) {
                 weaponSystem.animations.add('fireWeapon', animationSprites, 1, true);
@@ -3537,53 +4130,58 @@ var PLAYER_MANAGER = (function () {
                 ammo.onUpdate();
             };
             weaponSystem.sync = function (player) {
-                var x = player.x, y = player.y;
+                var x = player.x, y = player.y, angle = player.angle;
                 weaponSystem.x = x + weaponSystem.offset;
                 weaponSystem.y = y;
+                weaponSystem.angle = angle;
             };
             weaponSystem.destroyIt = function () {
                 var x = weaponSystem.x, y = weaponSystem.y;
-                _this.weaponManager.blueImpact(x, y, 1, player.onLayer);
+                _this.effectsManager.blueImpact(x, y, 1, player.onLayer);
                 _this.phaserSprites.destroy(weaponSystem.name);
             };
             weaponSystem.fire = function () {
                 var gameData = _this.phaserMaster.getOnly(['gameData']).gameData;
                 var powerupLvl = Math.floor((gameData.player.powerup - 1) / 5);
-                ammo.fire(weaponSystem, null, weaponSystem + 1);
-                if (powerupLvl >= 0) {
-                    ammo.fire(weaponSystem, weaponSystem.x + (1 * 30), weaponSystem.y - (200));
-                    ammo.fire(weaponSystem, weaponSystem.x - (1 * 30), weaponSystem.y - (200));
-                }
-                if (powerupLvl >= 1) {
-                    ammo.fire(weaponSystem, weaponSystem.x + (2 * 30), weaponSystem.y - (200));
-                    ammo.fire(weaponSystem, weaponSystem.x - (2 * 30), weaponSystem.y - (200));
-                }
-                if (powerupLvl >= 2) {
-                    ammo.fire(weaponSystem, weaponSystem.x + (3 * 30), weaponSystem.y - (200));
-                    ammo.fire(weaponSystem, weaponSystem.x - (3 * 30), weaponSystem.y - (200));
-                }
-                if (powerupLvl >= 3) {
-                    ammo.fire(weaponSystem, weaponSystem.x + (4 * 30), weaponSystem.y - (200));
-                    ammo.fire(weaponSystem, weaponSystem.x - (4 * 30), weaponSystem.y - (200));
-                }
-                if (powerupLvl >= 4) {
-                    ammo.fire(weaponSystem, weaponSystem.x + (5 * 30), weaponSystem.y - (200));
-                    ammo.fire(weaponSystem, weaponSystem.x - (5 * 30), weaponSystem.y - (200));
-                }
-                if (powerupLvl >= 5) {
-                    ammo.fire(weaponSystem, weaponSystem.x + (6 * 30), weaponSystem.y - (200));
-                    ammo.fire(weaponSystem, weaponSystem.x - (6 * 30), weaponSystem.y - (200));
-                }
+                var coords;
                 if (animationSprites.length > 0) {
                     weaponSystem.animations.play('fireWeapon', 60, false);
                 }
+                var spreadFactor = Math.abs(player.getDistanceFromTargetingBox() / Math.round(Phaser.Math.distance(player.x, player.y, player.targetBox.x, player.targetBox.y)));
+                if (powerupLvl >= 0) {
+                    ammo.fire(weaponSystem, player.targetBox.x, player.targetBox.y - 1);
+                }
+                if (powerupLvl >= 1) {
+                    coords = _this.weaponManager.calculateSpread(50, player.targetBox);
+                    ammo.fire(weaponSystem, coords.x1, coords.y1);
+                    ammo.fire(weaponSystem, coords.x2, coords.y2);
+                }
+                if (powerupLvl >= 2) {
+                    coords = _this.weaponManager.calculateSpread(100 / spreadFactor, player.targetBox);
+                    ammo.fire(weaponSystem, coords.x1, coords.y1);
+                    ammo.fire(weaponSystem, coords.x2, coords.y2);
+                }
+                if (powerupLvl >= 3) {
+                    coords = _this.weaponManager.calculateSpread(150 / spreadFactor, player.targetBox);
+                    ammo.fire(weaponSystem, coords.x1, coords.y1);
+                    ammo.fire(weaponSystem, coords.x2, coords.y2);
+                }
+                if (powerupLvl >= 4) {
+                    coords = _this.weaponManager.calculateSpread(200 / spreadFactor, player.targetBox);
+                    ammo.fire(weaponSystem, coords.x1, coords.y1);
+                    ammo.fire(weaponSystem, coords.x2, coords.y2);
+                }
+                if (powerupLvl >= 5) {
+                    coords = _this.weaponManager.calculateSpread(250 / spreadFactor, player.targetBox);
+                    ammo.fire(weaponSystem, coords.x1, coords.y1);
+                    ammo.fire(weaponSystem, coords.x2, coords.y2);
+                }
             };
-            this_11.phaserGroup.add(params.layer + 1, weaponSystem);
+            this_11.phaserGroup.add(this_11.phaserMaster.get('layers').PLAYER_OVER, weaponSystem);
             var maxBulletsOnscreen = ((powerupLvl + 2) * 12);
             var ammo = this_11.weaponManager.playerBullets(maxBulletsOnscreen, weaponType);
             ammo.checkOrientation(weaponSystem.angle);
-            ammo.onUpdate = function () {
-            };
+            ammo.onUpdate = function () { };
             weaponSystem.ammo = ammo;
             player.weaponSystems.push(weaponSystem);
         };
@@ -3601,31 +4199,31 @@ var PLAYER_MANAGER = (function () {
         var turrets = powerupLvl === 5 ? 2 : 1;
         var gap = 20;
         var _loop_15 = function (i) {
-            var weaponSystem = this_12.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_12.game.rnd.integer(), atlas: this_12.weaponAtlas, filename: animationSprites[0], visible: true });
+            var weaponSystem = this_12.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this_12.game.rnd.integer(), atlas: this_12.weaponAtlas, filename: animationSprites[0], alpha: 0 });
             weaponSystem.anchor.setTo(0.5, 0.5);
             if (animationSprites.length > 0) {
                 weaponSystem.animations.add('fireWeapon', animationSprites, 1, true);
             }
             weaponSystem.offset = (gap * i) - ((gap / 2) * (turrets - 1));
-            weaponSystem.onUpdate = function () {
-                ammo.onUpdate();
-            };
+            weaponSystem.onUpdate = function () { };
             weaponSystem.sync = function (player) {
                 var x = player.x, y = player.y;
-                weaponSystem.x = x + weaponSystem.offset;
-                weaponSystem.y = y;
+                var coords = _this.weaponManager.calculateRotateCoords(weaponSystem.offset, player.targetBox);
+                weaponSystem.x = x + coords.x;
+                weaponSystem.y = y + coords.y;
             };
             weaponSystem.destroyIt = function () {
                 var x = weaponSystem.x, y = weaponSystem.y;
-                _this.weaponManager.blueImpact(x, y, 1, player.onLayer);
-                _this.phaserSprites.destroy(weaponSystem.name);
             };
             weaponSystem.fire = function () {
                 var gameData = _this.phaserMaster.getOnly(['gameData']).gameData;
                 var powerupLvl = Math.floor((gameData.player.powerup - 1) / 5);
+                if (animationSprites.length > 0) {
+                    weaponSystem.animations.play('fireWeapon', 60, false);
+                }
                 ammo.fireAngle = 270 + weaponSystem.angle;
                 ammo.fire(weaponSystem);
-                if (powerupLvl >= 0) {
+                if (powerupLvl === 0) {
                     ammo.fire(weaponSystem);
                     ammo.fire(weaponSystem);
                 }
@@ -3645,16 +4243,12 @@ var PLAYER_MANAGER = (function () {
                     ammo.fire(weaponSystem);
                     ammo.fire(weaponSystem);
                 }
-                if (animationSprites.length > 0) {
-                    weaponSystem.animations.play('fireWeapon', 60, false);
-                }
             };
-            this_12.phaserGroup.add(params.layer + 1, weaponSystem);
+            this_12.phaserGroup.add(this_12.phaserMaster.get('layers').PLAYER_OVER, weaponSystem);
             var maxBulletsOnscreen = ((powerupLvl + 2) * 8);
             var ammo = this_12.weaponManager.playerBullets(maxBulletsOnscreen, weaponType);
             ammo.checkOrientation(weaponSystem.angle);
-            ammo.onUpdate = function () {
-            };
+            ammo.onUpdate = function () { };
             weaponSystem.ammo = ammo;
             player.weaponSystems.push(weaponSystem);
         };
@@ -3678,59 +4272,57 @@ var PLAYER_MANAGER = (function () {
                 weaponSystem.animations.add('fireWeapon', animationSprites, 1, true);
             }
             weaponSystem.offset = (gap * i) - ((gap / 2) * (turrets - 1));
-            weaponSystem.onUpdate = function () {
-                ammo.onUpdate();
-            };
+            weaponSystem.onUpdate = function () { };
             weaponSystem.sync = function (player) {
                 var x = player.x, y = player.y;
-                weaponSystem.x = x + weaponSystem.offset;
-                weaponSystem.y = y;
+                var coords = _this.weaponManager.calculateRotateCoords(weaponSystem.offset, player.targetBox);
+                weaponSystem.x = x + coords.x;
+                weaponSystem.y = y + coords.y;
             };
             weaponSystem.destroyIt = function () {
-                var x = weaponSystem.x, y = weaponSystem.y;
-                _this.weaponManager.blueImpact(x, y, 1, player.onLayer);
                 _this.phaserSprites.destroy(weaponSystem.name);
             };
             weaponSystem.fire = function () {
                 var gameData = _this.phaserMaster.getOnly(['gameData']).gameData;
                 var powerupLvl = Math.floor((gameData.player.powerup - 1) / 5);
+                if (animationSprites.length > 0) {
+                    weaponSystem.animations.play('fireWeapon', 60, false);
+                }
                 ammo.fireAngle = 270 + weaponSystem.angle;
-                ammo.fire(weaponSystem, null, weaponSystem + 1);
+                if (powerupLvl == 0) {
+                    ammo.fire(weaponSystem);
+                }
                 if (powerupLvl >= 1) {
                     _this.game.time.events.add(50, function () {
-                        ammo.fire(weaponSystem, null, weaponSystem + 20);
+                        ammo.fire(weaponSystem);
                     }).autoDestroy = true;
                 }
                 if (powerupLvl >= 2) {
                     _this.game.time.events.add(100, function () {
-                        ammo.fire(weaponSystem, null, weaponSystem - 20);
+                        ammo.fire(weaponSystem);
                     }).autoDestroy = true;
                 }
                 if (powerupLvl >= 3) {
                     _this.game.time.events.add(150, function () {
-                        ammo.fire(weaponSystem, null, weaponSystem + 20);
+                        ammo.fire(weaponSystem);
                     }).autoDestroy = true;
                 }
                 if (powerupLvl >= 4) {
                     _this.game.time.events.add(200, function () {
-                        ammo.fire(weaponSystem, null, weaponSystem - 20);
+                        ammo.fire(weaponSystem);
                     }).autoDestroy = true;
                 }
                 if (powerupLvl >= 5) {
                     _this.game.time.events.add(50, function () {
-                        ammo.fire(weaponSystem, null, weaponSystem - 20);
+                        ammo.fire(weaponSystem);
                     }).autoDestroy = true;
                 }
-                if (animationSprites.length > 0) {
-                    weaponSystem.animations.play('fireWeapon', 60, false);
-                }
             };
-            this_13.phaserGroup.add(params.layer + 1, weaponSystem);
-            var maxBulletsOnscreen = 45;
+            this_13.phaserGroup.add(this_13.phaserMaster.get('layers').PLAYER_OVER, weaponSystem);
+            var maxBulletsOnscreen = 12;
             var ammo = this_13.weaponManager.playerBullets(maxBulletsOnscreen, weaponType);
             ammo.checkOrientation(weaponSystem.angle);
-            ammo.onUpdate = function () {
-            };
+            ammo.onUpdate = function () { };
             weaponSystem.ammo = ammo;
             player.weaponSystems.push(weaponSystem);
         };
@@ -3741,11 +4333,10 @@ var PLAYER_MANAGER = (function () {
         return player.weaponSystems;
     };
     PLAYER_MANAGER.prototype.attachClusterbomb = function (player, params, weaponType) {
-        var _this = this;
         var animationSprites = Phaser.Animation.generateFrameNames('laser_fire_', 1, 6).slice();
         var gap = 35;
         var turrets = 5;
-        var weaponSystem = this.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this.game.rnd.integer(), atlas: this.weaponAtlas, filename: animationSprites[0] });
+        var weaponSystem = this.phaserSprites.addFromAtlas({ name: "ship_weapon_" + this.game.rnd.integer(), atlas: this.weaponAtlas, filename: animationSprites[0], alpha: 0 });
         weaponSystem.anchor.setTo(0.5, 0.5);
         if (animationSprites.length > 0) {
             weaponSystem.animations.add('fireWeapon', animationSprites, 1, true);
@@ -3760,13 +4351,11 @@ var PLAYER_MANAGER = (function () {
         };
         weaponSystem.destroyIt = function () {
             var x = weaponSystem.x, y = weaponSystem.y;
-            _this.weaponManager.blueImpact(x, y, 1, player.onLayer);
-            _this.phaserSprites.destroy(weaponSystem.name);
         };
         weaponSystem.fire = function () {
-            ammo.fireOffset(0, -32);
+            ammo.fire(weaponSystem, player.targetBox.x, player.targetBox.y - 1);
         };
-        this.phaserGroup.add(params.layer + 1, weaponSystem);
+        this.phaserGroup.add(this.phaserMaster.get('layers').PLAYER_OVER, weaponSystem);
         var maxBulletsOnscreen = 4;
         var onKill = function () {
             player.clearAllEnemyBullets(Phaser.Timer.SECOND * 2);
@@ -3774,10 +4363,24 @@ var PLAYER_MANAGER = (function () {
         var ammo = this.weaponManager.createClusterbomb(maxBulletsOnscreen, onKill);
         ammo.onUpdate = function () {
         };
-        ammo.trackSprite(weaponSystem, 0, 0);
         weaponSystem.ammo = ammo;
         player.subweaponSystems.push(weaponSystem);
         return player.subweaponSystems;
+    };
+    PLAYER_MANAGER.prototype.damgePopup = function (target, amount) {
+        var _this = this;
+        var x = target.x, y = target.y, width = target.width, height = target.height;
+        this.game.time.events.add(this.game.rnd.integerInRange(0, 150), function () {
+            var damageAmount = _this.phaserTexts.add({ name: "enemy_" + _this.game.rnd.integer(), group: 'ui', font: 'gem', x: x + _this.game.rnd.integerInRange(-20, 20), y: y + _this.game.rnd.integerInRange(-20, 20), size: 12, default: amount });
+            _this.game.add.tween(damageAmount.scale).to({ x: 1.5, y: 1.5 }, 250, Phaser.Easing.Back.In, true, 0, 0, false);
+            _this.game.add.tween(damageAmount).to({ y: damageAmount.y + 10 }, 250, Phaser.Easing.Back.In, true, 0, 0, false).
+                onComplete.add(function () {
+                _this.game.add.tween(damageAmount).to({ y: damageAmount.y - 10, alpha: 0 }, 250, Phaser.Easing.Bounce.Out, true, 0, 0, false).
+                    onComplete.add(function () {
+                    _this.phaserTexts.destroy(damageAmount.name);
+                });
+            });
+        }, this).autoDestroy = true;
     };
     PLAYER_MANAGER.prototype.bulletCollisionDetection = function () {
         var _this = this;
@@ -3792,23 +4395,25 @@ var PLAYER_MANAGER = (function () {
                 var weaponData = collidable.weaponData;
                 if ((!e.isDamaged && !e.isDestroyed) || (weaponData.ignoreDamageState && !e.isDestroyed)) {
                     if (weaponData.reference === 'LASER') {
-                        _this.weaponManager.electricDischarge(collidable.x, collidable.y - collidable.height, 1, e.onLayer + 1);
+                        var coords = _this.weaponManager.calculateRotateCoords(0, _this.player.targetBox);
+                        _this.effectsManager.electricDischarge(e.x + _this.game.rnd.integerInRange(-10, 10), e.y + _this.game.rnd.integerInRange(-10, 10), 1, e.onLayer + 1);
                     }
                     if (weaponData.reference === 'SPREAD') {
-                        _this.weaponManager.blueImpact(collidable.x, collidable.y - collidable.height, 1, e.onLayer + 1);
+                        _this.effectsManager.blueImpact(collidable.x, collidable.y, 1, e.onLayer + 1);
                     }
                     if (weaponData.reference === 'SHOTGUN') {
-                        _this.weaponManager.pelletImpact(collidable.x, collidable.y - collidable.height, 1, e.onLayer + 1);
+                        _this.effectsManager.pelletImpact(collidable.x, collidable.y, 1, e.onLayer + 1);
                     }
                     if (weaponData.reference === 'GATLING') {
-                        _this.weaponManager.pelletImpact(collidable.x, collidable.y - collidable.height, 1, e.onLayer + 1);
+                        _this.effectsManager.pelletImpact(collidable.x, collidable.y, 1, e.onLayer + 1);
                     }
                     if (weaponData.reference === 'BULLET') {
-                        _this.weaponManager.orangeImpact(collidable.x, collidable.y - collidable.height, 1, e.onLayer + 1);
+                        _this.effectsManager.orangeImpact(collidable.x, collidable.y, 1, e.onLayer + 1);
                     }
                     if (weaponData.reference === 'MISSLE') {
-                        _this.weaponManager.createExplosionBasic(collidable.x, collidable.y - collidable.height, 1, e.onLayer + 1, Math.round(weaponData.damage / 2));
+                        _this.weaponManager.createExplosionBasic(collidable.x, collidable.y, 1, e.onLayer + 1, Math.round(weaponData.damage / 2));
                     }
+                    _this.damgePopup(e, weaponData.damage);
                     e.damageIt(weaponData.damage);
                 }
                 if (!weaponData.pierce && !weaponData.completeAnimation) {
@@ -3829,9 +4434,10 @@ var PLAYER_MANAGER = (function () {
 var UTILITY_MANAGER = (function () {
     function UTILITY_MANAGER() {
     }
-    UTILITY_MANAGER.prototype.assign = function (game, phaserSprites, phaserBitmapdata, phaserGroup, atlas) {
+    UTILITY_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserBitmapdata, phaserGroup, atlas) {
         this.game = game;
         this.phaserSprites = phaserSprites;
+        this.phaserMaster = phaserMaster;
         this.phaserBitmapdata = phaserBitmapdata;
         this.phaserGroup = phaserGroup;
         this.atlas = atlas;
@@ -3872,7 +4478,7 @@ var UTILITY_MANAGER = (function () {
                 callback();
             });
         };
-        this.phaserGroup.add(layer, overlay);
+        this.phaserGroup.add(this.phaserMaster.get('layers').OVERLAY, overlay);
     };
     UTILITY_MANAGER.prototype.buildOverlayGrid = function (squareSizeH, squareSizeV, layer, image) {
         if (squareSizeH === void 0) { squareSizeH = 80; }
@@ -3898,7 +4504,7 @@ var UTILITY_MANAGER = (function () {
                     game.add.tween(gridSquare.scale).to({ x: 1, y: 1 }, speed, Phaser.Easing.Linear.Out, true, 0, 0, false);
                 };
                 count++;
-                this_14.phaserGroup.add(layer, gridSquare);
+                this_14.phaserGroup.add(this_14.phaserMaster.get('layers').OVERLAY, gridSquare);
             };
             var this_14 = this;
             for (var r = 0; r < Math.ceil(game.world.width / squareSizeH) + 1; r++) {
@@ -4011,12 +4617,71 @@ var UTILITY_MANAGER = (function () {
 var WEAPON_MANAGER = (function () {
     function WEAPON_MANAGER() {
     }
-    WEAPON_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserGroup, atlas) {
+    WEAPON_MANAGER.prototype.assign = function (game, phaserMaster, phaserSprites, phaserGroup, effectsManager, atlas) {
         this.game = game;
         this.phaserSprites = phaserSprites;
         this.phaserMaster = phaserMaster;
         this.phaserGroup = phaserGroup;
+        this.effectsManager = effectsManager;
         this.atlas = atlas;
+    };
+    WEAPON_MANAGER.prototype.calculateRotateCoords = function (spreadAmount, trackingbox) {
+        var angle = trackingbox.angle;
+        var anglePercentage = Math.abs(trackingbox.angle);
+        if (anglePercentage > 90) {
+            anglePercentage = Math.abs(anglePercentage - 180);
+        }
+        var quadrant;
+        if (angle >= 0 && angle < 90) {
+            quadrant = 0;
+        }
+        if (angle >= 90 && angle < 180) {
+            quadrant = 1;
+        }
+        if (angle >= -180 && angle < -90) {
+            quadrant = 2;
+        }
+        if (angle >= -90 && angle < 0) {
+            quadrant = 3;
+        }
+        var spreadX = Math.round(spreadAmount - (spreadAmount * (anglePercentage / 90)));
+        var spreadY = Math.round((spreadAmount * (anglePercentage / 90)));
+        spreadX = quadrant === 1 ? -spreadX : spreadX;
+        spreadY = quadrant === 3 ? -spreadY : spreadY;
+        return {
+            x: spreadX,
+            y: spreadY
+        };
+    };
+    WEAPON_MANAGER.prototype.calculateSpread = function (spreadAmount, trackingbox) {
+        var angle = trackingbox.angle;
+        var anglePercentage = Math.abs(trackingbox.angle);
+        if (anglePercentage > 90) {
+            anglePercentage = Math.abs(anglePercentage - 180);
+        }
+        var quadrant;
+        if (angle >= 0 && angle < 90) {
+            quadrant = 0;
+        }
+        if (angle >= 90 && angle < 180) {
+            quadrant = 1;
+        }
+        if (angle >= -180 && angle < -90) {
+            quadrant = 2;
+        }
+        if (angle >= -90 && angle < 0) {
+            quadrant = 3;
+        }
+        var spreadX = Math.round(spreadAmount - (spreadAmount * (anglePercentage / 90)));
+        var spreadY = Math.round((spreadAmount * (anglePercentage / 90)));
+        spreadX = quadrant === 1 ? -spreadX : spreadX;
+        spreadY = quadrant === 3 ? -spreadY : spreadY;
+        return {
+            x1: trackingbox.x + spreadX,
+            y1: trackingbox.y + spreadY,
+            x2: trackingbox.x - spreadX,
+            y2: trackingbox.y - spreadY
+        };
     };
     WEAPON_MANAGER.prototype.enemyBullet = function (bulletPoolTotal) {
         var _this = this;
@@ -4032,11 +4697,11 @@ var WEAPON_MANAGER = (function () {
             weapon.bulletSpeed = -Math.abs(weapon.bulletSpeed);
             weapon.bulletAngleOffset = -Math.abs(weapon.bulletAngleOffset);
         };
-        this.phaserGroup.add(7, weapon.bullets);
+        this.phaserGroup.add(this.phaserMaster.get('layers').ENEMY_BULLETS, weapon.bullets);
         weapon.bullets.children.map(function (bullet) {
             bullet.destroyIt = function (layer) {
                 bullet.kill();
-                _this.orangeImpact(bullet.x + _this.game.rnd.integerInRange(-5, 5), bullet.y + _this.game.rnd.integerInRange(-5, 15), 1, layer);
+                _this.effectsManager.orangeImpact(bullet.x + _this.game.rnd.integerInRange(-5, 5), bullet.y + _this.game.rnd.integerInRange(-5, 15), 1, layer);
             };
         });
         return weapon;
@@ -4082,7 +4747,7 @@ var WEAPON_MANAGER = (function () {
                 weapon.bulletAngleOffset = -Math.abs(weapon.bulletAngleOffset);
             }
         };
-        this.phaserGroup.add(8, weapon.bullets);
+        this.phaserGroup.add(this.phaserMaster.get('layers').PLAYER_BULLETS, weapon.bullets);
         weapon.bullets.children.map(function (bullet) {
             bullet.weaponData = data;
             bullet.pierce = data.pierce;
@@ -4104,6 +4769,7 @@ var WEAPON_MANAGER = (function () {
         var weapon = game.add.weapon(1, this.atlas, data.spriteAnimation[0]);
         weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
         weapon.bulletSpeed = data.bulletSpeed;
+        weapon.bulletAngleOffset = 90;
         weapon.multiFire = true;
         weapon.bulletLifespan = 750;
         weapon.bomblets = bomblets;
@@ -4125,7 +4791,7 @@ var WEAPON_MANAGER = (function () {
                 bullet.kill();
             };
         });
-        this.phaserGroup.add(7, weapon.bullets);
+        this.phaserGroup.add(this.phaserMaster.get('layers').SPECIAL_WEAPON, weapon.bullets);
         return weapon;
     };
     WEAPON_MANAGER.prototype.createBomblet = function (amount) {
@@ -4135,7 +4801,7 @@ var WEAPON_MANAGER = (function () {
         var weaponData = phaserMaster.getAll().weaponData;
         var data = {
             reference: 'BOMBLET',
-            spriteAnimation: ["icon_sw_1"],
+            spriteAnimation: ["bomblet"],
             damage: 25,
             pierce: false,
             ignoreDamageState: false,
@@ -4153,7 +4819,7 @@ var WEAPON_MANAGER = (function () {
                 bomblet.bullets.callAll('play', null, 'fire');
             }
             bomblet.onKill.add(function (bullet) {
-                _this.createExplosionBasic(bullet.x, bullet.y, 1.25, 8, data.damage);
+                _this.createExplosionBasic(bullet.x, bullet.y, 1.25, _this.phaserMaster.get('layers').SPECIAL_WEAPON, data.damage);
             });
             bomblet.bullets.children.map(function (bullet) {
                 bullet.weaponData = data;
@@ -4162,7 +4828,7 @@ var WEAPON_MANAGER = (function () {
                     bullet.kill();
                 };
             });
-            this.phaserGroup.add(7, bomblet.bullets);
+            this.phaserGroup.add(this.phaserMaster.get('layers').SPECIAL_WEAPON, bomblet.bullets);
             bomblets.push(bomblet);
         }
         return bomblets;
@@ -4180,7 +4846,7 @@ var WEAPON_MANAGER = (function () {
             ignoreDamageState: false,
             completeAnimation: true
         };
-        var explosion = phaserSprites.addFromAtlas({ name: "impact_A", group: 'impactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
+        var explosion = phaserSprites.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'impactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
         explosion.scale.setTo(scale, scale);
         explosion.anchor.setTo(0.5, 0.5);
         explosion.weaponData = data;
@@ -4192,9 +4858,7 @@ var WEAPON_MANAGER = (function () {
             phaserSprites.destroy(explosion.name);
         };
         game.camera.shake(0.004, 500);
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
+        phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').VISUALS : layer, explosion);
         game.physics.enable(explosion, Phaser.Physics.ARCADE);
         return explosion;
     };
@@ -4223,9 +4887,7 @@ var WEAPON_MANAGER = (function () {
             phaserSprites.destroy(explosion.name);
         };
         game.camera.shake(0.004, 500);
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
+        phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').VISUALS : layer, explosion);
         game.physics.enable(explosion, Phaser.Physics.ARCADE);
         return explosion;
     };
@@ -4233,11 +4895,12 @@ var WEAPON_MANAGER = (function () {
         if (onDestroy === void 0) { onDestroy = function () { }; }
         if (onUpdate === void 0) { onUpdate = function () { }; }
         var game = this.game;
+        console.log(damage);
         var _a = this, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
         var data = {
             reference: 'EXPLOSION_BASIC',
             spriteAnimation: Phaser.Animation.generateFrameNames('explosions_Layer_', 1, 16),
-            damage: 25,
+            damage: damage !== undefined ? damage : 25,
             pierce: false,
             ignoreDamageState: false,
             completeAnimation: true
@@ -4254,123 +4917,8 @@ var WEAPON_MANAGER = (function () {
             phaserSprites.destroy(explosion.name);
         };
         game.camera.shake(0.002, 500);
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
+        phaserGroup.add(layer === undefined ? this.phaserMaster.get('layers').VISUALS : layer, explosion);
         game.physics.enable(explosion, Phaser.Physics.ARCADE);
-        return explosion;
-    };
-    WEAPON_MANAGER.prototype.createExplosion = function (x, y, scale, layer, onDestroy, onUpdate) {
-        if (onDestroy === void 0) { onDestroy = function () { }; }
-        if (onUpdate === void 0) { onUpdate = function () { }; }
-        var game = this.game;
-        var _a = this, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var data = {
-            spriteAnimation: Phaser.Animation.generateFrameNames('explosion2_layer_', 1, 12)
-        };
-        var explosion = phaserSprites.addFromAtlas({ name: "explosion_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
-        explosion.scale.setTo(scale, scale);
-        explosion.anchor.setTo(0.5, 0.5);
-        explosion.animations.add('explosion', data.spriteAnimation, 1, true);
-        explosion.animations.play('explosion', 30, false).onComplete.add(function () {
-            explosion.destroyIt();
-        }, explosion);
-        explosion.destroyIt = function () {
-            phaserSprites.destroy(explosion.name);
-        };
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
-        return explosion;
-    };
-    WEAPON_MANAGER.prototype.pelletImpact = function (x, y, scale, layer) {
-        var game = this.game;
-        var _a = this, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var data = {
-            spriteAnimation: Phaser.Animation.generateFrameNames('sparks_', 1, 3)
-        };
-        var explosion = phaserSprites.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
-        explosion.scale.setTo(scale, scale);
-        explosion.anchor.setTo(0.5, 0.5);
-        explosion.animations.add('explosion', data.spriteAnimation, 1, true);
-        explosion.animations.play('explosion', 30, false).onComplete.add(function () {
-            explosion.destroyIt();
-        }, explosion);
-        explosion.destroyIt = function () {
-            phaserSprites.destroy(explosion.name);
-        };
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
-        game.physics.enable(explosion, Phaser.Physics.ARCADE);
-        return explosion;
-    };
-    WEAPON_MANAGER.prototype.blueImpact = function (x, y, scale, layer) {
-        var game = this.game;
-        var _a = this, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var data = {
-            spriteAnimation: Phaser.Animation.generateFrameNames('blue_explosion_small_layer_', 1, 7)
-        };
-        var frames = Phaser.Animation.generateFrameNames('blue_explosion_small_layer_', 1, 7);
-        var explosion = phaserSprites.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
-        explosion.scale.setTo(scale, scale);
-        explosion.anchor.setTo(0.5, 0.5);
-        game.physics.enable(explosion, Phaser.Physics.ARCADE);
-        explosion.animations.add('explosion', data.spriteAnimation, 1, true);
-        explosion.animations.play('explosion', 30, false).onComplete.add(function () {
-            explosion.destroyIt();
-        }, explosion);
-        explosion.destroyIt = function () {
-            phaserSprites.destroy(explosion.name);
-        };
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
-        return explosion;
-    };
-    WEAPON_MANAGER.prototype.orangeImpact = function (x, y, scale, layer) {
-        var game = this.game;
-        var _a = this, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var data = {
-            spriteAnimation: Phaser.Animation.generateFrameNames('orange_ring_explosion_layer_', 1, 7)
-        };
-        var frames = Phaser.Animation.generateFrameNames('orange_ring_explosion_layer_', 1, 7);
-        var explosion = phaserSprites.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
-        explosion.scale.setTo(scale, scale);
-        explosion.anchor.setTo(0.5, 0.5);
-        game.physics.enable(explosion, Phaser.Physics.ARCADE);
-        explosion.animations.add('explosion', data.spriteAnimation, 1, true);
-        explosion.animations.play('explosion', 30, false).onComplete.add(function () {
-            explosion.destroyIt();
-        }, explosion);
-        explosion.destroyIt = function () {
-            phaserSprites.destroy(explosion.name);
-        };
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
-        return explosion;
-    };
-    WEAPON_MANAGER.prototype.electricDischarge = function (x, y, scale, layer) {
-        var game = this.game;
-        var _a = this, phaserSprites = _a.phaserSprites, phaserGroup = _a.phaserGroup, atlas = _a.atlas;
-        var data = {
-            spriteAnimation: Phaser.Animation.generateFrameNames('disintegrate', 1, 10)
-        };
-        var explosion = phaserSprites.addFromAtlas({ name: "impact_" + game.rnd.integer(), group: 'noimpactExplosions', x: x, y: y, atlas: atlas, filename: data.spriteAnimation[0] });
-        explosion.scale.setTo(scale, scale);
-        explosion.anchor.setTo(0.5, 0.5);
-        game.physics.enable(explosion, Phaser.Physics.ARCADE);
-        explosion.animations.add('explosion', data.spriteAnimation, 1, true);
-        explosion.animations.play('explosion', 30, false).onComplete.add(function () {
-            explosion.destroyIt();
-        }, explosion);
-        explosion.destroyIt = function () {
-            phaserSprites.destroy(explosion.name);
-        };
-        if (layer !== undefined) {
-            phaserGroup.add(layer, explosion);
-        }
         return explosion;
     };
     return WEAPON_MANAGER;

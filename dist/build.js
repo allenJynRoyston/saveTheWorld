@@ -25986,6 +25986,7 @@ Object.defineProperty(exports, "__esModule", {
 //
 //
 //
+//
 
 
 exports.default = {
@@ -25999,7 +26000,6 @@ exports.default = {
     };
   },
   mounted: function mounted() {
-
     this.store.watch(this.store.getters._gameData, function (val) {});
     this.init();
   },
@@ -26007,7 +26007,7 @@ exports.default = {
   methods: {
     init: function init() {
       this.loadGame('level1.js');
-      //this.loadGame('heroSelect.js')
+      // this.loadGame('heroSelect.js')
     },
     loadGame: function loadGame(fileName) {
       var _this = this;
@@ -26022,7 +26022,7 @@ exports.default = {
       js.src = 'src/phaser/saveTheWorld/' + fileName;
       document.body.appendChild(js);
       js.onload = function () {
-        __phaser.init(_this.$el, _this, { width: 640, height: 640, store: _this.$store });
+        __phaser.init(_this.$el, _this, { width: 775, height: 740, store: _this.$store });
       };
     },
     startGame: function startGame() {
@@ -26032,14 +26032,13 @@ exports.default = {
       this.loadGame('level1.js');
     },
     returnToTitle: function returnToTitle() {
-      alert("return to title");
+      this.loadGame('heroSelect.js');
     },
     loadNextLevel: function loadNextLevel() {
       alert('load next level');
       this.test();
     },
     retry: function retry() {
-      alert("retry level");
       this.test();
     },
     loadFile: function loadFile(file, index) {
@@ -26057,16 +26056,19 @@ exports.default = {
 /***/ (function(module, exports) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _vm._m(0)
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "game-container"
   }, [_c('div', {
     attrs: {
       "id": "phaser-example"
     }
-  })])
-}]}
+  }), _c('a', {
+    attrs: {
+      "href": _vm.gameData.snapshot,
+      "download": "download"
+    }
+  }, [_vm._v("Link")])])
+},staticRenderFns: []}
 
 /***/ }),
 /* 48 */
@@ -26673,8 +26675,11 @@ function createNewLocalData() {
       },
       player: {
         health: 100,
-        lives: 1
-      }
+        lives: 3,
+        powerup: 1,
+        special: 3
+      },
+      snapshot: null
     }
   };
   localStorage.setItem('checksum', getChecksumValue(JSON.stringify(localData)));
@@ -27685,7 +27690,7 @@ var index_esm = {
 /* 71 */
 /***/ (function(module, exports) {
 
-module.exports = {"primaryWeapons":{"BULLET":{"id":0,"type":"primaryWeapon","reference":"BULLET","name":"X22 ROUNDS","damage":25,"initialVelocity":-3000,"velocity":35,"cooldown":75,"pierce":false,"spread":0,"secondaryExplosion":false,"description":"Rapid fire, low damage ballistic bullets.","spriteAnimation":["bullet_1.png","bullet_2.png"],"spriteIcon":"icon_pw_1.png","rapidFireSpd":0},"MISSLE":{"id":23,"type":"primaryWeapon","reference":"MISSLES","name":"EXPLOSIVE MISSLES","damage":100,"initialVelocity":150,"velocity":10,"number":3,"cooldown":500,"pierce":false,"spread":2,"secondaryExplosion":true,"description":"Missles that explode upon impact.  High damage.","spriteAnimation":["orange_ring_explosion_layer_1.png","orange_ring_explosion_layer_2.png","orange_ring_explosion_layer_3.png","orange_ring_explosion_layer_4.png","orange_ring_explosion_layer_5.png","orange_ring_explosion_layer_6.png","orange_ring_explosion_layer_7.png"],"spriteIcon":"icon_pw_2.png","rapidFireSpd":75},"LASER":{"id":0,"type":"primaryWeapon","reference":"LASER","name":"PHASER BEAM","damage":10,"initialVelocity":-2000,"velocity":100,"cooldown":250,"pierce":true,"spread":0,"secondaryExplosion":false,"description":"Phase shifting laser beams that can pass through and damage multiple targets.  Medium damage.","spriteAnimation":["beam_anim_1.png","beam_anim_2.png","beam_anim_3.png","beam_anim_4.png"],"spriteIcon":"icon_pw_3.png","rapidFireSpd":0}},"secondaryWeapons":{"CLUSTERBOMB":{"id":50,"type":"secondaryWeapon","reference":"CLUSTERBOMB","name":"CLUSTER BOMBS","damage":100,"initialVelocity":-300,"velocity":10,"cooldown":4000,"description":"Upon impact, several dozen bomblets are created which can also explode upon contact.","spriteAnimation":["icon_sw_1.png"],"spriteIcon":"icon_sw_1.png","bomblets":25},"TRIPLEBOMB":{"id":50,"type":"secondaryWeapon","reference":"TRIPLEBOMB","name":"BOALA BOMBS","damage":200,"initialVelocity":-500,"velocity":10,"cooldown":2500,"description":"Release three sets of boala bombs that cause high damage on impact.  Disrupts the momentum of incoming objects.","spriteAnimation":["icon_sw_2.png"],"spriteIcon":"icon_sw_2.png"},"TURRET":{"id":50,"type":"secondaryWeapon","reference":"TURRET","name":"AUTO TURRET","damage":5,"initialVelocity":null,"velocity":null,"cooldown":10000,"description":"Stationary self deployed turret which automatically shoots at targets in front of it.","spriteAnimation":["icon_sw_2.png"],"spriteIcon":"icon_sw_4.png","lifespan":9000},"BLASTRADIUS":{"id":50,"type":"secondaryWeapon","reference":"BLASTRADIUS","name":"HEAT DISPERATION BLAST","damage":5,"initialVelocity":null,"velocity":null,"cooldown":1500,"description":"Creates a strong heatwave directly around the ship, dealing heavy damage to anything caught in the radius.","spriteAnimation":["blue_explosion_layer_1.png","blue_explosion_layer_2.png","blue_explosion_layer_3.png","blue_explosion_layer_4.png","blue_explosion_layer_5.png","blue_explosion_layer_6.png","blue_explosion_layer_7.png"],"spriteIcon":"icon_sw_3.png","limit":3}},"perks":{"FIREPOWER":{"id":50,"type":"secondaryWeapon","reference":"FIREPOWER","name":"EXTRA FIREPOWER","damage":100,"velocity":-400,"cooldown":4000,"description":"Weapons start fully powered up.","sprite":"bomblet","spriteIcon":"icon_perk_1.png","bomblets":25},"REGEN":{"id":50,"type":"secondaryWeapon","reference":"REGEN","name":"AMALORATIVE PLATING","damage":200,"initialVelocity":-200,"velocity":10,"cooldown":2500,"description":"Health regenerates over time.","sprite":"bomblet","spriteIcon":"icon_perk_2.png"},"ARMORPLATING":{"id":50,"type":"secondaryWeapon","reference":"ARMORPLATING","name":"AUTO TURRET","damage":5,"initialVelocity":null,"velocity":null,"cooldown":10000,"description":"Pilot begins missions with 150% more health, and takes 25% less damage.","sprite":"bomblet","spriteIcon":"icon_perk_3.png","lifespan":4000}}}
+module.exports = {"primaryWeapons":{"BULLET":{"id":0,"type":"primaryWeapon","reference":"BULLET","name":"X22 ROUNDS","damage":35,"cooldown":75,"bulletSpeed":1700,"pierce":false,"completeAnimation":false,"description":"Rapid fire, low damage ballistic bullets.","spriteAnimation":["bullet_1"],"spriteIcon":"icon_pw_1","rapidFireSpd":5},"GATLING":{"id":23,"type":"primaryWeapon","reference":"GATLING","name":"GATLING","damage":50,"pierce":false,"completeAnimation":false,"ignoreDamageState":false,"bulletSpeed":1800,"cooldown":750,"descriptiona":"A beam weapon that has lots of power but short range.","spriteAnimation":["shot_beam_3","shot_beam_4","shot_beam_5","shot_beam_6","shot_beam_7","shot_beam_8","shot_beam_9","shot_beam_10"],"spriteIcon":"icon_pw_2","rapidFireSpd":125},"SHOTGUN":{"id":23,"type":"primaryWeapon","reference":"SHOTGUN","name":"SHOTGUN","damage":5,"pierce":true,"completeAnimation":false,"ignoreDamageState":true,"bulletSpeed":2500,"cooldown":500,"descriptiona":"A beam weapon that has lots of power but short range.","spriteAnimation":["shotgun_pellet_1"],"spriteIcon":"icon_pw_2","rapidFireSpd":25},"SPREAD":{"id":0,"type":"primaryWeapon","reference":"SPREAD","name":"X22 ROUNDS","damage":35,"pierce":false,"completeAnimation":false,"ignoreDamageState":false,"cooldown":75,"bulletSpeed":1600,"description":"Rapid fire, low damage bullets that cover an increasing area","spriteAnimation":["ammo_spread_1","ammo_spread_2"],"spriteIcon":"icon_pw_1","rapidFireSpd":0},"MISSLE":{"id":23,"type":"primaryWeapon","reference":"MISSLE","name":"EXPLOSIVE MISSLES","damage":75,"pierce":false,"completeAnimation":false,"ignoreDamageState":false,"bulletSpeed":1000,"cooldown":350,"descriptiona":"Missles that explode upon impact.  High damage.","spriteAnimation":["missle_1","missle_2","missle_3","missle_4"],"spriteIcon":"icon_pw_2","rapidFireSpd":25},"LASER":{"id":0,"type":"primaryWeapon","reference":"LASER","name":"PHASER BEAM","damage":35,"pierce":true,"completeAnimation":false,"ignoreDamageState":false,"bulletSpeed":1600,"cooldown":200,"description":"Phase shifting laser beams that can pass through and damage multiple targets.  Medium damage.","spriteAnimation":["beam_anim_1","beam_anim_2","beam_anim_3","beam_anim_4"],"spriteIcon":"icon_pw_3","rapidFireSpd":0}},"secondaryWeapons":{"CLUSTERBOMB":{"id":50,"type":"secondaryWeapon","reference":"CLUSTERBOMB","name":"CLUSTER BOMBS","damage":100,"pierce":false,"completeAnimation":false,"ignoreDamageState":false,"bulletSpeed":400,"cooldown":4000,"description":"Upon impact, several dozen bomblets are created which can also explode upon contact.","spriteAnimation":["icon_sw_1"],"spriteIcon":"icon_sw_1","rapidFireSpd":0}},"perks":{"ARMORPLATING":{"id":50,"type":"perks","reference":"ARMORPLATING","name":"ARMOR UP","damage":5,"initialVelocity":null,"velocity":null,"cooldown":10000,"description":"Ship takes 50% less damage than usual.","sprite":"bomblet","spriteIcon":"icon_perk_3","lifespan":4000},"FIREPOWER":{"id":50,"type":"perks","reference":"FIREPOWER","name":"BLACKBOX","damage":100,"velocity":-400,"cooldown":4000,"description":"Powerups are retained even when you lose a life.","sprite":"bomblet","spriteIcon":"icon_perk_1","bomblets":25},"REGEN":{"id":50,"type":"perks","reference":"REGEN","name":"SMART METALS","damage":200,"initialVelocity":-200,"velocity":10,"cooldown":2500,"description":"Health regenerates over time.","sprite":"bomblet","spriteIcon":"icon_perk_2"}}}
 
 /***/ })
 /******/ ]);

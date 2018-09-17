@@ -2,87 +2,399 @@
 
 {
 	"filename": "1B",
-	"frame": {"x":140,"y":1,"w":124,"h":135},
+	"frame": {"x":1,"y":1,"w":124,"h":135},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":124,"h":135},
 	"sourceSize": {"w":124,"h":135}
 },
 {
-	"filename": "asteroid_large_layer_1",
-	"frame": {"x":1,"y":1,"w":137,"h":150},
+	"filename": "asteroid1/asteroid_1",
+	"frame": {"x":46,"y":492,"w":43,"h":42},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":137,"h":150},
-	"sourceSize": {"w":137,"h":150}
+	"spriteSourceSize": {"x":0,"y":0,"w":43,"h":42},
+	"sourceSize": {"w":43,"h":42}
 },
 {
-	"filename": "asteroid_large_layer_2",
-	"frame": {"x":1,"y":153,"w":137,"h":150},
+	"filename": "asteroid1/asteroid_2",
+	"frame": {"x":1,"y":394,"w":44,"h":43},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":137,"h":150},
-	"sourceSize": {"w":137,"h":150}
+	"spriteSourceSize": {"x":0,"y":0,"w":44,"h":43},
+	"sourceSize": {"w":44,"h":43}
 },
 {
-	"filename": "asteroid_large_layer_3",
-	"frame": {"x":1,"y":305,"w":137,"h":150},
+	"filename": "asteroid1/asteroid_3",
+	"frame": {"x":47,"y":405,"w":44,"h":43},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":137,"h":150},
-	"sourceSize": {"w":137,"h":150}
+	"spriteSourceSize": {"x":0,"y":0,"w":44,"h":43},
+	"sourceSize": {"w":44,"h":43}
 },
 {
-	"filename": "asteroid_mid_layer_1",
-	"frame": {"x":201,"y":315,"w":51,"h":57},
+	"filename": "asteroid1/asteroid_4",
+	"frame": {"x":1,"y":439,"w":44,"h":42},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
-	"sourceSize": {"w":51,"h":57}
+	"spriteSourceSize": {"x":0,"y":0,"w":44,"h":42},
+	"sourceSize": {"w":44,"h":42}
 },
 {
-	"filename": "asteroid_mid_layer_2",
-	"frame": {"x":201,"y":374,"w":51,"h":57},
+	"filename": "asteroid1/asteroid_5",
+	"frame": {"x":1,"y":760,"w":41,"h":42},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
-	"sourceSize": {"w":51,"h":57}
+	"spriteSourceSize": {"x":0,"y":0,"w":41,"h":42},
+	"sourceSize": {"w":41,"h":42}
 },
 {
-	"filename": "asteroid_mid_layer_3",
-	"frame": {"x":201,"y":433,"w":51,"h":57},
+	"filename": "asteroid1/asteroid_6",
+	"frame": {"x":1,"y":669,"w":42,"h":40},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":57},
-	"sourceSize": {"w":51,"h":57}
+	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":40},
+	"sourceSize": {"w":42,"h":40}
 },
 {
-	"filename": "asteroid_small_layer_1",
-	"frame": {"x":133,"y":457,"w":32,"h":30},
+	"filename": "asteroid1/asteroid_7",
+	"frame": {"x":47,"y":450,"w":44,"h":40},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
-	"sourceSize": {"w":32,"h":30}
+	"spriteSourceSize": {"x":0,"y":0,"w":44,"h":40},
+	"sourceSize": {"w":44,"h":40}
 },
 {
-	"filename": "asteroid_small_layer_2",
-	"frame": {"x":140,"y":424,"w":32,"h":30},
+	"filename": "asteroid1/asteroid_8",
+	"frame": {"x":50,"y":364,"w":47,"h":39},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
-	"sourceSize": {"w":32,"h":30}
+	"spriteSourceSize": {"x":0,"y":0,"w":47,"h":39},
+	"sourceSize": {"w":47,"h":39}
 },
 {
-	"filename": "asteroid_small_layer_3",
-	"frame": {"x":167,"y":456,"w":32,"h":30},
+	"filename": "asteroid1/asteroid_9",
+	"frame": {"x":1,"y":342,"w":47,"h":41},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":30},
-	"sourceSize": {"w":32,"h":30}
+	"spriteSourceSize": {"x":0,"y":0,"w":47,"h":41},
+	"sourceSize": {"w":47,"h":41}
+},
+{
+	"filename": "asteroid1/asteroid_10",
+	"frame": {"x":50,"y":320,"w":47,"h":42},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":47,"h":42},
+	"sourceSize": {"w":47,"h":42}
+},
+{
+	"filename": "asteroid1/asteroid_11",
+	"frame": {"x":67,"y":275,"w":47,"h":43},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":47,"h":43},
+	"sourceSize": {"w":47,"h":43}
+},
+{
+	"filename": "asteroid1/asteroid_12",
+	"frame": {"x":1,"y":297,"w":47,"h":43},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":47,"h":43},
+	"sourceSize": {"w":47,"h":43}
+},
+{
+	"filename": "asteroid1/asteroid_13",
+	"frame": {"x":1,"y":483,"w":43,"h":43},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":43,"h":43},
+	"sourceSize": {"w":43,"h":43}
+},
+{
+	"filename": "asteroid1/asteroid_14",
+	"frame": {"x":87,"y":743,"w":40,"h":43},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":43},
+	"sourceSize": {"w":40,"h":43}
+},
+{
+	"filename": "asteroid1/asteroid_15",
+	"frame": {"x":89,"y":560,"w":38,"h":45},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":38,"h":45},
+	"sourceSize": {"w":38,"h":45}
+},
+{
+	"filename": "asteroid1/asteroid_16",
+	"frame": {"x":44,"y":739,"w":41,"h":46},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":41,"h":46},
+	"sourceSize": {"w":41,"h":46}
+},
+{
+	"filename": "asteroid1/asteroid_17",
+	"frame": {"x":1,"y":528,"w":42,"h":47},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":47},
+	"sourceSize": {"w":42,"h":47}
+},
+{
+	"filename": "asteroid1/asteroid_18",
+	"frame": {"x":45,"y":536,"w":42,"h":47},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":47},
+	"sourceSize": {"w":42,"h":47}
+},
+{
+	"filename": "asteroid1/asteroid_19",
+	"frame": {"x":45,"y":689,"w":41,"h":48},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":41,"h":48},
+	"sourceSize": {"w":41,"h":48}
+},
+{
+	"filename": "asteroid1/asteroid_20",
+	"frame": {"x":1,"y":711,"w":41,"h":47},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":41,"h":47},
+	"sourceSize": {"w":41,"h":47}
+},
+{
+	"filename": "asteroid1/asteroid_21",
+	"frame": {"x":45,"y":585,"w":42,"h":44},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":44},
+	"sourceSize": {"w":42,"h":44}
+},
+{
+	"filename": "asteroid1/asteroid_22",
+	"frame": {"x":1,"y":625,"w":42,"h":42},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":42},
+	"sourceSize": {"w":42,"h":42}
+},
+{
+	"filename": "asteroid1/asteroid_23",
+	"frame": {"x":44,"y":787,"w":41,"h":39},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":41,"h":39},
+	"sourceSize": {"w":41,"h":39}
+},
+{
+	"filename": "asteroid1/asteroid_24",
+	"frame": {"x":1,"y":804,"w":41,"h":36},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":41,"h":36},
+	"sourceSize": {"w":41,"h":36}
+},
+{
+	"filename": "asteroid1/asteroid_25",
+	"frame": {"x":87,"y":788,"w":40,"h":38},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":38},
+	"sourceSize": {"w":40,"h":38}
+},
+{
+	"filename": "asteroid1/asteroid_26",
+	"frame": {"x":88,"y":702,"w":39,"h":39},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":39,"h":39},
+	"sourceSize": {"w":39,"h":39}
+},
+{
+	"filename": "asteroid1/asteroid_27",
+	"frame": {"x":45,"y":631,"w":42,"h":41},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":41},
+	"sourceSize": {"w":42,"h":41}
+},
+{
+	"filename": "asteroid1/hitbox",
+	"frame": {"x":1,"y":385,"w":47,"h":7},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":47,"h":7},
+	"sourceSize": {"w":47,"h":7}
+},
+{
+	"filename": "asteroid2/asteroid_1",
+	"frame": {"x":84,"y":856,"w":25,"h":25},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":25},
+	"sourceSize": {"w":25,"h":25}
+},
+{
+	"filename": "asteroid2/asteroid_2",
+	"frame": {"x":89,"y":674,"w":27,"h":26},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":26},
+	"sourceSize": {"w":27,"h":26}
+},
+{
+	"filename": "asteroid2/asteroid_3",
+	"frame": {"x":93,"y":440,"w":29,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":28},
+	"sourceSize": {"w":29,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_4",
+	"frame": {"x":93,"y":470,"w":29,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":28},
+	"sourceSize": {"w":29,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_5",
+	"frame": {"x":91,"y":500,"w":29,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":28},
+	"sourceSize": {"w":29,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_6",
+	"frame": {"x":91,"y":530,"w":29,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":28},
+	"sourceSize": {"w":29,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_7",
+	"frame": {"x":89,"y":615,"w":27,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":28},
+	"sourceSize": {"w":27,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_8",
+	"frame": {"x":29,"y":872,"w":26,"h":27},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":27},
+	"sourceSize": {"w":26,"h":27}
+},
+{
+	"filename": "asteroid2/asteroid_9",
+	"frame": {"x":57,"y":856,"w":25,"h":26},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":26},
+	"sourceSize": {"w":25,"h":26}
+},
+{
+	"filename": "asteroid2/asteroid_10",
+	"frame": {"x":48,"y":828,"w":26,"h":26},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":26},
+	"sourceSize": {"w":26,"h":26}
+},
+{
+	"filename": "asteroid2/asteroid_11",
+	"frame": {"x":76,"y":828,"w":26,"h":26},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":26},
+	"sourceSize": {"w":26,"h":26}
+},
+{
+	"filename": "asteroid2/asteroid_12",
+	"frame": {"x":1,"y":879,"w":26,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":28},
+	"sourceSize": {"w":26,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_13",
+	"frame": {"x":99,"y":320,"w":28,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
+	"sourceSize": {"w":28,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_14",
+	"frame": {"x":99,"y":350,"w":28,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
+	"sourceSize": {"w":28,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_15",
+	"frame": {"x":93,"y":410,"w":29,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":28},
+	"sourceSize": {"w":29,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_16",
+	"frame": {"x":99,"y":380,"w":28,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
+	"sourceSize": {"w":28,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_17",
+	"frame": {"x":89,"y":645,"w":27,"h":27},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":27},
+	"sourceSize": {"w":27,"h":27}
+},
+{
+	"filename": "asteroid2/asteroid_18",
+	"frame": {"x":21,"y":842,"w":25,"h":28},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":28},
+	"sourceSize": {"w":25,"h":28}
+},
+{
+	"filename": "asteroid2/asteroid_19",
+	"frame": {"x":84,"y":883,"w":25,"h":25},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":25},
+	"sourceSize": {"w":25,"h":25}
+},
+{
+	"filename": "asteroid2/hitbox",
+	"frame": {"x":89,"y":607,"w":29,"h":6},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":6},
+	"sourceSize": {"w":29,"h":6}
 },
 {
 	"filename": "big_1",
-	"frame": {"x":140,"y":138,"w":124,"h":135},
+	"frame": {"x":1,"y":138,"w":124,"h":135},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":124,"h":135},
@@ -90,47 +402,31 @@
 },
 {
 	"filename": "big_1_hitbox_1",
-	"frame": {"x":140,"y":275,"w":124,"h":38},
+	"frame": {"x":1,"y":275,"w":64,"h":20},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":124,"h":38},
-	"sourceSize": {"w":124,"h":38}
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":20},
+	"sourceSize": {"w":64,"h":20}
 },
 {
 	"filename": "big_1_hitbox_2",
-	"frame": {"x":140,"y":315,"w":54,"h":107},
+	"frame": {"x":1,"y":842,"w":18,"h":35},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":54,"h":107},
-	"sourceSize": {"w":54,"h":107}
+	"spriteSourceSize": {"x":0,"y":0,"w":18,"h":35},
+	"sourceSize": {"w":18,"h":35}
 },
 {
-	"filename": "e_bullet",
-	"frame": {"x":174,"y":424,"w":24,"h":24},
+	"filename": "smallShip/hitbox",
+	"frame": {"x":45,"y":674,"w":42,"h":13},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":24,"h":24},
-	"sourceSize": {"w":24,"h":24}
+	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":13},
+	"sourceSize": {"w":42,"h":13}
 },
 {
-	"filename": "small_1",
-	"frame": {"x":1,"y":457,"w":42,"h":46},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":46},
-	"sourceSize": {"w":42,"h":46}
-},
-{
-	"filename": "small_1_hitbox_1",
-	"frame": {"x":45,"y":457,"w":42,"h":46},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":46},
-	"sourceSize": {"w":42,"h":46}
-},
-{
-	"filename": "small_1_hitbox_2",
-	"frame": {"x":89,"y":457,"w":42,"h":46},
+	"filename": "smallShip/small_1",
+	"frame": {"x":1,"y":577,"w":42,"h":46},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":42,"h":46},
@@ -141,8 +437,8 @@
 	"version": "1.0",
 	"image": "enemies.png",
 	"format": "RGBA8888",
-	"size": {"w":265,"h":504},
+	"size": {"w":128,"h":909},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:f0bb3b829bb0134a24aec10916b6e589:cf1422f38894d0054a913cdf0526791c:9b2a76c8b2a408b3f0547a4eddda1e06$"
+	"smartupdate": "$TexturePacker:SmartUpdate:d23b3bf48d717755d6c906636c122e10:3307623ab5698718c411df83dddc8dc6:9b2a76c8b2a408b3f0547a4eddda1e06$"
 }
 }
